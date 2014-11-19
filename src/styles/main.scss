@@ -1,0 +1,215 @@
+$dark-red: #600;
+$dark-grey: #222;
+$light-grey: #999;
+$salmon: #B22;
+
+
+
+
+
+body {
+  position: relative;
+}
+
+aside {
+  background-color: $dark-grey;
+  height: 100%;
+  width: 400px;
+  position: fixed;
+  overflow: hidden;
+
+  section {
+    border-bottom: $light-grey dashed 1px;
+    border-top: $light-grey dashed 1px;
+    font-family: 'Lato';
+    padding: 8px 0 8px 15px;
+    cursor: pointer;
+
+    &:first-child {
+      border-top: none;
+    }
+  }
+
+  h1 {
+    font-size: 25px;
+    color: $salmon;
+    text-transform: uppercase;
+  }
+
+  h2 {
+    font-size: 15px;
+    margin-bottom: 8px;
+  }
+
+  section.active {
+    background-color: $light-grey;
+    border: none;
+    cursor: default;
+    overflow-y: hidden;
+
+     h1 {
+      color: #600;
+      margin-bottom: 10px;
+    }
+
+    & > div {
+      opacity: 1;
+    }
+  }
+
+  section > div {
+    overflow-y: auto;
+    line-height: 1.1;
+    padding: 1px;
+    opacity: 0.2;
+
+    .separated {
+      border-top: #222 1px dashed;
+      margin-top: 0.5em;
+      padding-top: 0.5em;
+    }
+  }
+
+  section.minor {
+    float: left;
+
+    h1 {
+      font-size: 50%;
+    }
+  }
+
+
+
+  #data {
+
+    .field {
+      float: left;
+      margin: 3px 10px 3px 0;
+      background-color: $dark-red;
+      color: $light-grey;
+      padding: 3px 6px;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+  }
+}
+
+
+
+main {
+  height: 100%;
+  margin-left: 400px;
+  position: relative;
+  // background-color: #F00;
+  overflow-x: auto;
+
+  // nav {
+  //   height: 30px;
+  //   font-family: 'Lato';
+  //   background-color: $dark-grey;
+  //   color: #D22;
+  // }
+
+  // nav .control {
+  //   background-color: $light-grey;
+  //   color: $dark-red;
+  //   height: 100%;
+  //   vertical-align: middle;
+  //   display: inline-block;
+  //   line-height: 30px;
+  //   padding: 0 8px 0 8px;
+  //   margin: 0 15px;
+  // }
+
+  table {
+
+    thead {
+
+      th {
+        padding: 2px 8px;
+        font-family: 'Oswald';
+        text-align: left;
+        vertical-align: bottom;
+
+        &.number, &.currency {
+          text-align: right;
+        }
+      }
+    }
+    
+    tbody {
+
+      tr {
+
+        td {
+          padding: 2px 8px;
+          font-family: 'Lato';
+          text-align: left;
+
+          &.number {
+            font-family: 'Inconsolata';
+            text-align: right;
+          }
+
+          &.currency {
+            font-family: 'Inconsolata';
+            text-align: right;
+          }
+
+          &.time {
+            white-space: nowrap;
+          }
+        }
+
+        &:hover {
+          background-color: #D66;
+        }
+      }
+
+    }
+
+  }
+}
+
+
+.expandable {
+  padding-left: 8px;
+
+  & > .content {
+    display: none;
+  }
+
+  &.expanded {
+    & > .content {
+      display: block;
+    }
+
+    & > .collapsed {
+      display: none;
+    }
+  }
+
+
+  &:hover {
+    border-left: 4px solid $dark-red;
+    padding-left: 4px;
+  }
+}
+
+.clear {
+  clear: both;
+}
+
+.button {
+  border-radius: 3px;
+  background-color: $dark-red;
+  padding: 5px;
+  color: $light-grey;
+  float: left;
+  font-size: 80%;
+}
+
+.right {
+  float:right;
+}

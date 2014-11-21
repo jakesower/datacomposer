@@ -1,5 +1,6 @@
 var gulp = require('gulp'),
-    plugins = require("gulp-load-plugins")();
+    plugins = require('gulp-load-plugins')(),
+    stylish = require('jshint-stylish');
 
 
 
@@ -13,23 +14,35 @@ gulp.task('styles', function() {
 });
 
 
-gulp.task('scripts', function() {
+gulp.task('browserify', function() {
+  return gulp.src('src/scripts/app.js')
+    .pipe(plugins.browserify())
+    .pipe(plugins.rename('app.js'))
+    .pipe(gulp.dest('dist/assets/js'))
+});
+
+
+gulp.task('lint', function() {
   return gulp.src('src/scripts/**/*.js')
     .pipe(plugins.jshint())
-    .pipe(plugins.jshint.reporter('default'))
-    .pipe(plugins.concat('main.js'))
-    .pipe(gulp.dest('dist/assets/js'))
-    // .pipe(rename({suffix: '.min'}))
-    // .pipe(uglify())
-    // .pipe(gulp.dest('dist/assets/js'))
+    .pipe(plugins.jshint.reporter(stylish))
 });
+
+
+gulp.task('templates', function() {
+  return gulp.src('src/scripts/**/*.html')
+    .pipe(plugins.templateCompile())
+    .pipe(plugins.concat('templates.js'))
+    .pipe(gulp.dest('dist/assets/js'))
+})
 
 
 gulp.task('watch', function() {
   plugins.livereload.listen();
 
   gulp.watch('src/styles/**/*.scss', ['styles']);
-  gulp.watch('src/scripts/**/*.js', ['scripts']);
+  gulp.watch('src/scripts/**/*.js', ['browserify', 'lint']);
+  gulp.watch('src/scripts/**/*.html', ['templates'])
 
   gulp.watch('dist/**').on('change', plugins.livereload.changed);
 });

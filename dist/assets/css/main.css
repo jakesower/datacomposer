@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'Lato';
+  src: url('/assets/fonts/Lato.woff2') format('woff2'), url('/assets/fonts/Lato.woff') format('woff2'); }
+
+@font-face {
+  font-family: 'Oswald';
+  src: url('/assets/fonts/Oswald.woff2') format('woff2'), url('/assets/fonts/Oswald.woff') format('woff2'); }
+
 body {
   position: relative; }
 
@@ -10,7 +18,7 @@ aside {
   aside section {
     border-bottom: #999 dashed 1px;
     border-top: #999 dashed 1px;
-    font-family: 'Lato';
+    font-family: 'Oswald';
     padding: 8px 0 8px 15px;
     cursor: pointer; }
     aside section:first-child {
@@ -31,7 +39,8 @@ aside {
       color: #600;
       margin-bottom: 10px; }
     aside section.active > div {
-      opacity: 1; }
+      opacity: 1;
+      line-height: 144%; }
   aside section > div {
     overflow-y: auto;
     line-height: 1.1;

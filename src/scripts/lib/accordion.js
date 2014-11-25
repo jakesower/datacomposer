@@ -36,6 +36,7 @@ Accordion.prototype = {
       this.showSection(e, false);
     }, this);
     this.applyMaxHeight();
+    this.activateSection($(this.el).find('>')[0]);
   },
 
 
@@ -45,7 +46,7 @@ Accordion.prototype = {
         sample = $(sections[0]).find(this.panelSelector);
 
     if(this.activeSection) {
-      this.activeSection.hide();
+      $(this.activeSection).hide();
     }
 
     usedSpace = _.reduce(sections, function(sum, section){ return sum + $(section).outerHeight(); }, 0);
@@ -60,7 +61,7 @@ Accordion.prototype = {
     });
 
     if(this.activeSection) {
-      this.activeSection.show();
+      $(this.activeSection).show();
     }
 
   },
@@ -100,7 +101,7 @@ Accordion.prototype = {
       that.activateSection(this);
     });
 
-    $(window).on('resize', this.applyMaxHeight);
+    $(window).on('resize', this.applyMaxHeight, this);
   }
 };
 

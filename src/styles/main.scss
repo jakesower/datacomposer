@@ -4,6 +4,17 @@ $light-grey: #999;
 $salmon: #B22;
 
 
+@font-face {
+  font-family: 'Lato';
+  src: url('/assets/fonts/Lato.woff2') format('woff2'),
+       url('/assets/fonts/Lato.woff') format('woff2');
+}
+
+@font-face {
+  font-family: 'Oswald';
+  src: url('/assets/fonts/Oswald.woff2') format('woff2'),
+       url('/assets/fonts/Oswald.woff') format('woff2');
+}
 
 
 
@@ -21,7 +32,7 @@ aside {
   section {
     border-bottom: $light-grey dashed 1px;
     border-top: $light-grey dashed 1px;
-    font-family: 'Lato';
+    font-family: 'Oswald';
     padding: 8px 0 8px 15px;
     cursor: pointer;
 
@@ -54,6 +65,7 @@ aside {
 
     & > div {
       opacity: 1;
+      line-height: 144%;
     }
   }
 

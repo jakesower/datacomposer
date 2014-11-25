@@ -1,53 +1,108 @@
-var cssTransitions = ['background-color', 'color'];
-var root = $('#tools');
-var allSections = $(root).find("> section");
-var activeSection = allSections[0];
-var allPanels = $(root).find("> section > div");
-var activePanel = allPanels[0];
+//*****************************************************************************
+// Accordion menu
+//*****************************************************************************
 
-var applyMaxHeight = function() {
-  var totalHeight = $(root).height();
-  var active = _.find($(root).children(), function(elt){
-    return $(elt).hasClass('active'); 
-  });
+var $ = require('jquery'),
+    _ = require('lodash');
 
-  var inactive = _.find($(root).children(), function(elt){
-    return !$(elt).hasClass('active'); 
-  });
-
-  var childHeight = $(inactive).outerHeight();
-  var sectionHeight = totalHeight - (($(root).children().length) * (childHeight+1));
-  var innerHeightDelta = $(active).find('> div').outerHeight() - $(active).find('> div').height();
-
-  _.each(allPanels, function(elt){
-    $(elt).css("max-height", (sectionHeight - innerHeightDelta));
-  });
-
-};
-
-$(root).find('> section').click(function(){
-  if(activeSection !== this) {
-    activeSection = this;
-    allPanels.slideUp();
-    allSections.removeClass('active');
-
-    $(this).addClass('active');
-    $(this).find('> div').slideDown();
-  }
-});
-
-$(window).resize(function(){
-  applyMaxHeight();
-});
-
-allPanels.hide();
-$(activePanel).show();
-applyMaxHeight();
-$(root).show();
-
-function Accordion(el, options) {
-
+/**
+* Accordion menu takes an element and makes an accordion with its children.
+* Children should follow the pattern of:
+*
+* <div>
+*   <h1>Heading</h1>
+*   <div>Contents</div>
+* </div>
+*
+* Note that the elements need not be divs or h1 tags--anything tags will work
+* so long as they follow that nesting pattern.
+*/
+function Accordion(el) {
+  this.el = el;
+  this.initialize();
+  this.bind();
 }
 
 
-module.export = Accordion;
+Accordion.prototype = {
+  el            : null,
+  activeSection : null,
+  panelSelector : ':nth-child(2)',
+
+
+  initialize : function() {
+    _.each($(this.el).find('>'), function(e) {
+      $(e).find(this.panelSelector).hide();
+      this.showSection(e, false);
+    }, this);
+    this.applyMaxHeight();
+  },
+
+
+  applyMaxHeight : function() {
+    var usedSpace, availableSpace, innerHeight,
+        sections = $(this.el).find('>');
+        sample = $(sections[0]).find(this.panelSelector);
+
+    if(this.activeSection) {
+      this.activeSection.hide();
+    }
+
+    usedSpace = _.reduce(sections, function(sum, section){ return sum + $(section).outerHeight(); }, 0);
+    availableSpace = $(this.el).height() - usedSpace - 5;
+
+    sample.show();
+    innerHeight = sample.outerHeight() - sample.height();
+    sample.hide();
+
+    _.each($(this.el).find('>').find(this.panelSelector), function(panel) {
+      $(panel).css("max-height", (availableSpace - innerHeight));
+    });
+
+    if(this.activeSection) {
+      this.activeSection.show();
+    }
+
+  },
+
+
+  activateSection : function(section) {
+    if(this.activeSection === section) {
+      return;
+    }
+ 
+    if(this.activeSection) {
+      this.showSection($(this.activeSection), false);
+    }
+
+    this.activeSection = section;
+    this.showSection(section, true);
+  },
+
+
+  showSection : function(section, visible) {
+    var panel = $(section).find(this.panelSelector);
+
+    if(visible) {
+      panel.slideDown();
+      $(section).addClass('active');
+    } else {
+      panel.slideUp();
+      $(section).removeClass('active');
+    }
+  },
+
+
+  bind : function() {
+    var that = this;
+
+    $(this.el).on('click', '>', function() {
+      that.activateSection(this);
+    });
+
+    $(window).on('resize', this.applyMaxHeight);
+  }
+};
+
+
+module.exports = Accordion;

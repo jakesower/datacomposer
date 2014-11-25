@@ -1,7 +1,15 @@
 var gulp = require('gulp'),
     plugins = require('gulp-load-plugins')(),
-    stylish = require('jshint-stylish');
+    stylish = require('jshint-stylish'),
+    hbsfy = require('hbsfy').configure({
+      extensions: ['hbs']
+    });
 
+
+function handleError(err) {
+  console.log(err.toString());
+  this.emit('end');
+}
 
 
 gulp.task('styles', function() {
@@ -16,8 +24,10 @@ gulp.task('styles', function() {
 
 gulp.task('browserify', function() {
   return gulp.src('src/scripts/app.js')
-    .pipe(plugins.browserify())
-    .pipe(plugins.rename('app.js'))
+    .pipe(plugins.browserify({
+      transform: [hbsfy]
+    }))
+    .on('error', handleError)
     .pipe(gulp.dest('dist/assets/js'))
 });
 
@@ -29,12 +39,12 @@ gulp.task('lint', function() {
 });
 
 
-gulp.task('templates', function() {
-  return gulp.src('src/scripts/**/*.html')
-    .pipe(plugins.templateCompile())
-    .pipe(plugins.concat('templates.js'))
-    .pipe(gulp.dest('dist/assets/js'))
-})
+// gulp.task('templates', function() {
+//   return gulp.src('src/scripts/templates/*.hbs')
+//     .pipe(plugins.handlebars())
+//     .pipe(plugins.concat('templates.js'))
+//     .pipe(gulp.dest('src/scripts'))     // keep in src for immediate consumption by browserify
+// });
 
 
 gulp.task('watch', function() {
@@ -42,7 +52,7 @@ gulp.task('watch', function() {
 
   gulp.watch('src/styles/**/*.scss', ['styles']);
   gulp.watch('src/scripts/**/*.js', ['browserify', 'lint']);
-  gulp.watch('src/scripts/**/*.html', ['templates'])
+  gulp.watch('src/scripts/templates/**/*', ['browserify'])
 
   gulp.watch('dist/**').on('change', plugins.livereload.changed);
 });

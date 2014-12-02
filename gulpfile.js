@@ -1,9 +1,7 @@
 var gulp = require('gulp'),
     plugins = require('gulp-load-plugins')(),
-    stylish = require('jshint-stylish'),
-    hbsfy = require('hbsfy').configure({
-      extensions: ['hbs']
-    });
+    browserify = require('gulp-browserify'),
+    stylish = require('jshint-stylish');
 
 
 function handleError(err) {
@@ -24,8 +22,8 @@ gulp.task('styles', function() {
 
 gulp.task('browserify', function() {
   return gulp.src('src/scripts/app.js')
-    .pipe(plugins.browserify({
-      transform: [hbsfy]
+    .pipe(browserify({
+      transform: ["node-underscorify"]
     }))
     .on('error', handleError)
     .pipe(gulp.dest('dist/assets/js'))

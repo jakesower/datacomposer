@@ -35,15 +35,13 @@
     "gulp-watch": "~1.2.0",
     "gulp-browserify": "~0.5.0",
     "jshint-stylish": "~1.0.0",
-    "gulp-handlebars": "~3.0.1",
-    "handlebars": "~2.0.0",
-    "browserify-handlebars": "~1.0.0",
-    "hbsfy": "~2.2.0",
-    "node-static": "~0.7.6"
+    "node-static": "~0.7.6",
+    "node-underscorify": "0.0.12"
   },
   "dependencies": {
     "lodash": "~2.4.1",
     "jquery": "~2.1.1",
-    "backbone": "~1.1.2"
+    "backbone": "~1.1.2",
+    "babyparse": "~0.2.1"
   }
 }

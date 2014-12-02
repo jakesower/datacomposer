@@ -1,4 +1,760 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/*
+	Baby Parse
+	v0.2.1
+	https://github.com/Rich-Harris/BabyParse
+
+	based on Papa Parse v3.0.1
+	https://github.com/mholt/PapaParse
+*/
+
+
+(function ( global ) {
+
+	// A configuration object from which to draw default settings
+	var DEFAULTS = {
+		delimiter: "",	// empty: auto-detect
+		header: false,
+		dynamicTyping: false,
+		preview: 0,
+		step: undefined,
+		comments: false,
+		complete: undefined,
+		keepEmptyRows: false
+	};
+
+	var Baby = {};
+	Baby.parse = CsvToJson;
+	Baby.unparse = JsonToCsv;
+	Baby.RECORD_SEP = String.fromCharCode(30);
+	Baby.UNIT_SEP = String.fromCharCode(31);
+	Baby.BYTE_ORDER_MARK = "\ufeff";
+	Baby.BAD_DELIMITERS = ["\r", "\n", "\"", Baby.BYTE_ORDER_MARK];
+
+
+	function CsvToJson(_input, _config)
+	{
+		var config = copyAndValidateConfig(_config);
+		var ph = new ParserHandle(config);
+		var results = ph.parse(_input);
+		if (isFunction(config.complete))
+			config.complete(results);
+		return results;
+	}
+
+
+
+
+	function JsonToCsv(_input, _config)
+	{
+		var _output = "";
+		var _fields = [];
+
+		// Default configuration
+		var _quotes = false;	// whether to surround every datum with quotes
+		var _delimiter = ",";	// delimiting character
+		var _newline = "\r\n";	// newline character(s)
+
+		unpackConfig();
+
+		if (typeof _input === 'string')
+			_input = JSON.parse(_input);
+
+		if (_input instanceof Array)
+		{
+			if (!_input.length || _input[0] instanceof Array)
+				return serialize(null, _input);
+			else if (typeof _input[0] === 'object')
+				return serialize(objectKeys(_input[0]), _input);
+		}
+		else if (typeof _input === 'object')
+		{
+			if (typeof _input.data === 'string')
+				_input.data = JSON.parse(_input.data);
+
+			if (_input.data instanceof Array)
+			{
+				if (!_input.fields)
+					_input.fields = _input.data[0] instanceof Array
+									? _input.fields
+									: objectKeys(_input.data[0]);
+
+				if (!(_input.data[0] instanceof Array) && typeof _input.data[0] !== 'object')
+					_input.data = [_input.data];	// handles input like [1,2,3] or ["asdf"]
+			}
+
+			return serialize(_input.fields || [], _input.data || []);
+		}
+
+		// Default (any valid paths should return before this)
+		throw "exception: Unable to serialize unrecognized input";
+
+
+		function unpackConfig()
+		{
+			if (typeof _config !== 'object')
+				return;
+
+			if (typeof _config.delimiter === 'string'
+				&& _config.delimiter.length == 1
+				&& Baby.BAD_DELIMITERS.indexOf(_config.delimiter) == -1)
+			{
+				_delimiter = _config.delimiter;
+			}
+
+			if (typeof _config.quotes === 'boolean'
+				|| _config.quotes instanceof Array)
+				_quotes = _config.quotes;
+
+			if (typeof _config.newline === 'string')
+				_newline = _config.newline;
+		}
+
+
+		// Turns an object's keys into an array
+		function objectKeys(obj)
+		{
+			if (typeof obj !== 'object')
+				return [];
+			var keys = [];
+			for (var key in obj)
+				keys.push(key);
+			return keys;
+		}
+
+		// The double for loop that iterates the data and writes out a CSV string including header row
+		function serialize(fields, data)
+		{
+			var csv = "";
+
+			if (typeof fields === 'string')
+				fields = JSON.parse(fields);
+			if (typeof data === 'string')
+				data = JSON.parse(data);
+
+			var hasHeader = fields instanceof Array && fields.length > 0;
+			var dataKeyedByField = !(data[0] instanceof Array);
+
+			// If there a header row, write it first
+			if (hasHeader)
+			{
+				for (var i = 0; i < fields.length; i++)
+				{
+					if (i > 0)
+						csv += _delimiter;
+					csv += safe(fields[i], i);
+				}
+				if (data.length > 0)
+					csv += _newline;
+			}
+
+			// Then write out the data
+			for (var row = 0; row < data.length; row++)
+			{
+				var maxCol = hasHeader ? fields.length : data[row].length;
+
+				for (var col = 0; col < maxCol; col++)
+				{
+					if (col > 0)
+						csv += _delimiter;
+					var colIdx = hasHeader && dataKeyedByField ? fields[col] : col;
+					csv += safe(data[row][colIdx], col);
+				}
+
+				if (row < data.length - 1)
+					csv += _newline;
+			}
+
+			return csv;
+		}
+
+		// Encloses a value around quotes if needed (makes a value safe for CSV insertion)
+		function safe(str, col)
+		{
+			if (typeof str === "undefined")
+				return "";
+
+			str = str.toString().replace(/"/g, '""');
+
+			var needsQuotes = (typeof _quotes === 'boolean' && _quotes)
+							|| (_quotes instanceof Array && _quotes[col])
+							|| hasAny(str, Baby.BAD_DELIMITERS)
+							|| str.indexOf(_delimiter) > -1
+							|| str.charAt(0) == ' '
+							|| str.charAt(str.length - 1) == ' ';
+
+			return needsQuotes ? '"' + str + '"' : str;
+		}
+
+		function hasAny(str, substrings)
+		{
+			for (var i = 0; i < substrings.length; i++)
+				if (str.indexOf(substrings[i]) > -1)
+					return true;
+			return false;
+		}
+	}
+
+
+
+
+
+
+	// Use one ParserHandle per entire CSV file or string
+	function ParserHandle(_config)
+	{
+		// One goal is to minimize the use of regular expressions...
+		var FLOAT = /^\s*-?(\d*\.?\d+|\d+\.?\d*)(e[-+]?\d+)?\s*$/i;
+
+		var _delimiterError;	// Temporary state between delimiter detection and processing results
+		var _fields = [];		// Fields are from the header row of the input, if there is one
+		var _results = {		// The last results returned from the parser
+			data: [],
+			errors: [],
+			meta: {}
+		};
+		_config = copy(_config);
+
+		this.parse = function(input)
+		{
+			_delimiterError = false;
+			if (!_config.delimiter)
+			{
+				var delimGuess = guessDelimiter(input);
+				if (delimGuess.successful)
+					_config.delimiter = delimGuess.bestDelimiter;
+				else
+				{
+					_delimiterError = true;	// add error after parsing (otherwise it would be overwritten)
+					_config.delimiter = ",";
+				}
+				_results.meta.delimiter = _config.delimiter;
+			}
+
+			if (isFunction(_config.step))
+			{
+				var userStep = _config.step;
+				_config.step = function(results, parser)
+				{
+					_results = results;
+					if (needsHeaderRow())
+						processResults();
+					else
+						userStep(processResults(), parser);
+				};
+			}
+
+			_results = new Parser(_config).parse(input);
+			return processResults();
+		};
+
+		function processResults()
+		{
+			if (_results && _delimiterError)
+			{
+				addError("Delimiter", "UndetectableDelimiter", "Unable to auto-detect delimiting character; defaulted to comma");
+				_delimiterError = false;
+			}
+
+			if (needsHeaderRow())
+				fillHeaderFields();
+
+			return applyHeaderAndDynamicTyping();
+		}
+
+		function needsHeaderRow()
+		{
+			return _config.header && _fields.length == 0;
+		}
+
+		function fillHeaderFields()
+		{
+			if (!_results)
+				return;
+			for (var i = 0; needsHeaderRow() && i < _results.data.length; i++)
+				for (var j = 0; j < _results.data[i].length; j++)
+					_fields.push(_results.data[i][j]);
+			_results.data.splice(0, 1);
+		}
+
+		function applyHeaderAndDynamicTyping()
+		{
+			if (!_results || (!_config.header && !_config.dynamicTyping))
+				return _results;
+
+			for (var i = 0; i < _results.data.length; i++)
+			{
+				var row = {};
+				for (var j = 0; j < _results.data[i].length; j++)
+				{
+					if (_config.dynamicTyping)
+					{
+						var value = _results.data[i][j];
+						if (value == "true")
+							_results.data[i][j] = true;
+						else if (value == "false")
+							_results.data[i][j] = false;
+						else
+							_results.data[i][j] = tryParseFloat(value);
+					}
+
+					if (_config.header)
+					{
+						if (j >= _fields.length)
+						{
+							if (!row["__parsed_extra"])
+								row["__parsed_extra"] = [];
+							row["__parsed_extra"].push(_results.data[i][j]);
+						}
+						row[_fields[j]] = _results.data[i][j];
+					}
+				}
+
+				if (_config.header)
+				{
+					_results.data[i] = row;
+					if (j > _fields.length)
+						addError("FieldMismatch", "TooManyFields", "Too many fields: expected " + _fields.length + " fields but parsed " + j, i);
+					else if (j < _fields.length)
+						addError("FieldMismatch", "TooFewFields", "Too few fields: expected " + _fields.length + " fields but parsed " + j, i);
+				}
+			}
+
+			if (_config.header && _results.meta);
+				_results.meta.fields = _fields;
+
+			return _results;
+		}
+
+		function guessDelimiter(input)
+		{
+			var delimChoices = [",", "\t", "|", ";", Baby.RECORD_SEP, Baby.UNIT_SEP];
+			var bestDelim, bestDelta, fieldCountPrevRow;
+
+			for (var i = 0; i < delimChoices.length; i++)
+			{
+				var delim = delimChoices[i];
+				var delta = 0, avgFieldCount = 0;
+				fieldCountPrevRow = undefined;
+
+				var preview = new Parser({
+					delimiter: delim,
+					preview: 10
+				}).parse(input);
+
+				for (var j = 0; j < preview.data.length; j++)
+				{
+					var fieldCount = preview.data[j].length;
+					avgFieldCount += fieldCount;
+
+					if (typeof fieldCountPrevRow === 'undefined')
+					{
+						fieldCountPrevRow = fieldCount;
+						continue;
+					}
+					else if (fieldCount > 1)
+					{
+						delta += Math.abs(fieldCount - fieldCountPrevRow);
+						fieldCountPrevRow = fieldCount;
+					}
+				}
+
+				avgFieldCount /= preview.data.length;
+
+				if ((typeof bestDelta === 'undefined' || delta < bestDelta)
+					&& avgFieldCount > 1.99)
+				{
+					bestDelta = delta;
+					bestDelim = delim;
+				}
+			}
+
+			_config.delimiter = bestDelim;
+
+			return {
+				successful: !!bestDelim,
+				bestDelimiter: bestDelim
+			}
+		}
+
+		function tryParseFloat(val)
+		{
+			var isNumber = FLOAT.test(val);
+			return isNumber ? parseFloat(val) : val;
+		}
+
+		function addError(type, code, msg, row)
+		{
+			_results.errors.push({
+				type: type,
+				code: code,
+				message: msg,
+				row: row
+			});
+		}
+	}
+
+
+
+
+
+
+
+	function Parser(config)
+	{
+		var self = this;
+		var EMPTY = /^\s*$/;
+
+		var _input;		// The input text being parsed
+		var _delimiter;	// The delimiting character
+		var _comments;	// Comment character (default '#') or boolean
+		var _step;		// The step (streaming) function
+		var _callback;	// The callback to invoke when finished
+		var _preview;	// Maximum number of lines (not rows) to parse
+		var _ch;		// Current character
+		var _i;			// Current character's positional index
+		var _inQuotes;	// Whether in quotes or not
+		var _lineNum;	// Current line number (1-based indexing)
+		var _data;		// Parsed data (results)
+		var _errors;	// Parse errors
+		var _rowIdx;	// Current row index within results (0-based)
+		var _colIdx;	// Current col index within result row (0-based)
+		var _runningRowIdx;		// Cumulative row index, used by the preview feature
+		var _aborted = false;	// Abort flag
+		var _paused = false;	// Pause flag
+
+		// Unpack the config object
+		config = config || {};
+		_delimiter = config.delimiter;
+		_comments = config.comments;
+		_step = config.step;
+		_preview = config.preview;
+
+		// Delimiter integrity check
+		if (typeof _delimiter !== 'string'
+			|| _delimiter.length != 1
+			|| Baby.BAD_DELIMITERS.indexOf(_delimiter) > -1)
+			_delimiter = ",";
+
+		// Comment character integrity check
+		if (_comments === true)
+			_comments = "#";
+		else if (typeof _comments !== 'string'
+			|| _comments.length != 1
+			|| Baby.BAD_DELIMITERS.indexOf(_comments) > -1
+			|| _comments == _delimiter)
+			_comments = false;
+
+
+		this.parse = function(input)
+		{
+			if (typeof input !== 'string')
+				throw "Input must be a string";
+			reset(input);
+			return parserLoop();
+		};
+
+		this.abort = function()
+		{
+			_aborted = true;
+		};
+
+		function parserLoop()
+		{
+			while (_i < _input.length)
+			{
+				if (_aborted) break;
+				if (_preview > 0 && _runningRowIdx >= _preview) break;
+				if (_paused) return finishParsing();
+
+				if (_ch == '"')
+					parseQuotes();
+				else if (_inQuotes)
+					parseInQuotes();
+				else
+					parseNotInQuotes();
+
+				nextChar();
+			}
+
+			return finishParsing();
+		}
+
+		function nextChar()
+		{
+			_i++;
+			_ch = _input[_i];
+		}
+
+		function finishParsing()
+		{
+			if (_aborted)
+				addError("Abort", "ParseAbort", "Parsing was aborted by the user's step function");
+			if (_inQuotes)
+				addError("Quotes", "MissingQuotes", "Unescaped or mismatched quotes");
+			endRow();	// End of input is also end of the last row
+			if (!isFunction(_step))
+				return returnable();
+		}
+
+		function parseQuotes()
+		{
+			if (quotesOnBoundary() && !quotesEscaped())
+				_inQuotes = !_inQuotes;
+			else
+			{
+				saveChar();
+				if (_inQuotes && quotesEscaped())
+					_i++
+				else
+					addError("Quotes", "UnexpectedQuotes", "Unexpected quotes");
+			}
+		}
+
+		function parseInQuotes()
+		{
+			if (twoCharLineBreak(_i) || oneCharLineBreak(_i))
+				_lineNum++;
+			saveChar();
+		}
+
+		function parseNotInQuotes()
+		{
+			if (_ch == _delimiter)
+				newField();
+			else if (twoCharLineBreak(_i))
+			{
+				newRow();
+				nextChar();
+			}
+			else if (oneCharLineBreak(_i))
+				newRow();
+			else if (isCommentStart())
+				skipLine();
+			else
+				saveChar();
+		}
+
+		function isCommentStart()
+		{
+			if (!_comments)
+				return false;
+
+			var firstCharOfLine = _i == 0
+									|| oneCharLineBreak(_i-1)
+									|| twoCharLineBreak(_i-2);
+			return firstCharOfLine && _input[_i] === _comments;
+		}
+
+		function skipLine()
+		{
+			while (!twoCharLineBreak(_i)
+				&& !oneCharLineBreak(_i)
+				&& _i < _input.length)
+			{
+				nextChar();
+			}
+		}
+
+		function saveChar()
+		{
+			_data[_rowIdx][_colIdx] += _ch;
+		}
+
+		function newField()
+		{
+			_data[_rowIdx].push("");
+			_colIdx = _data[_rowIdx].length - 1;
+		}
+
+		function newRow()
+		{
+			endRow();
+
+			_lineNum++;
+			_runningRowIdx++;
+			_data.push([]);
+			_rowIdx = _data.length - 1;
+			newField();
+		}
+
+		function endRow()
+		{
+			trimEmptyLastRow();
+			if (isFunction(_step))
+			{
+				if (_data[_rowIdx])
+					_step(returnable(), self);
+				clearErrorsAndData();
+			}
+		}
+
+		function trimEmptyLastRow()
+		{
+			if (_data[_rowIdx].length == 1 && EMPTY.test(_data[_rowIdx][0]))
+			{
+				if (config.keepEmptyRows)
+					_data[_rowIdx].splice(0, 1);	// leave row, but no fields
+				else
+					_data.splice(_rowIdx, 1);		// cut out row entirely
+				_rowIdx = _data.length - 1;
+			}
+		}
+
+		function twoCharLineBreak(i)
+		{
+			return i < _input.length - 1 &&
+				((_input[i] == "\r" && _input[i+1] == "\n")
+				|| (_input[i] == "\n" && _input[i+1] == "\r"))
+		}
+
+		function oneCharLineBreak(i)
+		{
+			return _input[i] == "\r" || _input[i] == "\n";
+		}
+
+		function quotesEscaped()
+		{
+			// Quotes as data cannot be on boundary, for example: ,"", are not escaped quotes
+			return !quotesOnBoundary() && _i < _input.length - 1 && _input[_i+1] == '"';
+		}
+
+		function quotesOnBoundary()
+		{
+			return (!_inQuotes && isBoundary(_i-1)) || isBoundary(_i+1);
+		}
+
+		function isBoundary(i)
+		{
+			if (typeof i != 'number')
+				i = _i;
+
+			var ch = _input[i];
+
+			return (i <= -1 || i >= _input.length)
+				|| (ch == _delimiter
+					|| ch == "\r"
+					|| ch == "\n");
+		}
+
+		function addError(type, code, msg)
+		{
+			_errors.push({
+				type: type,
+				code: code,
+				message: msg,
+				line: _lineNum,
+				row: _rowIdx,
+				index: _i
+			});
+		}
+
+		function reset(input)
+		{
+			_input = input;
+			_inQuotes = false;
+			_i = 0, _runningRowIdx = 0, _lineNum = 1;
+			clearErrorsAndData();
+			_data = [ [""] ];	// starting parsing requires an empty field
+			_ch = _input[_i];
+		}
+
+		function clearErrorsAndData()
+		{
+			_data = [];
+			_errors = [];
+			_rowIdx = 0;
+			_colIdx = 0;
+		}
+
+		function returnable()
+		{
+			return {
+				data: _data,
+				errors: _errors,
+				meta: {
+					lines: _lineNum,
+					delimiter: _delimiter,
+					aborted: _aborted
+				}
+			};
+		}
+	}
+
+	// Replaces bad config values with good, default ones
+	function copyAndValidateConfig(origConfig)
+	{
+		if (typeof origConfig !== 'object')
+			origConfig = {};
+
+		var config = copy(origConfig);
+
+		if (typeof config.delimiter !== 'string'
+			|| config.delimiter.length != 1
+			|| Baby.BAD_DELIMITERS.indexOf(config.delimiter) > -1)
+			config.delimiter = DEFAULTS.delimiter;
+
+		if (typeof config.header !== 'boolean')
+			config.header = DEFAULTS.header;
+
+		if (typeof config.dynamicTyping !== 'boolean')
+			config.dynamicTyping = DEFAULTS.dynamicTyping;
+
+		if (typeof config.preview !== 'number')
+			config.preview = DEFAULTS.preview;
+
+		if (typeof config.step !== 'function')
+			config.step = DEFAULTS.step;
+
+		if (typeof config.complete !== 'function')
+			config.complete = DEFAULTS.complete;
+
+		if (typeof config.keepEmptyRows !== 'boolean')
+			config.keepEmptyRows = DEFAULTS.keepEmptyRows;
+
+		return config;
+	}
+
+	function copy(obj)
+	{
+		if (typeof obj !== 'object')
+			return obj;
+		var cpy = obj instanceof Array ? [] : {};
+		for (var key in obj)
+			cpy[key] = copy(obj[key]);
+		return cpy;
+	}
+
+	function isFunction(func)
+	{
+		return typeof func === 'function';
+	}
+
+
+
+
+
+
+	// export to Node...
+	if ( typeof module !== 'undefined' && module.exports ) {
+		module.exports = Baby;
+	}
+
+	// ...or as AMD module...
+	else if ( typeof define === 'function' && define.amd ) {
+		define( function () { return Baby; });
+	}
+
+	// ...or as browser global
+	else {
+		global.Baby = Baby;
+	}
+
+
+
+}( typeof window !== 'undefined' ? window : this ));
+
+},{}],2:[function(require,module,exports){
 //     Backbone.js 1.1.2
 
 //     (c) 2010-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -1608,7 +2364,7 @@
 
 }));
 
-},{"underscore":2}],2:[function(require,module,exports){
+},{"underscore":3}],3:[function(require,module,exports){
 //     Underscore.js 1.7.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -3025,607 +3781,7 @@
   }
 }.call(this));
 
-},{}],3:[function(require,module,exports){
-"use strict";
-/*globals Handlebars: true */
-var base = require("./handlebars/base");
-
-// Each of these augment the Handlebars object. No need to setup here.
-// (This is done to easily share code between commonjs and browse envs)
-var SafeString = require("./handlebars/safe-string")["default"];
-var Exception = require("./handlebars/exception")["default"];
-var Utils = require("./handlebars/utils");
-var runtime = require("./handlebars/runtime");
-
-// For compatibility and usage outside of module systems, make the Handlebars object a namespace
-var create = function() {
-  var hb = new base.HandlebarsEnvironment();
-
-  Utils.extend(hb, base);
-  hb.SafeString = SafeString;
-  hb.Exception = Exception;
-  hb.Utils = Utils;
-  hb.escapeExpression = Utils.escapeExpression;
-
-  hb.VM = runtime;
-  hb.template = function(spec) {
-    return runtime.template(spec, hb);
-  };
-
-  return hb;
-};
-
-var Handlebars = create();
-Handlebars.create = create;
-
-Handlebars['default'] = Handlebars;
-
-exports["default"] = Handlebars;
-},{"./handlebars/base":4,"./handlebars/exception":5,"./handlebars/runtime":6,"./handlebars/safe-string":7,"./handlebars/utils":8}],4:[function(require,module,exports){
-"use strict";
-var Utils = require("./utils");
-var Exception = require("./exception")["default"];
-
-var VERSION = "2.0.0";
-exports.VERSION = VERSION;var COMPILER_REVISION = 6;
-exports.COMPILER_REVISION = COMPILER_REVISION;
-var REVISION_CHANGES = {
-  1: '<= 1.0.rc.2', // 1.0.rc.2 is actually rev2 but doesn't report it
-  2: '== 1.0.0-rc.3',
-  3: '== 1.0.0-rc.4',
-  4: '== 1.x.x',
-  5: '== 2.0.0-alpha.x',
-  6: '>= 2.0.0-beta.1'
-};
-exports.REVISION_CHANGES = REVISION_CHANGES;
-var isArray = Utils.isArray,
-    isFunction = Utils.isFunction,
-    toString = Utils.toString,
-    objectType = '[object Object]';
-
-function HandlebarsEnvironment(helpers, partials) {
-  this.helpers = helpers || {};
-  this.partials = partials || {};
-
-  registerDefaultHelpers(this);
-}
-
-exports.HandlebarsEnvironment = HandlebarsEnvironment;HandlebarsEnvironment.prototype = {
-  constructor: HandlebarsEnvironment,
-
-  logger: logger,
-  log: log,
-
-  registerHelper: function(name, fn) {
-    if (toString.call(name) === objectType) {
-      if (fn) { throw new Exception('Arg not supported with multiple helpers'); }
-      Utils.extend(this.helpers, name);
-    } else {
-      this.helpers[name] = fn;
-    }
-  },
-  unregisterHelper: function(name) {
-    delete this.helpers[name];
-  },
-
-  registerPartial: function(name, partial) {
-    if (toString.call(name) === objectType) {
-      Utils.extend(this.partials,  name);
-    } else {
-      this.partials[name] = partial;
-    }
-  },
-  unregisterPartial: function(name) {
-    delete this.partials[name];
-  }
-};
-
-function registerDefaultHelpers(instance) {
-  instance.registerHelper('helperMissing', function(/* [args, ]options */) {
-    if(arguments.length === 1) {
-      // A missing field in a {{foo}} constuct.
-      return undefined;
-    } else {
-      // Someone is actually trying to call something, blow up.
-      throw new Exception("Missing helper: '" + arguments[arguments.length-1].name + "'");
-    }
-  });
-
-  instance.registerHelper('blockHelperMissing', function(context, options) {
-    var inverse = options.inverse,
-        fn = options.fn;
-
-    if(context === true) {
-      return fn(this);
-    } else if(context === false || context == null) {
-      return inverse(this);
-    } else if (isArray(context)) {
-      if(context.length > 0) {
-        if (options.ids) {
-          options.ids = [options.name];
-        }
-
-        return instance.helpers.each(context, options);
-      } else {
-        return inverse(this);
-      }
-    } else {
-      if (options.data && options.ids) {
-        var data = createFrame(options.data);
-        data.contextPath = Utils.appendContextPath(options.data.contextPath, options.name);
-        options = {data: data};
-      }
-
-      return fn(context, options);
-    }
-  });
-
-  instance.registerHelper('each', function(context, options) {
-    if (!options) {
-      throw new Exception('Must pass iterator to #each');
-    }
-
-    var fn = options.fn, inverse = options.inverse;
-    var i = 0, ret = "", data;
-
-    var contextPath;
-    if (options.data && options.ids) {
-      contextPath = Utils.appendContextPath(options.data.contextPath, options.ids[0]) + '.';
-    }
-
-    if (isFunction(context)) { context = context.call(this); }
-
-    if (options.data) {
-      data = createFrame(options.data);
-    }
-
-    if(context && typeof context === 'object') {
-      if (isArray(context)) {
-        for(var j = context.length; i<j; i++) {
-          if (data) {
-            data.index = i;
-            data.first = (i === 0);
-            data.last  = (i === (context.length-1));
-
-            if (contextPath) {
-              data.contextPath = contextPath + i;
-            }
-          }
-          ret = ret + fn(context[i], { data: data });
-        }
-      } else {
-        for(var key in context) {
-          if(context.hasOwnProperty(key)) {
-            if(data) {
-              data.key = key;
-              data.index = i;
-              data.first = (i === 0);
-
-              if (contextPath) {
-                data.contextPath = contextPath + key;
-              }
-            }
-            ret = ret + fn(context[key], {data: data});
-            i++;
-          }
-        }
-      }
-    }
-
-    if(i === 0){
-      ret = inverse(this);
-    }
-
-    return ret;
-  });
-
-  instance.registerHelper('if', function(conditional, options) {
-    if (isFunction(conditional)) { conditional = conditional.call(this); }
-
-    // Default behavior is to render the positive path if the value is truthy and not empty.
-    // The `includeZero` option may be set to treat the condtional as purely not empty based on the
-    // behavior of isEmpty. Effectively this determines if 0 is handled by the positive path or negative.
-    if ((!options.hash.includeZero && !conditional) || Utils.isEmpty(conditional)) {
-      return options.inverse(this);
-    } else {
-      return options.fn(this);
-    }
-  });
-
-  instance.registerHelper('unless', function(conditional, options) {
-    return instance.helpers['if'].call(this, conditional, {fn: options.inverse, inverse: options.fn, hash: options.hash});
-  });
-
-  instance.registerHelper('with', function(context, options) {
-    if (isFunction(context)) { context = context.call(this); }
-
-    var fn = options.fn;
-
-    if (!Utils.isEmpty(context)) {
-      if (options.data && options.ids) {
-        var data = createFrame(options.data);
-        data.contextPath = Utils.appendContextPath(options.data.contextPath, options.ids[0]);
-        options = {data:data};
-      }
-
-      return fn(context, options);
-    } else {
-      return options.inverse(this);
-    }
-  });
-
-  instance.registerHelper('log', function(message, options) {
-    var level = options.data && options.data.level != null ? parseInt(options.data.level, 10) : 1;
-    instance.log(level, message);
-  });
-
-  instance.registerHelper('lookup', function(obj, field) {
-    return obj && obj[field];
-  });
-}
-
-var logger = {
-  methodMap: { 0: 'debug', 1: 'info', 2: 'warn', 3: 'error' },
-
-  // State enum
-  DEBUG: 0,
-  INFO: 1,
-  WARN: 2,
-  ERROR: 3,
-  level: 3,
-
-  // can be overridden in the host environment
-  log: function(level, message) {
-    if (logger.level <= level) {
-      var method = logger.methodMap[level];
-      if (typeof console !== 'undefined' && console[method]) {
-        console[method].call(console, message);
-      }
-    }
-  }
-};
-exports.logger = logger;
-var log = logger.log;
-exports.log = log;
-var createFrame = function(object) {
-  var frame = Utils.extend({}, object);
-  frame._parent = object;
-  return frame;
-};
-exports.createFrame = createFrame;
-},{"./exception":5,"./utils":8}],5:[function(require,module,exports){
-"use strict";
-
-var errorProps = ['description', 'fileName', 'lineNumber', 'message', 'name', 'number', 'stack'];
-
-function Exception(message, node) {
-  var line;
-  if (node && node.firstLine) {
-    line = node.firstLine;
-
-    message += ' - ' + line + ':' + node.firstColumn;
-  }
-
-  var tmp = Error.prototype.constructor.call(this, message);
-
-  // Unfortunately errors are not enumerable in Chrome (at least), so `for prop in tmp` doesn't work.
-  for (var idx = 0; idx < errorProps.length; idx++) {
-    this[errorProps[idx]] = tmp[errorProps[idx]];
-  }
-
-  if (line) {
-    this.lineNumber = line;
-    this.column = node.firstColumn;
-  }
-}
-
-Exception.prototype = new Error();
-
-exports["default"] = Exception;
-},{}],6:[function(require,module,exports){
-"use strict";
-var Utils = require("./utils");
-var Exception = require("./exception")["default"];
-var COMPILER_REVISION = require("./base").COMPILER_REVISION;
-var REVISION_CHANGES = require("./base").REVISION_CHANGES;
-var createFrame = require("./base").createFrame;
-
-function checkRevision(compilerInfo) {
-  var compilerRevision = compilerInfo && compilerInfo[0] || 1,
-      currentRevision = COMPILER_REVISION;
-
-  if (compilerRevision !== currentRevision) {
-    if (compilerRevision < currentRevision) {
-      var runtimeVersions = REVISION_CHANGES[currentRevision],
-          compilerVersions = REVISION_CHANGES[compilerRevision];
-      throw new Exception("Template was precompiled with an older version of Handlebars than the current runtime. "+
-            "Please update your precompiler to a newer version ("+runtimeVersions+") or downgrade your runtime to an older version ("+compilerVersions+").");
-    } else {
-      // Use the embedded version info since the runtime doesn't know about this revision yet
-      throw new Exception("Template was precompiled with a newer version of Handlebars than the current runtime. "+
-            "Please update your runtime to a newer version ("+compilerInfo[1]+").");
-    }
-  }
-}
-
-exports.checkRevision = checkRevision;// TODO: Remove this line and break up compilePartial
-
-function template(templateSpec, env) {
-  /* istanbul ignore next */
-  if (!env) {
-    throw new Exception("No environment passed to template");
-  }
-  if (!templateSpec || !templateSpec.main) {
-    throw new Exception('Unknown template object: ' + typeof templateSpec);
-  }
-
-  // Note: Using env.VM references rather than local var references throughout this section to allow
-  // for external users to override these as psuedo-supported APIs.
-  env.VM.checkRevision(templateSpec.compiler);
-
-  var invokePartialWrapper = function(partial, indent, name, context, hash, helpers, partials, data, depths) {
-    if (hash) {
-      context = Utils.extend({}, context, hash);
-    }
-
-    var result = env.VM.invokePartial.call(this, partial, name, context, helpers, partials, data, depths);
-
-    if (result == null && env.compile) {
-      var options = { helpers: helpers, partials: partials, data: data, depths: depths };
-      partials[name] = env.compile(partial, { data: data !== undefined, compat: templateSpec.compat }, env);
-      result = partials[name](context, options);
-    }
-    if (result != null) {
-      if (indent) {
-        var lines = result.split('\n');
-        for (var i = 0, l = lines.length; i < l; i++) {
-          if (!lines[i] && i + 1 === l) {
-            break;
-          }
-
-          lines[i] = indent + lines[i];
-        }
-        result = lines.join('\n');
-      }
-      return result;
-    } else {
-      throw new Exception("The partial " + name + " could not be compiled when running in runtime-only mode");
-    }
-  };
-
-  // Just add water
-  var container = {
-    lookup: function(depths, name) {
-      var len = depths.length;
-      for (var i = 0; i < len; i++) {
-        if (depths[i] && depths[i][name] != null) {
-          return depths[i][name];
-        }
-      }
-    },
-    lambda: function(current, context) {
-      return typeof current === 'function' ? current.call(context) : current;
-    },
-
-    escapeExpression: Utils.escapeExpression,
-    invokePartial: invokePartialWrapper,
-
-    fn: function(i) {
-      return templateSpec[i];
-    },
-
-    programs: [],
-    program: function(i, data, depths) {
-      var programWrapper = this.programs[i],
-          fn = this.fn(i);
-      if (data || depths) {
-        programWrapper = program(this, i, fn, data, depths);
-      } else if (!programWrapper) {
-        programWrapper = this.programs[i] = program(this, i, fn);
-      }
-      return programWrapper;
-    },
-
-    data: function(data, depth) {
-      while (data && depth--) {
-        data = data._parent;
-      }
-      return data;
-    },
-    merge: function(param, common) {
-      var ret = param || common;
-
-      if (param && common && (param !== common)) {
-        ret = Utils.extend({}, common, param);
-      }
-
-      return ret;
-    },
-
-    noop: env.VM.noop,
-    compilerInfo: templateSpec.compiler
-  };
-
-  var ret = function(context, options) {
-    options = options || {};
-    var data = options.data;
-
-    ret._setup(options);
-    if (!options.partial && templateSpec.useData) {
-      data = initData(context, data);
-    }
-    var depths;
-    if (templateSpec.useDepths) {
-      depths = options.depths ? [context].concat(options.depths) : [context];
-    }
-
-    return templateSpec.main.call(container, context, container.helpers, container.partials, data, depths);
-  };
-  ret.isTop = true;
-
-  ret._setup = function(options) {
-    if (!options.partial) {
-      container.helpers = container.merge(options.helpers, env.helpers);
-
-      if (templateSpec.usePartial) {
-        container.partials = container.merge(options.partials, env.partials);
-      }
-    } else {
-      container.helpers = options.helpers;
-      container.partials = options.partials;
-    }
-  };
-
-  ret._child = function(i, data, depths) {
-    if (templateSpec.useDepths && !depths) {
-      throw new Exception('must pass parent depths');
-    }
-
-    return program(container, i, templateSpec[i], data, depths);
-  };
-  return ret;
-}
-
-exports.template = template;function program(container, i, fn, data, depths) {
-  var prog = function(context, options) {
-    options = options || {};
-
-    return fn.call(container, context, container.helpers, container.partials, options.data || data, depths && [context].concat(depths));
-  };
-  prog.program = i;
-  prog.depth = depths ? depths.length : 0;
-  return prog;
-}
-
-exports.program = program;function invokePartial(partial, name, context, helpers, partials, data, depths) {
-  var options = { partial: true, helpers: helpers, partials: partials, data: data, depths: depths };
-
-  if(partial === undefined) {
-    throw new Exception("The partial " + name + " could not be found");
-  } else if(partial instanceof Function) {
-    return partial(context, options);
-  }
-}
-
-exports.invokePartial = invokePartial;function noop() { return ""; }
-
-exports.noop = noop;function initData(context, data) {
-  if (!data || !('root' in data)) {
-    data = data ? createFrame(data) : {};
-    data.root = context;
-  }
-  return data;
-}
-},{"./base":4,"./exception":5,"./utils":8}],7:[function(require,module,exports){
-"use strict";
-// Build out our basic SafeString type
-function SafeString(string) {
-  this.string = string;
-}
-
-SafeString.prototype.toString = function() {
-  return "" + this.string;
-};
-
-exports["default"] = SafeString;
-},{}],8:[function(require,module,exports){
-"use strict";
-/*jshint -W004 */
-var SafeString = require("./safe-string")["default"];
-
-var escape = {
-  "&": "&amp;",
-  "<": "&lt;",
-  ">": "&gt;",
-  '"': "&quot;",
-  "'": "&#x27;",
-  "`": "&#x60;"
-};
-
-var badChars = /[&<>"'`]/g;
-var possible = /[&<>"'`]/;
-
-function escapeChar(chr) {
-  return escape[chr];
-}
-
-function extend(obj /* , ...source */) {
-  for (var i = 1; i < arguments.length; i++) {
-    for (var key in arguments[i]) {
-      if (Object.prototype.hasOwnProperty.call(arguments[i], key)) {
-        obj[key] = arguments[i][key];
-      }
-    }
-  }
-
-  return obj;
-}
-
-exports.extend = extend;var toString = Object.prototype.toString;
-exports.toString = toString;
-// Sourced from lodash
-// https://github.com/bestiejs/lodash/blob/master/LICENSE.txt
-var isFunction = function(value) {
-  return typeof value === 'function';
-};
-// fallback for older versions of Chrome and Safari
-/* istanbul ignore next */
-if (isFunction(/x/)) {
-  isFunction = function(value) {
-    return typeof value === 'function' && toString.call(value) === '[object Function]';
-  };
-}
-var isFunction;
-exports.isFunction = isFunction;
-/* istanbul ignore next */
-var isArray = Array.isArray || function(value) {
-  return (value && typeof value === 'object') ? toString.call(value) === '[object Array]' : false;
-};
-exports.isArray = isArray;
-
-function escapeExpression(string) {
-  // don't escape SafeStrings, since they're already safe
-  if (string instanceof SafeString) {
-    return string.toString();
-  } else if (string == null) {
-    return "";
-  } else if (!string) {
-    return string + '';
-  }
-
-  // Force a string conversion as this will be done by the append regardless and
-  // the regex test will do this transparently behind the scenes, causing issues if
-  // an object's to string has escaped characters in it.
-  string = "" + string;
-
-  if(!possible.test(string)) { return string; }
-  return string.replace(badChars, escapeChar);
-}
-
-exports.escapeExpression = escapeExpression;function isEmpty(value) {
-  if (!value && value !== 0) {
-    return true;
-  } else if (isArray(value) && value.length === 0) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
-exports.isEmpty = isEmpty;function appendContextPath(contextPath, id) {
-  return (contextPath ? contextPath + '.' : '') + id;
-}
-
-exports.appendContextPath = appendContextPath;
-},{"./safe-string":7}],9:[function(require,module,exports){
-// Create a simple path alias to allow browserify to resolve
-// the runtime on a supported path.
-module.exports = require('./dist/cjs/handlebars.runtime');
-
-},{"./dist/cjs/handlebars.runtime":3}],10:[function(require,module,exports){
-module.exports = require("handlebars/runtime")["default"];
-
-},{"handlebars/runtime":9}],11:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.1.1
  * http://jquery.com/
@@ -12817,7 +12973,7 @@ return jQuery;
 
 }));
 
-},{}],12:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -19606,7 +19762,7 @@ return jQuery;
 }.call(this));
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],13:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 // render the skeleton of the app, then initialize components
 
 var $         = require('jquery'),
@@ -19620,8 +19776,11 @@ Backbone.$ = $;
 
 views.source = {name: "Source", view: require('./views/source.js')};
 
-templates.datacomposer = require('./templates/datacomposer.hbs');
-templates.control = require('./templates/control.hbs');
+
+Grid = require('./views/grid.js');
+
+templates.datacomposer = require('./templates/datacomposer.tpl');
+templates.control = require('./templates/control.tpl');
 
 $(function() {
   // render skeleton
@@ -19640,10 +19799,13 @@ $(function() {
   });
 
 
+  // render the grid
+  new Grid();
+
   new Accordion(sidebar);
 });
 
-},{"./lib/accordion.js":14,"./templates/control.hbs":16,"./templates/datacomposer.hbs":18,"./views/source.js":19,"backbone":1,"jquery":11,"lodash":12}],14:[function(require,module,exports){
+},{"./lib/accordion.js":7,"./templates/control.tpl":10,"./templates/datacomposer.tpl":12,"./views/grid.js":14,"./views/source.js":15,"backbone":2,"jquery":4,"lodash":5}],7:[function(require,module,exports){
 //*****************************************************************************
 // Accordion menu
 //*****************************************************************************
@@ -19754,41 +19916,507 @@ Accordion.prototype = {
 
 module.exports = Accordion;
 
-},{"jquery":11,"lodash":12}],15:[function(require,module,exports){
-var Dataset = {};
+},{"jquery":4,"lodash":5}],8:[function(require,module,exports){
+/**
+ * Provides methods for handline the different types of columns. Methods included:
+ *
+ * test    : see if a value matches the pattern for the type
+ * coerce  : force any value into the type and return the result
+ * compare : compare two values for sorting purposes
+ * numeric : return a value as a number for purposes where a number is needed
+ * string  : get the value as a string
+*/
+
+var _ = require('lodash');
 
 
-module.exports = Dataset;
-},{}],16:[function(require,module,exports){
-// hbsfy compiled Handlebars template
-var HandlebarsCompiler = require('hbsfy/runtime');
-module.exports = HandlebarsCompiler.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
-  var helper, functionType="function", helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression;
-  return "<section>\n  <h1>"
-    + escapeExpression(((helper = (helper = helpers.name || (depth0 != null ? depth0.name : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"name","hash":{},"data":data}) : helper)))
-    + "</h1>\n  <div></div>\n</section>";
-},"useData":true});
+var DataTypes = {
+  number: {
+    name : "number",
+    regexp : /^\s*[\-\.]?[0-9]+([\.][0-9]+)?\s*$/,
 
-},{"hbsfy/runtime":10}],17:[function(require,module,exports){
-// hbsfy compiled Handlebars template
-var HandlebarsCompiler = require('hbsfy/runtime');
-module.exports = HandlebarsCompiler.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
-  return "Upload CSV: <input id=\"csv\" type=\"file\">";
-  },"useData":true});
+    test : function(v) {
+      if (v === null || typeof v === "undefined" || typeof v === 'number' || this.regexp.test( v ) ) {
+        return true;
+      } else {
+        return false;
+      }
+    },
 
-},{"hbsfy/runtime":10}],18:[function(require,module,exports){
-// hbsfy compiled Handlebars template
-var HandlebarsCompiler = require('hbsfy/runtime');
-module.exports = HandlebarsCompiler.template({"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
-  return "<aside id=\"tools\">\n</aside>\n\n<main>\n  <div id=\"grid\">\n  </div>\n</main>\n";
-  },"useData":true});
+    coerce : function(v) {
+      var cv = +v;
+      if (_.isNull(v) || typeof v === "undefined" || _.isNaN(cv)) {
+        return null;
+      }
+      return cv;
+    },
 
-},{"hbsfy/runtime":10}],19:[function(require,module,exports){
+    compare : function(n1, n2) {
+      if (n1 === null && n2 !== null) { return -1; }
+      if (n1 !== null && n2 === null) { return 1; }
+      if (n1 === null && n2 === null) { return 0; }
+      if (n1 === n2) { return 0; }
+      return (n1 < n2 ? -1 : 1);
+    },
+
+    numeric : function(value) {
+      if (_.isNaN(value) || value === null) {
+        return null;
+      }
+      return value;
+    },
+
+    string : function(v) {
+      if(_.isNull(v) || typeof v === "undefined") {
+        return '';
+      }
+      
+      return v.toString();
+    }
+  },
+
+
+  string: {
+    test : function(v) {
+      return (v === null || typeof v === "undefined" || typeof v === 'string');
+    },
+
+    coerce : function(v) {
+      if (_.isNaN(v) || v === null || typeof v === "undefined") {
+        return null;
+      }
+      return v.toString();
+    },
+
+    compare : function(s1, s2) {
+      if (s1 === null && s2 !== null) { return -1; }
+      if (s1 !== null && s2 === null) { return 1; }
+      if (s1 < s2) { return -1; }
+      if (s1 > s2) { return 1;  }
+      return 0;
+    },
+
+    numeric : function(value) {
+      if (_.isNaN(+value) || value === null) {
+        return null;
+      } else if (_.isNumber(+value)) {
+        return +value;
+      } else {
+        return null;
+      }
+    },
+
+    string : function(v) {
+      if(_.isNull(v) || typeof v === "undefined") {
+        return '';
+      }
+      
+      return v.toString();
+    }
+
+  },
+
+
+  "boolean" : {
+    name : "boolean",
+    regexp : /^(true|false)$/,
+
+    test : function(v) {
+      if (v === null || typeof v === "undefined" || typeof v === 'boolean' || this.regexp.test( v ) ) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+
+    coerce : function(v) {
+      if (_.isNaN(v) || v === null || typeof v === "undefined") {
+        return null;
+      }
+      if (v === 'false') { return false; }
+      return Boolean(v);
+    },
+
+    compare : function(n1, n2) {
+      if (n1 === null && n2 !== null) { return -1; }
+      if (n1 !== null && n2 === null) { return 1; }
+      if (n1 === null && n2 === null) { return 0; }
+      if (n1 === n2) { return 0; }
+      return (n1 < n2 ? -1 : 1);
+    },
+
+    numeric : function(value) {
+      if (value === null || _.isNaN(value)) {
+        return null;
+      } else {
+        return (value) ? 1 : 0;
+      }
+    },
+
+    string : function(v) {
+      if(_.isNull(v) || typeof v === "undefined") {
+        return '';
+      }
+      
+      return v.toString();
+    }
+  },
+
+
+  time : {
+    name : "time",
+    formats : ["M/D/YYYY", "M/D/YY", "YYYY-MM-DD"],
+    stringFormat : "YYYY-MM-DD",
+    _formatLookup : [
+      ['DD', "\\d{2}"],
+      ['D' ,  "(\\d{1}|\\d{2})"],
+      ['MM', "\\d{2}"],
+      ['M' , "(\\d{1}|\\d{2})"],
+      ['YYYY', "\\d{4}"],
+      ['YY', "\\d{2}"],
+      ['A', "[AM|PM]"],
+      ['hh', "\\d{2}"],
+      ['h', "(\\d{1}|\\d{2})"],
+      ['mm', "\\d{2}"],
+      ['m', "(\\d{1}|\\d{2})"],
+      ['ss', "\\d{2}"],
+      ['s', "(\\d{1}|\\d{2})"],
+      ['ZZ',"[-|+]\\d{4}"],
+      ['Z', "[-|+]\\d{2}:\\d{2}"]
+    ],
+    _regexpTable : {},
+
+    _regexp: function(format) {
+      //memoise
+      if (this._regexpTable[format]) {
+        return new RegExp(this._regexpTable[format], 'g');
+      }
+
+      //build the regexp for substitutions
+      var regexp = format;
+      _.each(this._formatLookup, function(pair) {
+        regexp = regexp.replace(pair[0], pair[1]);
+      }, this);
+
+      // escape all forward slashes
+      regexp = regexp.split("/").join("\\/");
+
+      // save the string of the regexp, NOT the regexp itself.
+      // For some reason, this resulted in inconsistant behavior
+      this._regexpTable[format] = regexp;
+      return new RegExp(this._regexpTable[format], 'g');
+    },
+
+    test : function(v, options) {
+      options = options || {};
+      if (v === null || typeof v === "undefined") {
+        return true;
+      }
+      if (_.isString(v) ) {
+        var formats = options.formats || this.formats;
+
+        return _.find(formats, function(f) {
+          return !!this._regexp(f).test(v);
+        }, this);
+
+      } else {
+        //any number or moment obj basically
+        return true;
+      }
+    },
+
+    coerce : function(v, options) {
+      options = options || {};
+
+      if (_.isNull(v) || typeof v === "undefined" || _.isNaN(v)) {
+        return null;
+      }
+
+      // if string, then parse as a time
+      if (_.isString(v)) {
+        var formats = options.formats || this.formats;
+        var format = _.find(formats, function(f) {
+          return this._regexp(f).test(v);
+        }, this);
+
+        return _.isUndefined(format) ? null : moment(v, format);
+      } else if (_.isNumber(v)) {
+        return moment(v);
+      } else {
+        return v;
+      }
+
+    },
+
+    compare : function(d1, d2) {
+      if (d1 < d2) {return -1;}
+      if (d1 > d2) {return 1;}
+      return 0;
+    },
+
+    numeric : function( value ) {
+      if (_.isNaN(value) || value === null) {
+        return null;
+      }
+      return value.valueOf();
+    },
+
+    string : function(v) {
+      if(_.isNull(v) || typeof v === "undefined") {
+        return '';
+      }
+      
+      return v.format(this.stringFormat);
+    }
+  },
+
+
+  currency: {
+    name : "currency",
+    regexp : /^\s*\$?[+-]?\$?[0-9]{1,3}(?:,?[0-9]{3})*(?:\.[0-9]{2})?\s*$/,
+
+    test : function(v) {
+      if (v === null || typeof v === "undefined" || typeof v === 'number' || this.regexp.test( v ) ) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+
+    coerce : function(v) {
+      var cv, cents, dollars, output;
+
+      if (_.isNull(v) || typeof v === "undefined") {
+        return null;
+      }
+
+      // return a uniform format for US currency
+      cv = +v.replace(/\$|,/g, '');
+      cents = (cv*100).toString().slice(-2); // ensure cents
+      dollars = Math.floor(Math.abs(cv)).toString();
+      
+      // format dollars
+      output = "";
+      while(dollars.length > 3) {
+        output = "," + (dollars.slice(-3)) + output;
+        dollars = dollars.slice(0,-3);
+      }
+      output = (cv < 0 ? '-$' : '$') + dollars + output + '.' + cents;
+
+      return output;
+    },
+
+    compare : function(m1, m2) {
+      n1 = this.numeric(m1); n2 = this.numeric(m2);
+
+      if (n1 === null && n2 !== null) { return -1; }
+      if (n1 !== null && n2 === null) { return 1; }
+      if (n1 === null && n2 === null) { return 0; }
+      if (n1 === n2) { return 0; }
+      return (n1 < n2 ? -1 : 1);
+    },
+
+    numeric : function(value) {
+      var v = +value.replace(/[^0-9.]/, '');
+
+      if (_.isNaN(v) || v === null) {
+        return null;
+      }
+
+      return v;
+    },
+
+    string : function(v) {
+      if(_.isNull(v) || typeof v === "undefined") {
+        return '';
+      }
+      
+      return v.toString();
+    }
+
+  }
+};
+
+
+
+module.exports = DataTypes;
+},{"lodash":5}],9:[function(require,module,exports){
+var _ = require('lodash'),
+    Backbone = require('backbone'),
+    DataTypes = require('./data_types.js');
+
+
+// preference order for data types in order of strictest to more lenient
+var dataTypeOrder = ['boolean', 'number', 'currency', 'time', 'string'];
+
+var Dataset = function() {};
+
+_.extend(Dataset.prototype, Backbone.Events, {
+  universe: [],
+  columns: [],
+  set: [],
+
+
+  /**
+   * Adds a type to columns
+   *
+   * @param {array} columns - Array of columns
+   * @param {object} sample - A few rows of data to detect the type from
+   */
+  _detectDataTypes: function(columns, sample) {
+    return _.map(columns, function(column) {
+      var types, sampleRow = _.pluck(sample, column.name);
+
+      types = _.map(sampleRow, function(sampleVal) {
+        return _.find(dataTypeOrder, function(type) {
+          return DataTypes[type].test(sampleVal);
+        });
+      });
+
+      // console.log(DataTypes)
+      if(_.every(types, function(x){ return x === types[0]; })) {
+        // all the data types are the same; run with it
+        column.type = types[0];
+      } else {
+        column.type = 'string';
+      }
+      return column;
+    });
+  },
+
+
+  loadSource: function(source) {
+    var columns = source.columns,
+        data = source.data;
+
+    // create column names if we're only given strings
+    if(typeof columns[0] === 'string') {
+      columns = _.map(columns, function(c) { return {name: c}; });
+    }
+
+    // check to see if we need to autodetect column types
+    if(!_.has(columns[0], 'type')) {
+      columns = this._detectDataTypes(columns, data.slice(1, 6));
+    }
+
+    this.columns = columns;
+    this.universe = data;
+
+    this.recalculate();
+  },
+
+
+  recalculate: function() {
+    this.set = this.universe;
+    this.trigger("change", this.set);
+  }
+
+
+});
+
+
+
+module.exports = new Dataset();
+},{"./data_types.js":8,"backbone":2,"lodash":5}],10:[function(require,module,exports){
+module.exports = function(obj){
+var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
+with(obj||{}){
+__p+='<section>\n  <h1>'+
+((__t=( name ))==null?'':__t)+
+'</h1>\n  <div></div>\n</section>';
+}
+return __p;
+};
+
+},{}],11:[function(require,module,exports){
+module.exports = function(obj){
+var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
+with(obj||{}){
+__p+='Upload CSV: <input id="csv" type="file">';
+}
+return __p;
+};
+
+},{}],12:[function(require,module,exports){
+module.exports = function(obj){
+var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
+with(obj||{}){
+__p+='<aside id="tools">\n</aside>\n\n<main>\n  <div id="grid">\n  </div>\n</main>\n';
+}
+return __p;
+};
+
+},{}],13:[function(require,module,exports){
+module.exports = function(obj){
+var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
+with(obj||{}){
+__p+='<table>\n  <thead>\n    ';
+ dataset.eachColumn( function ( colName, colObject, index ) { 
+__p+='\n      <th class="'+
+((__t=( colObject.type ))==null?'':_.escape(__t))+
+'">'+
+((__t=( colName ))==null?'':_.escape(__t))+
+'</th>\n    ';
+ }) 
+__p+='\n  </thead>\n  <tbody>\n    ';
+ dataset.each( function( row ) { 
+__p+='\n      <tr>\n        ';
+ dataset.eachColumn( function ( colName, colObject ) { 
+__p+='\n          <td class="'+
+((__t=( colObject.type ))==null?'':_.escape(__t))+
+'">'+
+((__t=( colObject.toString(row[colName]) ))==null?'':_.escape(__t))+
+'</td>\n        ';
+ }) 
+__p+='\n      </tr>\n    ';
+ }) 
+__p+='\n  </tbody>\n</table>';
+}
+return __p;
+};
+
+},{}],14:[function(require,module,exports){
+var _ = require('lodash'),
+    Backbone = require('backbone'),
+    Dataset = require('../lib/dataset.js');
+
+
+var GridView = Backbone.View.extend({
+  el : '#grid',
+  dataset : null,
+  template: require('../templates/grid.tpl'),
+
+  initialize : function() {
+    Dataset.on('change', function(set) {
+      this.dataset = set;
+      this.render();
+    }, this);
+
+  },
+
+  render : function() {
+    if(this.dataset) {
+      this.$el.html( this.template({ dataset: this.dataset }) );
+    }
+  }
+});
+
+
+module.exports = GridView;
+
+},{"../lib/dataset.js":9,"../templates/grid.tpl":13,"backbone":2,"lodash":5}],15:[function(require,module,exports){
 var $ = require('jquery'),
     _ = require('lodash'),
     Backbone = require('backbone'),
     Dataset = require('../lib/dataset.js'),
-    template = require('../templates/controls/source.hbs');
+    template = require('../templates/controls/source.tpl'),
+    BabyParse = require('babyparse');
+
+var columnTypeDetectors = {
+  boolean: /^(true|false)$/,
+  number: /^\s*[\-\.]?[0-9]+([\.][0-9]+)?\s*$/,
+  string: new RegExp('.*')
+};
 
 var SourceView = Backbone.View.extend({
 
@@ -19801,13 +20429,54 @@ var SourceView = Backbone.View.extend({
   },
 
   render: function() {
-    console.log(this.$el);
     this.$el.html(template());
   },
 
 
+  // generic consumer of data--imports should all end up here as JSON
+  // format:
+  // {
+  //   columns: column objects or strings (will be auto detected)
+  //   data: raw data
+  // }
+  importData: function(data) {
+    Dataset.loadSource(data);
+  },
+
+
   importCSV: function() {
-    console.log(this);
+    var reader = new FileReader(),
+        file = $('#csv').prop('files')[0];
+
+    if(!file) { return null; }
+
+    reader.onload = _.bind(function() {
+      this.parseCSV(reader.result);
+    }, this);
+    
+    reader.readAsText(file);
+  },
+
+
+  parseCSV: function(csvData) {
+    var parsed = BabyParse.parse(csvData).data,
+        columns = parsed[0],
+        rawData = parsed.slice(1,-1),
+        data = [];
+
+    // data is coming in as an array--transform to object
+    _.each(rawData, function(row) {
+      var datum = {};
+      _.each(columns, function(col, idx) {
+        datum[col] = row[idx];
+      });
+      data.push(datum);
+    });
+
+    this.importData.call(this, {
+      columns: columns,
+      data: data
+    });
   }
 
 });
@@ -19815,4 +20484,4 @@ var SourceView = Backbone.View.extend({
 
 
 module.exports = SourceView;
-},{"../lib/dataset.js":15,"../templates/controls/source.hbs":17,"backbone":1,"jquery":11,"lodash":12}]},{},[13])
+},{"../lib/dataset.js":9,"../templates/controls/source.tpl":11,"babyparse":1,"backbone":2,"jquery":4,"lodash":5}]},{},[6])

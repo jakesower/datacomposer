@@ -11,8 +11,11 @@ Backbone.$ = $;
 
 views.source = {name: "Source", view: require('./views/source.js')};
 
-templates.datacomposer = require('./templates/datacomposer.hbs');
-templates.control = require('./templates/control.hbs');
+
+Grid = require('./views/grid.js');
+
+templates.datacomposer = require('./templates/datacomposer.tpl');
+templates.control = require('./templates/control.tpl');
 
 $(function() {
   // render skeleton
@@ -30,6 +33,9 @@ $(function() {
     new viewData.view({el: viewEl});
   });
 
+
+  // render the grid
+  new Grid();
 
   new Accordion(sidebar);
 });

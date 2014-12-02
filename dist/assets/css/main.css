@@ -18,7 +18,7 @@ aside {
   aside section {
     border-bottom: #999 dashed 1px;
     border-top: #999 dashed 1px;
-    font-family: 'Oswald';
+    font-family: 'Lato';
     padding: 8px 0 8px 15px;
     cursor: pointer; }
     aside section:first-child {

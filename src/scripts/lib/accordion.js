@@ -27,7 +27,7 @@ function Accordion(el) {
 Accordion.prototype = {
   el            : null,
   activeSection : null,
-  panelSelector : ':nth-child(2)',
+  panelSelector : '> :nth-child(2)',
 
 
   initialize : function() {
@@ -81,15 +81,15 @@ Accordion.prototype = {
   },
 
 
-  showSection : function(section, visible) {
+  showSection : function(section, visible, skipAnimation) {
     var panel = $(section).find(this.panelSelector);
 
     if(visible) {
-      panel.slideDown();
       $(section).addClass('active');
+      panel.slideDown();
     } else {
-      panel.slideUp();
       $(section).removeClass('active');
+      panel.slideUp();
     }
   },
 

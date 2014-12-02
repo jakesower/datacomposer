@@ -1,14 +1,14 @@
 <table>
   <thead>
-    <% dataset.eachColumn( function ( colName, colObject, index ) { %>
-      <th class="<%- colObject.type %>"><%- colName %></th>
+    <% dataset.eachColumn( function (column) { %>
+      <th class="<%- column.type %>"><%- column.name %></th>
     <% }) %>
   </thead>
   <tbody>
-    <% dataset.each( function( row ) { %>
+    <% dataset.each( function(row) { %>
       <tr>
-        <% dataset.eachColumn( function ( colName, colObject ) { %>
-          <td class="<%- colObject.type %>"><%- colObject.toString(row[colName]) %></td>
+        <% dataset.eachColumn( function (column) { %>
+          <td class="<%- column.type %>"><%- column.toString(row[column.name]) %></td>
         <% }) %>
       </tr>
     <% }) %>

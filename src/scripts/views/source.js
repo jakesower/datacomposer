@@ -5,11 +5,6 @@ var $ = require('jquery'),
     template = require('../templates/controls/source.tpl'),
     BabyParse = require('babyparse');
 
-var columnTypeDetectors = {
-  boolean: /^(true|false)$/,
-  number: /^\s*[\-\.]?[0-9]+([\.][0-9]+)?\s*$/,
-  string: new RegExp('.*')
-};
 
 var SourceView = Backbone.View.extend({
 

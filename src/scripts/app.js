@@ -9,7 +9,10 @@ var $         = require('jquery'),
 
 Backbone.$ = $;
 
-views.source = {name: "Source", view: require('./views/source.js')};
+views = {
+  source: {name: "Source", view: require('./views/source.js')},
+  filters: {name: "Filters", view: require('./views/filters.js')}
+};
 
 
 Grid = require('./views/grid.js');

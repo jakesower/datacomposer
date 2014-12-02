@@ -1,5 +1,6 @@
 var _ = require('lodash'),
     Backbone = require('backbone'),
+    Column = require('./column.js'),
     DataTypes = require('./data_types.js');
 
 
@@ -12,6 +13,7 @@ _.extend(Dataset.prototype, Backbone.Events, {
   universe: [],
   columns: [],
   set: [],
+  columnsByName: {},
 
 
   /**
@@ -56,6 +58,18 @@ _.extend(Dataset.prototype, Backbone.Events, {
       columns = this._detectDataTypes(columns, data.slice(1, 6));
     }
 
+    // we're now assured of the minimum info needed for proper columns
+    columns = _.map(columns, function(column) {
+      return new Column(column);
+    });
+
+
+    this.columnsByName = {};
+    _.each(columns, function(column) {
+      this.columnsByName[column.name] = column;
+    }, this);
+
+
     this.columns = columns;
     this.universe = data;
 
@@ -65,7 +79,20 @@ _.extend(Dataset.prototype, Backbone.Events, {
 
   recalculate: function() {
     this.set = this.universe;
-    this.trigger("change", this.set);
+    this.trigger("change", this);
+  },
+
+
+  each: function(func) {
+    _.each(this.set, func);
+  },
+
+  eachColumn: function(func) {
+    _.each(this.columns, func);
+  },
+
+  getColumn: function(name) {
+    return this.columnsByName[name];
   }
 
 
@@ -73,4 +100,5 @@ _.extend(Dataset.prototype, Backbone.Events, {
 
 
 
+// This is a singleton for now
 module.exports = new Dataset();

@@ -19774,7 +19774,10 @@ var $         = require('jquery'),
 
 Backbone.$ = $;
 
-views.source = {name: "Source", view: require('./views/source.js')};
+views = {
+  source: {name: "Source", view: require('./views/source.js')},
+  filters: {name: "Filters", view: require('./views/filters.js')}
+};
 
 
 Grid = require('./views/grid.js');
@@ -19805,7 +19808,7 @@ $(function() {
   new Accordion(sidebar);
 });
 
-},{"./lib/accordion.js":7,"./templates/control.tpl":10,"./templates/datacomposer.tpl":12,"./views/grid.js":14,"./views/source.js":15,"backbone":2,"jquery":4,"lodash":5}],7:[function(require,module,exports){
+},{"./lib/accordion.js":7,"./templates/control.tpl":11,"./templates/datacomposer.tpl":14,"./views/filters.js":16,"./views/grid.js":17,"./views/source.js":18,"backbone":2,"jquery":4,"lodash":5}],7:[function(require,module,exports){
 //*****************************************************************************
 // Accordion menu
 //*****************************************************************************
@@ -19835,7 +19838,7 @@ function Accordion(el) {
 Accordion.prototype = {
   el            : null,
   activeSection : null,
-  panelSelector : ':nth-child(2)',
+  panelSelector : '> :nth-child(2)',
 
 
   initialize : function() {
@@ -19889,15 +19892,15 @@ Accordion.prototype = {
   },
 
 
-  showSection : function(section, visible) {
+  showSection : function(section, visible, skipAnimation) {
     var panel = $(section).find(this.panelSelector);
 
     if(visible) {
-      panel.slideDown();
       $(section).addClass('active');
+      panel.slideDown();
     } else {
-      panel.slideUp();
       $(section).removeClass('active');
+      panel.slideUp();
     }
   },
 
@@ -19917,6 +19920,31 @@ Accordion.prototype = {
 module.exports = Accordion;
 
 },{"jquery":4,"lodash":5}],8:[function(require,module,exports){
+var _ = require('lodash'),
+    DataTypes = require('./data_types.js');
+
+var Column = function(options) {
+  _.extend(this, options);
+  return this;
+};
+
+
+_.extend(Column.prototype, {
+
+  toString: function(v) {
+    return DataTypes[this.type].string(v);
+  },
+
+  filters: function() {
+    return DataTypes[this.type].filters;
+  }
+
+});
+
+
+
+module.exports = Column;
+},{"./data_types.js":9,"lodash":5}],9:[function(require,module,exports){
 /**
  * Provides methods for handline the different types of columns. Methods included:
  *
@@ -19925,6 +19953,7 @@ module.exports = Accordion;
  * compare : compare two values for sorting purposes
  * numeric : return a value as a number for purposes where a number is needed
  * string  : get the value as a string
+ * filters : which filter types apply to the column
 */
 
 var _ = require('lodash');
@@ -19934,6 +19963,7 @@ var DataTypes = {
   number: {
     name : "number",
     regexp : /^\s*[\-\.]?[0-9]+([\.][0-9]+)?\s*$/,
+    filters : ['numeric', 'equality'],
 
     test : function(v) {
       if (v === null || typeof v === "undefined" || typeof v === 'number' || this.regexp.test( v ) ) {
@@ -19977,6 +20007,8 @@ var DataTypes = {
 
 
   string: {
+    filters : ['equality'], // enumerated possible
+
     test : function(v) {
       return (v === null || typeof v === "undefined" || typeof v === 'string');
     },
@@ -20020,6 +20052,7 @@ var DataTypes = {
   "boolean" : {
     name : "boolean",
     regexp : /^(true|false)$/,
+    filters : ['equality'],
 
     test : function(v) {
       if (v === null || typeof v === "undefined" || typeof v === 'boolean' || this.regexp.test( v ) ) {
@@ -20065,6 +20098,8 @@ var DataTypes = {
 
   time : {
     name : "time",
+    filters : ['numeric'], // should be time at some point
+
     formats : ["M/D/YYYY", "M/D/YY", "YYYY-MM-DD"],
     stringFormat : "YYYY-MM-DD",
     _formatLookup : [
@@ -20173,6 +20208,8 @@ var DataTypes = {
 
   currency: {
     name : "currency",
+    filters : ['numeric', 'equality'],
+
     regexp : /^\s*\$?[+-]?\$?[0-9]{1,3}(?:,?[0-9]{3})*(?:\.[0-9]{2})?\s*$/,
 
     test : function(v) {
@@ -20240,9 +20277,10 @@ var DataTypes = {
 
 
 module.exports = DataTypes;
-},{"lodash":5}],9:[function(require,module,exports){
+},{"lodash":5}],10:[function(require,module,exports){
 var _ = require('lodash'),
     Backbone = require('backbone'),
+    Column = require('./column.js'),
     DataTypes = require('./data_types.js');
 
 
@@ -20255,6 +20293,7 @@ _.extend(Dataset.prototype, Backbone.Events, {
   universe: [],
   columns: [],
   set: [],
+  columnsByName: {},
 
 
   /**
@@ -20299,6 +20338,18 @@ _.extend(Dataset.prototype, Backbone.Events, {
       columns = this._detectDataTypes(columns, data.slice(1, 6));
     }
 
+    // we're now assured of the minimum info needed for proper columns
+    columns = _.map(columns, function(column) {
+      return new Column(column);
+    });
+
+
+    this.columnsByName = {};
+    _.each(columns, function(column) {
+      this.columnsByName[column.name] = column;
+    }, this);
+
+
     this.columns = columns;
     this.universe = data;
 
@@ -20308,7 +20359,20 @@ _.extend(Dataset.prototype, Backbone.Events, {
 
   recalculate: function() {
     this.set = this.universe;
-    this.trigger("change", this.set);
+    this.trigger("change", this);
+  },
+
+
+  each: function(func) {
+    _.each(this.set, func);
+  },
+
+  eachColumn: function(func) {
+    _.each(this.columns, func);
+  },
+
+  getColumn: function(name) {
+    return this.columnsByName[name];
   }
 
 
@@ -20316,8 +20380,10 @@ _.extend(Dataset.prototype, Backbone.Events, {
 
 
 
+// This is a singleton for now
 module.exports = new Dataset();
-},{"./data_types.js":8,"backbone":2,"lodash":5}],10:[function(require,module,exports){
+},{"./column.js":8,"./data_types.js":9,"backbone":2,"lodash":5}],11:[function(require,module,exports){
+_ = require("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
@@ -20328,7 +20394,26 @@ __p+='<section>\n  <h1>'+
 return __p;
 };
 
-},{}],11:[function(require,module,exports){
+},{"lodash":5}],12:[function(require,module,exports){
+_ = require("lodash");
+module.exports = function(obj){
+var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
+with(obj||{}){
+__p+='(list of filters)\n<div class="clear"></div>\n<button id="new">+ New Filter</button>\n\n<form id="new-filter">\n  <select id="column">\n    <option value=""></option>\n    ';
+ _.each(dataset.columns, function(column) { 
+__p+='\n      <option value="'+
+((__t=( column.name ))==null?'':_.escape(__t))+
+'">'+
+((__t=( column.name ))==null?'':_.escape(__t))+
+'</option>\n    ';
+ }) 
+__p+='\n  </select>\n  \n  <div class="category" id="equality">\n    Equality\n  </div>\n\n  <div class="category" id="numeric">\n    Numeric\n\n  </div>\n\n  <div class="category" id="range">\n    Range\n  </div>\n\n  <div class="category" id="enumerated">\n    Enumerated\n\n  </div>\n\n  <div class="category" id="time">\n    Time\n\n  </div>\n</form>';
+}
+return __p;
+};
+
+},{"lodash":5}],13:[function(require,module,exports){
+_ = require("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
@@ -20337,7 +20422,8 @@ __p+='Upload CSV: <input id="csv" type="file">';
 return __p;
 };
 
-},{}],12:[function(require,module,exports){
+},{"lodash":5}],14:[function(require,module,exports){
+_ = require("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
@@ -20346,26 +20432,27 @@ __p+='<aside id="tools">\n</aside>\n\n<main>\n  <div id="grid">\n  </div>\n</mai
 return __p;
 };
 
-},{}],13:[function(require,module,exports){
+},{"lodash":5}],15:[function(require,module,exports){
+_ = require("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
 __p+='<table>\n  <thead>\n    ';
- dataset.eachColumn( function ( colName, colObject, index ) { 
+ dataset.eachColumn( function (column) { 
 __p+='\n      <th class="'+
-((__t=( colObject.type ))==null?'':_.escape(__t))+
+((__t=( column.type ))==null?'':_.escape(__t))+
 '">'+
-((__t=( colName ))==null?'':_.escape(__t))+
+((__t=( column.name ))==null?'':_.escape(__t))+
 '</th>\n    ';
  }) 
 __p+='\n  </thead>\n  <tbody>\n    ';
- dataset.each( function( row ) { 
+ dataset.each( function(row) { 
 __p+='\n      <tr>\n        ';
- dataset.eachColumn( function ( colName, colObject ) { 
+ dataset.eachColumn( function (column) { 
 __p+='\n          <td class="'+
-((__t=( colObject.type ))==null?'':_.escape(__t))+
+((__t=( column.type ))==null?'':_.escape(__t))+
 '">'+
-((__t=( colObject.toString(row[colName]) ))==null?'':_.escape(__t))+
+((__t=( column.toString(row[column.name]) ))==null?'':_.escape(__t))+
 '</td>\n        ';
  }) 
 __p+='\n      </tr>\n    ';
@@ -20375,7 +20462,67 @@ __p+='\n  </tbody>\n</table>';
 return __p;
 };
 
-},{}],14:[function(require,module,exports){
+},{"lodash":5}],16:[function(require,module,exports){
+var $ = require('jquery'),
+    _ = require('lodash'),
+    Backbone = require('backbone'),
+    Dataset = require('../lib/dataset.js'),
+    template = require('../templates/controls/filters.tpl');
+
+
+var FiltersView = Backbone.View.extend({
+
+  events: {
+    "change #column": "setColumn"
+  },
+
+  operators: {
+    equality: ['=', '≠'],
+    numeric: ['=', '≠', '<', '≤', '≥', '>']
+  },
+
+  initialize: function() {
+    Dataset.on('change', function(set) {
+      this.dataset = set;
+      this.render();
+    }, this);
+
+    this.render();
+  },
+
+  render: function() {
+    this.$el.html(template({dataset: Dataset}));
+    // this.$(".category").each(function(idx, cat) { $(cat).hide(); });
+  },
+
+
+
+  setColumn: function() {
+    var columnName = this.$("#column").val(),
+        column = Dataset.getColumn(columnName),
+        filters = (column ? column.filters() : []);
+    
+    var operators = _.map(filters, function(f) { return this.operators[f]; }, this);
+    operators = _.union(_.flatten(operators));
+
+    console.log(operators);
+
+    this.$(".category").each(function(idx, cat) {
+      $(cat).html(operators.join(", "));
+      // if(_.contains(filters, $(cat).attr("id"))) {
+      //   $(cat).show();
+      // } else {
+      //   $(cat).hide();
+      // }
+    });
+  }
+
+});
+
+
+
+module.exports = FiltersView;
+},{"../lib/dataset.js":10,"../templates/controls/filters.tpl":12,"backbone":2,"jquery":4,"lodash":5}],17:[function(require,module,exports){
 var _ = require('lodash'),
     Backbone = require('backbone'),
     Dataset = require('../lib/dataset.js');
@@ -20404,7 +20551,7 @@ var GridView = Backbone.View.extend({
 
 module.exports = GridView;
 
-},{"../lib/dataset.js":9,"../templates/grid.tpl":13,"backbone":2,"lodash":5}],15:[function(require,module,exports){
+},{"../lib/dataset.js":10,"../templates/grid.tpl":15,"backbone":2,"lodash":5}],18:[function(require,module,exports){
 var $ = require('jquery'),
     _ = require('lodash'),
     Backbone = require('backbone'),
@@ -20412,11 +20559,6 @@ var $ = require('jquery'),
     template = require('../templates/controls/source.tpl'),
     BabyParse = require('babyparse');
 
-var columnTypeDetectors = {
-  boolean: /^(true|false)$/,
-  number: /^\s*[\-\.]?[0-9]+([\.][0-9]+)?\s*$/,
-  string: new RegExp('.*')
-};
 
 var SourceView = Backbone.View.extend({
 
@@ -20484,4 +20626,4 @@ var SourceView = Backbone.View.extend({
 
 
 module.exports = SourceView;
-},{"../lib/dataset.js":9,"../templates/controls/source.tpl":11,"babyparse":1,"backbone":2,"jquery":4,"lodash":5}]},{},[6])
+},{"../lib/dataset.js":10,"../templates/controls/source.tpl":13,"babyparse":1,"backbone":2,"jquery":4,"lodash":5}]},{},[6])

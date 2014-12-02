@@ -1,10 +1,27 @@
 @font-face {
   font-family: 'Lato';
-  src: url('/assets/fonts/Lato.woff2') format('woff2'), url('/assets/fonts/Lato.woff') format('woff2'); }
+  src: url('/assets/fonts/Lato.woff2') format('woff2'), url('/assets/fonts/Lato.woff') format('woff'); }
 
 @font-face {
   font-family: 'Oswald';
-  src: url('/assets/fonts/Oswald.woff2') format('woff2'), url('/assets/fonts/Oswald.woff') format('woff2'); }
+  font-style: normal;
+  font-weight: 300;
+  src: url('/assets/fonts/oswald-light.woff2') format('woff2');
+  unicode-range: U100 -24F, U1E00-1EFF, U20A0-20AB, U20AD-20CF, U2C60-2C7F, UA720-A7FF; }
+
+@font-face {
+  font-family: 'Oswald';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/assets/fonts/oswald-regular.woff2') format('woff2');
+  unicode-range: U100 -24F, U1E00-1EFF, U20A0-20AB, U20AD-20CF, U2C60-2C7F, UA720-A7FF; }
+
+@font-face {
+  font-family: 'Oswald';
+  font-style: normal;
+  font-weight: 700;
+  src: url('/assets/fonts/oswald-bold.woff2') format('woff2');
+  unicode-range: U100 -24F, U1E00-1EFF, U20A0-20AB, U20AD-20CF, U2C60-2C7F, UA720-A7FF; }
 
 body {
   position: relative; }
@@ -71,6 +88,7 @@ main {
   main table thead th {
     padding: 2px 8px;
     font-family: 'Oswald';
+    font-size: 90%;
     text-align: left;
     vertical-align: bottom; }
     main table thead th.number, main table thead th.currency {
@@ -78,12 +96,13 @@ main {
   main table tbody tr td {
     padding: 2px 8px;
     font-family: 'Lato';
+    font-size: 70%;
     text-align: left; }
     main table tbody tr td.number {
-      font-family: 'Inconsolata';
+      font-family: 'Inconsolata', monospace;
       text-align: right; }
     main table tbody tr td.currency {
-      font-family: 'Inconsolata';
+      font-family: 'Inconsolata', monospace;
       text-align: right; }
     main table tbody tr td.time {
       white-space: nowrap; }

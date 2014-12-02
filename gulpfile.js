@@ -1,7 +1,11 @@
 var gulp = require('gulp'),
     plugins = require('gulp-load-plugins')(),
     browserify = require('gulp-browserify'),
-    stylish = require('jshint-stylish');
+    stylish = require('jshint-stylish'),
+    tplTransform = require('node-underscorify').transform({
+      extensions: ['tpl'],
+      requires: [{variable: '_', module: 'lodash'}]
+    });
 
 
 function handleError(err) {
@@ -23,7 +27,7 @@ gulp.task('styles', function() {
 gulp.task('browserify', function() {
   return gulp.src('src/scripts/app.js')
     .pipe(browserify({
-      transform: ["node-underscorify"]
+      transform: [tplTransform]
     }))
     .on('error', handleError)
     .pipe(gulp.dest('dist/assets/js'))
@@ -36,13 +40,6 @@ gulp.task('lint', function() {
     .pipe(plugins.jshint.reporter(stylish))
 });
 
-
-// gulp.task('templates', function() {
-//   return gulp.src('src/scripts/templates/*.hbs')
-//     .pipe(plugins.handlebars())
-//     .pipe(plugins.concat('templates.js'))
-//     .pipe(gulp.dest('src/scripts'))     // keep in src for immediate consumption by browserify
-// });
 
 
 gulp.task('watch', function() {

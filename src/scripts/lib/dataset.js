@@ -14,6 +14,7 @@ _.extend(Dataset.prototype, Backbone.Events, {
   columns: [],
   set: [],
   columnsByName: {},
+  filters: {},
 
 
   /**
@@ -77,9 +78,63 @@ _.extend(Dataset.prototype, Backbone.Events, {
   },
 
 
+  /**
+   * Creates a new filter to be applied to the universe
+   *
+   * @param {object} filterData - raw filter data used to compose filter
+   * @param {string} filterData.column - name of the column to filter
+   * @param {string} filterData.operator - operator to apply
+   * @param {string} filterData.operand - target of operator
+   */
+  addFilter: function(filterData) {
+    var filter, filterFunc,
+        filterID = _.uniqueId(),
+        operatorMap = {
+          "=": function(column, operand, dataRow) { return dataRow[column] === operand; },
+          "≠": function(column, operand, dataRow) { return dataRow[column] !== operand; },
+          "<": function(column, operand, dataRow) { return dataRow[column] < operand; },
+          "≤": function(column, operand, dataRow) { return dataRow[column] <= operand; },
+          "≥": function(column, operand, dataRow) { return dataRow[column] >= operand; },
+          ">": function(column, operand, dataRow) { return dataRow[column] > operand; }
+        },
+        column = this.columnsByName[filterData.column],
+        operator = operatorMap[filterData.operator],
+        operand = DataTypes[column.type].coerce(filterData.operand);
+
+    // we may be able to do a better job returning a pure function, rather than what lodash gives us
+    filterFunc = _.curry(operator, 3)(column.name, operand);
+
+    this.filters[filterID] = {
+      filter: filterFunc,
+      id: filterID,
+      string: filterData.column + " " + filterData.operator + " " + filterData.operand
+    };
+
+    this.recalculate();
+  },
+
+
+  removeFilter: function(filterId) {
+    delete this.filters[filterId];
+    this.recalculate();
+  },
+
+
+  // this method BEGS for optimization
   recalculate: function() {
-    this.set = this.universe;
+    var set = this.universe;
+
+    set = this.applyFilters(set);
+
+    this.set = set;
     this.trigger("change", this);
+  },
+
+
+  applyFilters: function(set) {
+    return _.reduce(_.values(this.filters), function(remaining, filter) {
+      return _.filter(remaining, filter.filter);
+    }, set);
   },
 
 

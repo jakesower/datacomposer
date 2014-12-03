@@ -2,6 +2,6 @@
 </aside>
 
 <main>
-  <div id="grid">
-  </div>
+  <div id="tools"></div>
+  <div id="grid"></div>
 </main>

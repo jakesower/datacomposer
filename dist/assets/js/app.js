@@ -20294,6 +20294,7 @@ _.extend(Dataset.prototype, Backbone.Events, {
   columns: [],
   set: [],
   columnsByName: {},
+  filters: {},
 
 
   /**
@@ -20357,9 +20358,63 @@ _.extend(Dataset.prototype, Backbone.Events, {
   },
 
 
+  /**
+   * Creates a new filter to be applied to the universe
+   *
+   * @param {object} filterData - raw filter data used to compose filter
+   * @param {string} filterData.column - name of the column to filter
+   * @param {string} filterData.operator - operator to apply
+   * @param {string} filterData.operand - target of operator
+   */
+  addFilter: function(filterData) {
+    var filter, filterFunc,
+        filterID = _.uniqueId(),
+        operatorMap = {
+          "=": function(column, operand, dataRow) { return dataRow[column] === operand; },
+          "≠": function(column, operand, dataRow) { return dataRow[column] !== operand; },
+          "<": function(column, operand, dataRow) { return dataRow[column] < operand; },
+          "≤": function(column, operand, dataRow) { return dataRow[column] <= operand; },
+          "≥": function(column, operand, dataRow) { return dataRow[column] >= operand; },
+          ">": function(column, operand, dataRow) { return dataRow[column] > operand; }
+        },
+        column = this.columnsByName[filterData.column],
+        operator = operatorMap[filterData.operator],
+        operand = DataTypes[column.type].coerce(filterData.operand);
+
+    // we may be able to do a better job returning a pure function, rather than what lodash gives us
+    filterFunc = _.curry(operator, 3)(column.name, operand);
+
+    this.filters[filterID] = {
+      filter: filterFunc,
+      id: filterID,
+      string: filterData.column + " " + filterData.operator + " " + filterData.operand
+    };
+
+    this.recalculate();
+  },
+
+
+  removeFilter: function(filterId) {
+    delete this.filters[filterId];
+    this.recalculate();
+  },
+
+
+  // this method BEGS for optimization
   recalculate: function() {
-    this.set = this.universe;
+    var set = this.universe;
+
+    set = this.applyFilters(set);
+
+    this.set = set;
     this.trigger("change", this);
+  },
+
+
+  applyFilters: function(set) {
+    return _.reduce(_.values(this.filters), function(remaining, filter) {
+      return _.filter(remaining, filter.filter);
+    }, set);
   },
 
 
@@ -20399,15 +20454,23 @@ _ = require("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='(list of filters)\n<div class="clear"></div>\n<button id="new">+ New Filter</button>\n\n<form id="new-filter">\n  <select id="column">\n    <option value=""></option>\n    ';
+__p+='<ul id="existing-filters">\n';
+ _.each(dataset.filters, function(filter) { 
+__p+='\n  <li class="filter">\n    <span class="text">'+
+((__t=( filter.string ))==null?'':_.escape(__t))+
+'</span>\n    <span class="remover" data-filterid="'+
+((__t=( filter.id ))==null?'':_.escape(__t))+
+'">✕</span>\n  </li>\n';
+ }); 
+__p+='\n</ul>\n<div class="clear"></div>\n\n<div class="separated">\n  <form id="new-filter">\n    <select id="column" name="column" required>\n      <option class="blank" value="" default>New Filter</option>\n      ';
  _.each(dataset.columns, function(column) { 
-__p+='\n      <option value="'+
+__p+='\n        <option value="'+
 ((__t=( column.name ))==null?'':_.escape(__t))+
 '">'+
 ((__t=( column.name ))==null?'':_.escape(__t))+
-'</option>\n    ';
+'</option>\n      ';
  }) 
-__p+='\n  </select>\n  \n  <div class="category" id="equality">\n    Equality\n  </div>\n\n  <div class="category" id="numeric">\n    Numeric\n\n  </div>\n\n  <div class="category" id="range">\n    Range\n  </div>\n\n  <div class="category" id="enumerated">\n    Enumerated\n\n  </div>\n\n  <div class="category" id="time">\n    Time\n\n  </div>\n</form>';
+__p+='\n    </select>\n\n    <select id="operator" name="operator" required>\n    </select>\n\n    <input type="text" id="operand" name="operand" required>\n    \n    <input type="submit" value="Add Filter">\n  </form>\n</div>';
 }
 return __p;
 };
@@ -20417,7 +20480,7 @@ _ = require("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='Upload CSV: <input id="csv" type="file">';
+__p+='Upload CSV: <input id="csv" type="file" accept=".csv">';
 }
 return __p;
 };
@@ -20427,7 +20490,7 @@ _ = require("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<aside id="tools">\n</aside>\n\n<main>\n  <div id="grid">\n  </div>\n</main>\n';
+__p+='<aside id="tools">\n</aside>\n\n<main>\n  <div id="tools"></div>\n  <div id="grid"></div>\n</main>\n';
 }
 return __p;
 };
@@ -20473,7 +20536,9 @@ var $ = require('jquery'),
 var FiltersView = Backbone.View.extend({
 
   events: {
-    "change #column": "setColumn"
+    "change #column": "setColumn",
+    "submit #new-filter": "createFilter",
+    "click .remover": "removeFilter"
   },
 
   operators: {
@@ -20492,7 +20557,6 @@ var FiltersView = Backbone.View.extend({
 
   render: function() {
     this.$el.html(template({dataset: Dataset}));
-    // this.$(".category").each(function(idx, cat) { $(cat).hide(); });
   },
 
 
@@ -20505,16 +20569,35 @@ var FiltersView = Backbone.View.extend({
     var operators = _.map(filters, function(f) { return this.operators[f]; }, this);
     operators = _.union(_.flatten(operators));
 
-    console.log(operators);
-
-    this.$(".category").each(function(idx, cat) {
-      $(cat).html(operators.join(", "));
-      // if(_.contains(filters, $(cat).attr("id"))) {
-      //   $(cat).show();
-      // } else {
-      //   $(cat).hide();
-      // }
+    this.$("select#operator").empty();
+    _.each(operators, function(operator) {
+      this.$("select#operator").append(
+        $("<option/>").val(operator).html(operator)
+      );
     });
+  },
+
+
+  createFilter: function(e) {
+    e.preventDefault();
+
+    var filter = {},
+        formValues = this.$el.find("#new-filter").serializeArray();
+
+    _.each(formValues, function(fv) {
+      filter[fv.name] = fv.value;
+    });
+    
+    this.$el.find("#new-filter")[0].reset();
+    Dataset.addFilter(filter);
+  },
+
+
+  removeFilter: function(e) {
+    var elt = e.target,
+        filterId = elt.dataset.filterid;
+    
+    Dataset.removeFilter(filterId);
   }
 
 });

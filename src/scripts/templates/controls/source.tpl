@@ -1,1 +1,1 @@
-Upload CSV: <input id="csv" type="file">
+Upload CSV: <input id="csv" type="file" accept=".csv">

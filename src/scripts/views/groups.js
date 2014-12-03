@@ -2,7 +2,7 @@ var $ = require('jquery'),
     _ = require('lodash'),
     Backbone = require('backbone'),
     Dataset = require('../lib/dataset.js'),
-    template = require('../templates/controls/filters.tpl');
+    template = require('../templates/controls/groups.tpl');
 
 
 var FiltersView = Backbone.View.extend({

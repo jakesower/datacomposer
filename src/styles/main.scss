@@ -47,6 +47,28 @@ aside {
   position: fixed;
   overflow: hidden;
 
+
+  select, input[type=text] {
+    font-size: 100%;
+    background-color: $light-grey;
+    color: $dark-red;
+    border: 3px solid $dark-grey;
+    outline: none;
+    padding: 3px;
+    margin: 3px 2px;
+  }
+
+  input[type=submit] {
+    font-size: 100%;
+    background-color: $dark-grey;
+    padding: 6px;
+    margin-left: 3px;
+    color: $salmon;
+    border: none;
+    outline: none;
+  }
+
+
   section {
     border-bottom: $light-grey dashed 1px;
     border-top: $light-grey dashed 1px;
@@ -69,6 +91,7 @@ aside {
     font-size: 15px;
     margin-bottom: 8px;
   }
+
 
   section.active {
     background-color: $light-grey;
@@ -105,6 +128,29 @@ aside {
 
     h1 {
       font-size: 50%;
+    }
+  }
+
+
+  ul#existing-filters {
+    li {
+      float: left;
+      margin: 3px 7px 3px 0;
+      border: 3px solid $dark-grey;
+      border-radius: 7px;
+
+      span {
+        float: left;
+        padding: 2px 7px;
+        color: $dark-red;
+      }
+
+      .remover {
+        color: $salmon;
+        background-color: $dark-grey;
+        overflow: hidden;
+        cursor: pointer;
+      }
     }
   }
 

@@ -136,8 +136,10 @@ main {
       text-align: right; }
     main table tbody tr td.time {
       white-space: nowrap; }
-  main table tbody tr:hover {
-    background-color: #D66; }
+    main table tbody tr td:nth-child(2n) {
+      background-color: #ddd; }
+  main table tbody tr:hover td {
+    background-color: #D66 !important; }
 
 .expandable {
   padding-left: 8px; }

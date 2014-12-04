@@ -238,10 +238,14 @@ main {
           &.time {
             white-space: nowrap;
           }
+
+          &:nth-child(2n) {
+            background-color: #ddd;
+          }
         }
 
-        &:hover {
-          background-color: #D66;
+        &:hover td {
+          background-color: #D66!important;
         }
       }
 

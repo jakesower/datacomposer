@@ -14,6 +14,7 @@ _.extend(Dataset.prototype, Backbone.Events, {
   columns: [],
   set: [],
   columnsByName: {},
+  columnsById: {},
   filters: {},
 
 
@@ -61,15 +62,29 @@ _.extend(Dataset.prototype, Backbone.Events, {
 
     // we're now assured of the minimum info needed for proper columns
     columns = _.map(columns, function(column) {
+      column.id = _.uniqueId();
       return new Column(column);
     });
-
 
     this.columnsByName = {};
     _.each(columns, function(column) {
       this.columnsByName[column.name] = column;
+      this.columnsById[column.id] = column;
     }, this);
 
+    // set up listeners on columns to be propogated via Dataset
+    _.each(columns, function(column) {
+      column.on('change', this.columnEvent, this);
+    }, this);
+
+    // run our data through the column types to force uniformity
+    data = _.map(data, function(datum) {
+      var out = {};
+      _.each(columns, function(column) {
+        out[column.name] = column.coerce(datum[column.name]);
+      });
+      return out;
+    });
 
     this.columns = columns;
     this.universe = data;
@@ -90,12 +105,12 @@ _.extend(Dataset.prototype, Backbone.Events, {
     var filter, filterFunc,
         filterID = _.uniqueId(),
         operatorMap = {
-          "=": function(column, operand, dataRow) { return dataRow[column] === operand; },
-          "≠": function(column, operand, dataRow) { return dataRow[column] !== operand; },
-          "<": function(column, operand, dataRow) { return dataRow[column] < operand; },
-          "≤": function(column, operand, dataRow) { return dataRow[column] <= operand; },
-          "≥": function(column, operand, dataRow) { return dataRow[column] >= operand; },
-          ">": function(column, operand, dataRow) { return dataRow[column] > operand; }
+          "equals": function(column, operand, dataRow) { return dataRow[column] === operand; },
+          "is": function(column, operand, dataRow) { return dataRow[column] === operand; },
+          "does not equal": function(column, operand, dataRow) { return dataRow[column] !== operand; },
+          "is not": function(column, operand, dataRow) { return dataRow[column] !== operand; },
+          "is at most": function(column, operand, dataRow) { return dataRow[column] <= operand; },
+          "is at least": function(column, operand, dataRow) { return dataRow[column] >= operand; },
         },
         column = this.columnsByName[filterData.column],
         operator = operatorMap[filterData.operator],
@@ -138,6 +153,17 @@ _.extend(Dataset.prototype, Backbone.Events, {
   },
 
 
+  // just pass along any events
+  columnEvent: function(event, column) {
+    this.trigger("column:change", column);
+  },
+
+
+  visibleColumns: function() {
+    return _.filter(this.columns, function(c){return c.get("visible");});
+  },
+
+
   each: function(func) {
     _.each(this.set, func);
   },
@@ -146,8 +172,17 @@ _.extend(Dataset.prototype, Backbone.Events, {
     _.each(this.columns, func);
   },
 
+  eachVisibleColumn: function(func) {
+    var visible = _.filter(this.columns, function(c){return c.get("visible");});
+    _.each(visible, func);
+  },
+
   getColumn: function(name) {
     return this.columnsByName[name];
+  },
+
+  rowCount: function() {
+    return this.set.length;
   }
 
 

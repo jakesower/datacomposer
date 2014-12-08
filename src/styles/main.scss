@@ -46,6 +46,7 @@ aside {
   width: 400px;
   position: fixed;
   overflow: hidden;
+  border-right: 1px $dark-grey solid;
 
 
   select, input[type=text] {
@@ -66,6 +67,33 @@ aside {
     color: $salmon;
     border: none;
     outline: none;
+  }
+
+  table {
+    width: 100%;
+
+    tbody tr:hover {
+      background-color: $dark-grey;
+
+      td {
+        color: #eee;
+      }
+    }
+
+    th {
+      font-size: 70%;
+      color: $dark-red;
+      text-transform: uppercase;
+      padding: 0 8px;
+    }
+
+    td {
+      padding: 1px 4px;
+    }
+
+    td.input {
+      text-align: center;
+    }
   }
 
 
@@ -178,7 +206,7 @@ main {
   margin-left: 400px;
   position: relative;
   // background-color: #F00;
-  overflow-x: auto;
+  // overflow-x: auto;
 
   // nav {
   //   height: 30px;
@@ -198,16 +226,23 @@ main {
   //   margin: 0 15px;
   // }
 
+  #gridContainer {
+    overflow: auto;
+  }
+
   table {
+    margin-left: 1px;
 
     thead {
 
       th {
+        font-family: 'Lato';
         padding: 2px 8px;
-        font-family: 'Oswald';
+        // font-family: 'Oswald';
         font-size: 90%;
         text-align: left;
         vertical-align: bottom;
+        background-color: #bbb;
 
         &.number, &.currency {
           text-align: right;
@@ -224,6 +259,7 @@ main {
           font-family: 'Lato';
           font-size: 70%;
           text-align: left;
+          font-family: 'Lato';
 
           &.number {
             font-family: 'Inconsolata', monospace;
@@ -245,7 +281,11 @@ main {
         }
 
         &:hover td {
-          background-color: #D66!important;
+          background-color: #EBB;
+
+          &:nth-child(2n) {
+            background-color: #EAA;
+          }
         }
       }
 

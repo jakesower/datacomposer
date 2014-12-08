@@ -11,7 +11,9 @@ Backbone.$ = $;
 
 views = {
   source: {name: "Source", view: require('./views/source.js')},
-  filters: {name: "Filters", view: require('./views/filters.js')}
+  columns: {name: 'Columns', view: require('./views/columns.js')},
+  filters: {name: "Filters", view: require('./views/filters.js')},
+  save: {name: "Save", view: require('./views/save.js')}
 };
 
 

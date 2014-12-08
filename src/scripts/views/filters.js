@@ -14,8 +14,10 @@ var FiltersView = Backbone.View.extend({
   },
 
   operators: {
-    equality: ['=', '≠'],
-    numeric: ['=', '≠', '<', '≤', '≥', '>']
+    // equality: ['=', '≠'],
+    // numeric: ['=', '≠', '<', '≤', '≥', '>']
+    equality: ['is', 'is not'],
+    numeric: ['equals', 'does not equal', 'is at most', 'is at least']
   },
 
   initialize: function() {
@@ -36,10 +38,9 @@ var FiltersView = Backbone.View.extend({
   setColumn: function() {
     var columnName = this.$("#column").val(),
         column = Dataset.getColumn(columnName),
-        filters = (column ? column.filters() : []);
+        filters = (column ? column.filters() : null);
     
-    var operators = _.map(filters, function(f) { return this.operators[f]; }, this);
-    operators = _.union(_.flatten(operators));
+    var operators = this.operators[filters];
 
     this.$("select#operator").empty();
     _.each(operators, function(operator) {

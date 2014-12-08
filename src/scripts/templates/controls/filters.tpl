@@ -2,7 +2,7 @@
 <% _.each(dataset.filters, function(filter) { %>
   <li class="filter">
     <span class="text"><%- filter.string %></span>
-    <span class="remover" data-filterid="<%- filter.id %>">✕</span>
+    <span class="remover" data-filterid="<%- filter.id %>">x</span>
   </li>
 <% }); %>
 </ul>

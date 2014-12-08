@@ -9,14 +9,15 @@
  * filters : which filter types apply to the column
 */
 
-var _ = require('lodash');
+var _ = require('lodash'),
+    moment = require('moment');
 
 
 var DataTypes = {
   number: {
     name : "number",
     regexp : /^\s*[\-\.]?[0-9]+([\.][0-9]+)?\s*$/,
-    filters : ['numeric', 'equality'],
+    filters : 'numeric',
 
     test : function(v) {
       if (v === null || typeof v === "undefined" || typeof v === 'number' || this.regexp.test( v ) ) {
@@ -60,7 +61,7 @@ var DataTypes = {
 
 
   string: {
-    filters : ['equality'], // enumerated possible
+    filters : 'equality', // enumerated possible
 
     test : function(v) {
       return (v === null || typeof v === "undefined" || typeof v === 'string');
@@ -105,7 +106,7 @@ var DataTypes = {
   "boolean" : {
     name : "boolean",
     regexp : /^(true|false)$/,
-    filters : ['equality'],
+    filters : 'equality',
 
     test : function(v) {
       if (v === null || typeof v === "undefined" || typeof v === 'boolean' || this.regexp.test( v ) ) {
@@ -151,7 +152,7 @@ var DataTypes = {
 
   time : {
     name : "time",
-    filters : ['numeric'], // should be time at some point
+    filters : 'numeric', // should be time at some point
 
     formats : ["M/D/YYYY", "M/D/YY", "YYYY-MM-DD"],
     stringFormat : "YYYY-MM-DD",
@@ -261,7 +262,7 @@ var DataTypes = {
 
   currency: {
     name : "currency",
-    filters : ['numeric', 'equality'],
+    filters : 'numeric',
 
     regexp : /^\s*\$?[+-]?\$?[0-9]{1,3}(?:,?[0-9]{3})*(?:\.[0-9]{2})?\s*$/,
 

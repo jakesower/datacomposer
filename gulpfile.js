@@ -28,7 +28,8 @@ gulp.task('styles', function() {
 gulp.task('browserify', function() {
   return gulp.src('src/scripts/app.js')
     .pipe(browserify({
-      transform: [tplTransform]
+      transform: [tplTransform],
+      standalone: 'DataComposer'
     }))
     .on('error', handleError)
     .pipe(gulp.dest('dist/assets/js'))

@@ -44,3 +44,5 @@ $(function() {
 
   new Accordion(sidebar);
 });
+
+module.exports = function() { return {}; };

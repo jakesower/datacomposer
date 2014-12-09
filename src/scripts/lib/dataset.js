@@ -7,9 +7,12 @@ var _ = require('lodash'),
 // preference order for data types in order of strictest to more lenient
 var dataTypeOrder = ['boolean', 'number', 'currency', 'time', 'string'];
 
-var Dataset = function() {};
+var Dataset = function(options) {
+  this.options = options;
+};
 
 _.extend(Dataset.prototype, Backbone.Events, {
+  options: {},
   universe: [],
   columns: [],
   set: [],

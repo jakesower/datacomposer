@@ -14,12 +14,7 @@ var FiltersView = Backbone.View.extend({
   },
 
   initialize: function() {
-    Dataset.on('change', function(set) {
-      this.dataset = set;
-      this.render();
-    }, this);
-
-    this.render();
+    Dataset.on('change:groupFilters', this.render, this);
   },
 
   render: function() {

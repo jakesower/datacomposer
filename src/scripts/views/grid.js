@@ -6,18 +6,11 @@ var $ = require('jquery'),
 
 
 var GridView = Backbone.View.extend({
-  el : 'main',
+  el : '.datacomposer main',
   template: require('../templates/grid.tpl'),
 
   initialize : function() {
-    Dataset.on('change', function() {
-      this.render();
-    }, this);
-
-    Dataset.on('column:change', function() {
-      this.render();
-    }, this);
-
+    Dataset.on('change', this.render, this);
   },
 
   render : function() {
@@ -30,7 +23,6 @@ var GridView = Backbone.View.extend({
     });
     
     this.$el.html( this.template({ dataset: Dataset }) );
-    // console.log(cols);
     this.$('table').dataTable({
       columns: cols,
       data: Dataset.set,

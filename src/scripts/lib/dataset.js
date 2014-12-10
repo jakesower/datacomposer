@@ -9,17 +9,147 @@ var dataTypeOrder = ['boolean', 'number', 'currency', 'time', 'string'];
 
 var Dataset = function(options) {
   this.options = options;
+  this.initialize();
 };
 
 _.extend(Dataset.prototype, Backbone.Events, {
+  _cache: {
+    source: [],
+    filter: [],
+    group: [],
+    groupFilter: [],
+    columns: []
+  },
   options: {},
-  universe: [],
   columns: [],
   set: [],
   columnsByName: {},
   columnsById: {},
   filters: {},
 
+
+  //
+  // After updates to the dataset, we cascade through different transforms in a
+  // fashion to minimize the amount of work done. Each method takes in a set*,
+  // caches it, performs its transforms, fires an event with the current state
+  // of the set, then calls the next function in the cascade.
+  //
+  // *If no set is passed in as input, the contents of the cache are used.
+  //
+  // As a mnemonic: cache, calculate, callback, cascade
+  // source -> filters -> groupings -> group filters -> columns
+  //
+
+  _applySource: function(set) {
+    // cache
+    this._cache.source = set;
+
+    // no calculations
+    this.set = set;
+
+    // callback
+    this.trigger('change:source', set);
+
+    // cascade
+    this._applyFilters(set);
+  },
+
+
+  _applyFilters: function(set) {
+    // cache
+    if(set) {
+      this._cache.filter = set;
+    } else {
+      set = this._cache.filter;
+    }
+
+    // calculate
+    set = _.reduce(_.values(this.filters), function(remaining, filter) {
+      return _.filter(remaining, filter.filter);
+    }, set);
+    this.set = set;
+
+    // callback
+    this.trigger('change:filters', set);
+
+    // cascade
+    this._applyGroupings(set);
+  },
+
+
+  _applyGroupings: function(set) {
+    // cache
+    if(set) {
+      this._cache.grouping = set;
+    } else {
+      set = this._cache.grouping;
+    }
+
+    // calculate
+    // NOOP for now
+    this.set = set;
+
+    // callback
+    this.trigger('change:groupings', set);
+
+    // cascade
+    this._applyGroupFilters(set);    
+  },
+
+
+  _applyGroupFilters: function(set) {    
+    // cache
+    if(set) {
+      this._cache.groupFilter = set;
+    } else {
+      set = this._cache.groupFilter;
+    }
+
+    // calculate
+    // NOOP for now
+    this.set = set;
+
+    // callback
+    this.trigger('change:groupFilters', set);
+
+    // cascade
+    this._applyColumns(set);    
+  },
+
+
+  _applyColumns: function(set) {
+    // cache
+    if(set) {
+      this._cache.columns = set;
+    } else {
+      set = this._cache.columns;
+    }
+
+    // calculate
+    var cols = this.visibleColumns();
+    set = _.map(set, function(datum) {
+      var out = {};
+      _.each(cols, function(col) {
+        out[col.name] = datum[col.name];
+      });
+      return out;
+    });
+    this.set = set;
+
+    // callback
+    this.trigger('change:columns', set);
+
+    // cascade
+    this._finishCascade(set);
+  },
+
+
+  _finishCascade: function(set) {
+    this.trigger('change', set);
+  },
+
+
+  // end cache, calculate, callback, cascade methods
 
   /**
    * Adds a type to columns
@@ -46,6 +176,11 @@ _.extend(Dataset.prototype, Backbone.Events, {
       }
       return column;
     });
+  },
+
+
+  initialize: function() {
+
   },
 
 
@@ -77,7 +212,7 @@ _.extend(Dataset.prototype, Backbone.Events, {
 
     // set up listeners on columns to be propogated via Dataset
     _.each(columns, function(column) {
-      column.on('change', this.columnEvent, this);
+      column.on('change', function() { this._applyColumns(); }, this);
     }, this);
 
     // run our data through the column types to force uniformity
@@ -90,9 +225,8 @@ _.extend(Dataset.prototype, Backbone.Events, {
     });
 
     this.columns = columns;
-    this.universe = data;
 
-    this.recalculate();
+    this._applySource(data);
   },
 
 
@@ -128,26 +262,14 @@ _.extend(Dataset.prototype, Backbone.Events, {
       string: filterData.column + " " + filterData.operator + " " + filterData.operand
     };
 
-    this.recalculate();
+    this._applyFilters();
   },
 
 
   removeFilter: function(filterId) {
     delete this.filters[filterId];
-    this.recalculate();
+    this._applyFilters();
   },
-
-
-  // this method BEGS for optimization
-  recalculate: function() {
-    var set = this.universe;
-
-    set = this.applyFilters(set);
-
-    this.set = set;
-    this.trigger("change", this);
-  },
-
 
   applyFilters: function(set) {
     return _.reduce(_.values(this.filters), function(remaining, filter) {

@@ -21,7 +21,7 @@ var FiltersView = Backbone.View.extend({
   },
 
   initialize: function() {
-    Dataset.on('change', function(set) {
+    Dataset.on('change:source', function(set) {
       this.dataset = set;
       this.render();
     }, this);

@@ -4,6 +4,7 @@ var $         = require('jquery'),
     _         = require('lodash'),
     Accordion = require('./lib/accordion.js'),
     Backbone  = require('backbone'),
+    Grid      = require('./views/grid.js'),
     views     = {},
     templates = {};
 
@@ -16,33 +17,39 @@ views = {
   save: {name: "Save", view: require('./views/save.js')}
 };
 
-
-Grid = require('./views/grid.js');
-
 templates.datacomposer = require('./templates/datacomposer.tpl');
 templates.control = require('./templates/control.tpl');
 
-$(function() {
-  // render skeleton
-  $('.datacomposer').replaceWith(templates.datacomposer());
 
-  // initialize ui stuff
-  var sidebar = $('#tools');
-
-  // render the controls
-  _.each(views, function(viewData) {
-    var control = $(templates.control(viewData));
-    $(sidebar).append(control);
-
-    var viewEl = control.children()[1];
-    new viewData.view({el: viewEl});
-  });
+function DataComposer(el, options) {
+  this.el = el;
+  this.options = options;
+  this.render();
+}
 
 
-  // render the grid
-  new Grid();
+DataComposer.prototype = {
+  el: null,
+  options: {},
 
-  new Accordion(sidebar);
-});
+  render: function() {
+    $(this.el).addClass("datacomposer").empty().append(templates.datacomposer());
+    var sidebar = $(this.el).find('aside#tools');
 
-module.exports = function() { return {}; };
+    // render the controls
+    _.each(views, function(viewData) {
+      var control = $(templates.control(viewData));
+      $(sidebar).append(control);
+
+      var viewEl = control.children()[1];
+      new viewData.view({el: viewEl});
+    });
+
+    // render the grid
+    new Grid();
+    new Accordion(sidebar);
+  }
+};
+
+
+module.exports = DataComposer;

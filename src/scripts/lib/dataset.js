@@ -21,6 +21,7 @@ _.extend(Dataset.prototype, Backbone.Events, {
     columns: []
   },
   options: {},
+  sourceList: [],
   columns: [],
   set: [],
   columnsByName: {},
@@ -167,7 +168,6 @@ _.extend(Dataset.prototype, Backbone.Events, {
         });
       });
 
-      // console.log(DataTypes)
       if(_.every(types, function(x){ return x === types[0]; })) {
         // all the data types are the same; run with it
         column.type = types[0];
@@ -181,6 +181,21 @@ _.extend(Dataset.prototype, Backbone.Events, {
 
   initialize: function() {
 
+  },
+
+
+  // expect sources to come in as { name: value, ... }
+  setSourceList: function(sourceList) {
+    var i = 0;
+    this.sourceList = [];
+    _.each(sourceList, function(value, name) {
+      this.sourceList.push({
+        id: i,
+        name: name,
+        value: value
+      });
+      ++i;
+    }, this);
   },
 
 

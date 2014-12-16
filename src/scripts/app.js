@@ -5,6 +5,7 @@ var $         = require('jquery'),
     Accordion = require('./lib/accordion.js'),
     Backbone  = require('backbone'),
     Grid      = require('./views/grid.js'),
+    Dataset   = require('./lib/dataset.js'),
     views     = {},
     templates = {};
 
@@ -24,6 +25,7 @@ templates.control = require('./templates/control.tpl');
 function DataComposer(el, options) {
   this.el = el;
   this.options = options;
+  Dataset.setSourceList(options.sources || {});
   this.render();
 }
 

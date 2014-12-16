@@ -37556,6 +37556,7 @@ var $         = _dereq_('jquery'),
     Accordion = _dereq_('./lib/accordion.js'),
     Backbone  = _dereq_('backbone'),
     Grid      = _dereq_('./views/grid.js'),
+    Dataset   = _dereq_('./lib/dataset.js'),
     views     = {},
     templates = {};
 
@@ -37575,6 +37576,7 @@ templates.control = _dereq_('./templates/control.tpl');
 function DataComposer(el, options) {
   this.el = el;
   this.options = options;
+  Dataset.setSourceList(options.sources || {});
   this.render();
 }
 
@@ -37604,7 +37606,7 @@ DataComposer.prototype = {
 
 
 module.exports = DataComposer;
-},{"./lib/accordion.js":9,"./templates/control.tpl":13,"./templates/datacomposer.tpl":19,"./views/columns.js":21,"./views/filters.js":22,"./views/grid.js":23,"./views/save.js":24,"./views/source.js":25,"backbone":2,"jquery":5,"lodash":6}],9:[function(_dereq_,module,exports){
+},{"./lib/accordion.js":9,"./lib/dataset.js":12,"./templates/control.tpl":13,"./templates/datacomposer.tpl":19,"./views/columns.js":21,"./views/filters.js":22,"./views/grid.js":23,"./views/save.js":24,"./views/source.js":25,"backbone":2,"jquery":5,"lodash":6}],9:[function(_dereq_,module,exports){
 //*****************************************************************************
 // Accordion menu
 //*****************************************************************************
@@ -38111,6 +38113,7 @@ _.extend(Dataset.prototype, Backbone.Events, {
     columns: []
   },
   options: {},
+  sourceList: [],
   columns: [],
   set: [],
   columnsByName: {},
@@ -38257,7 +38260,6 @@ _.extend(Dataset.prototype, Backbone.Events, {
         });
       });
 
-      // console.log(DataTypes)
       if(_.every(types, function(x){ return x === types[0]; })) {
         // all the data types are the same; run with it
         column.type = types[0];
@@ -38271,6 +38273,21 @@ _.extend(Dataset.prototype, Backbone.Events, {
 
   initialize: function() {
 
+  },
+
+
+  // expect sources to come in as { name: value, ... }
+  setSourceList: function(sourceList) {
+    var i = 0;
+    this.sourceList = [];
+    _.each(sourceList, function(value, name) {
+      this.sourceList.push({
+        id: i,
+        name: name,
+        value: value
+      });
+      ++i;
+    }, this);
   },
 
 
@@ -38500,7 +38517,15 @@ _ = _dereq_("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='Upload CSV: <input id="csv" type="file" accept=".csv">';
+__p+='<select id="source">\n<option value=""></option>\n';
+ _.each(dataset.sourceList, function(source) { 
+__p+='\n  <option value="'+
+((__t=( source.id ))==null?'':__t)+
+'">'+
+((__t=( source.name ))==null?'':__t)+
+'</option>\n';
+ }); 
+__p+='\n</select>\n<button id="loadSource">Load Source</button>\n<br>\nUpload CSV: <input id="csv" type="file" accept=".csv">';
 }
 return __p;
 };
@@ -38674,8 +38699,6 @@ var GridView = Backbone.View.extend({
     });
     
     this.$el.html( this.template({ dataset: Dataset }) );
-    console.log(cols);
-    console.log(Dataset.set[0]);
     this.$('table').dataTable({
       columns: cols,
       data: Dataset.set,
@@ -38733,15 +38756,17 @@ var $ = _dereq_('jquery'),
 var SourceView = Backbone.View.extend({
 
   events: {
-    "change #csv": "importCSV"
+    "change #csv": "importCSV",
+    "click #loadSource": "importURL"
   },
 
   initialize: function() {
+    Dataset.on('change:sourceList', this.render, this);
     this.render();
   },
 
   render: function() {
-    this.$el.html(template());
+    this.$el.html(template({dataset: Dataset}));
   },
 
 
@@ -38767,6 +38792,17 @@ var SourceView = Backbone.View.extend({
     }, this);
     
     reader.readAsText(file);
+  },
+
+
+  importURL: function() {
+    var sourceID = this.$("#source").val(),
+        url = Dataset.sourceList[sourceID].value;
+
+    console.log(sourceID + ' importing '+url);
+    $.getJSON(url, function(data) {
+      console.log(data);
+    });
   },
 
 

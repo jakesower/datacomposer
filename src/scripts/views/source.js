@@ -9,15 +9,17 @@ var $ = require('jquery'),
 var SourceView = Backbone.View.extend({
 
   events: {
-    "change #csv": "importCSV"
+    "change #csv": "importCSV",
+    "click #loadSource": "importURL"
   },
 
   initialize: function() {
+    Dataset.on('change:sourceList', this.render, this);
     this.render();
   },
 
   render: function() {
-    this.$el.html(template());
+    this.$el.html(template({dataset: Dataset}));
   },
 
 
@@ -43,6 +45,17 @@ var SourceView = Backbone.View.extend({
     }, this);
     
     reader.readAsText(file);
+  },
+
+
+  importURL: function() {
+    var sourceID = this.$("#source").val(),
+        url = Dataset.sourceList[sourceID].value;
+
+    console.log(sourceID + ' importing '+url);
+    $.getJSON(url, function(data) {
+      console.log(data);
+    });
   },
 
 

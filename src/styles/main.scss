@@ -45,6 +45,7 @@ aside {
   height: 100%;
   width: 400px;
   position: fixed;
+  z-index: 5;
   overflow: hidden;
   border-right: 1px $dark-grey solid;
 

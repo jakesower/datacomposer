@@ -21,15 +21,12 @@ var FiltersView = Backbone.View.extend({
   },
 
   initialize: function() {
-    Dataset.on('change:source', function(set) {
-      this.dataset = set;
-      this.render();
-    }, this);
-
+    Dataset.on('change:filters', this.render, this);
     this.render();
   },
 
   render: function() {
+    // console.log(Dataset.filters);
     this.$el.html(template({dataset: Dataset}));
   },
 

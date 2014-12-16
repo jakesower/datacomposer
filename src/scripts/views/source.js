@@ -2,6 +2,7 @@ var $ = require('jquery'),
     _ = require('lodash'),
     Backbone = require('backbone'),
     Dataset = require('../lib/dataset.js'),
+    Utils = require('../lib/utils.js'),
     template = require('../templates/controls/source.tpl'),
     BabyParse = require('babyparse');
 
@@ -52,10 +53,9 @@ var SourceView = Backbone.View.extend({
     var sourceID = this.$("#source").val(),
         url = Dataset.sourceList[sourceID].value;
 
-    console.log(sourceID + ' importing '+url);
-    $.getJSON(url, function(data) {
-      console.log(data);
-    });
+    Utils.Loader.loading(function() {
+      $.getJSON(url, this.importData);
+    }, this);
   },
 
 

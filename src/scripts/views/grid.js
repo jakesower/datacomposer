@@ -6,7 +6,7 @@ var $ = require('jquery'),
 
 
 var GridView = Backbone.View.extend({
-  el : '.datacomposer main',
+  el : '.datacomposer main > #grid',
   template: require('../templates/grid.tpl'),
 
   initialize : function() {

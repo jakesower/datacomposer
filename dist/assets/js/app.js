@@ -38425,23 +38425,73 @@ _.extend(Dataset.prototype, Backbone.Events, {
 // This is a singleton for now
 module.exports = new Dataset();
 },{"./column.js":10,"./data_types.js":11,"backbone":2,"lodash":6}],13:[function(_dereq_,module,exports){
-var $ = _dereq_('jquery');
+var $ = _dereq_('jquery'),
+    _ = _dereq_('lodash');
 
-// we should eventually move to a promise chain for turning off loading
+
+// use true promises, rather than jQuery
+var getJSON = function(url) {
+  return new Promise(function(resolve, rejct) {
+    var req = new XMLHttpRequest();
+    req.open('GET', url);
+
+    req.onload = function() {
+      if (req.status == 200) {
+        // Resolve the promise with the response text
+        resolve(JSON.parse(req.response));
+      } else {
+        // Otherwise reject with the status text
+        // which will hopefully be a meaningful error
+        reject(Error(req.statusText));
+      }
+    };
+
+    // Handle network errors
+    req.onerror = function() {
+      reject(Error("Network Error"));
+    };
+
+    // Make the request
+    req.send();
+  });
+};
+
+
 var Loader = {
-  loading: function(func, thisArg) {
+  registry: {},
+
+  check: function() {
+    if(_.size(this.registry) === 0) {
+      $('body').removeClass('loading');
+    } else {
+      $('body').addClass('loading');
+      $('#loading-messages #messages').html(_.values(this.registry).join(", "));
+    }
+  },
+
+  loading: function(func, msg, thisArg) {
+    var id = _.uniqueId();
+
+    this.registry[id] = msg;
+    this.check();
+
     thisArg = ((typeof thisArg == 'undefined') ? this : thisArg);
-    console.log(thisArg);
-    func.apply(thisArg);
+    Promise
+      .resolve(func.apply(thisArg))
+      .then(function(v) {
+          delete this.registry[id];
+          this.check();
+        }.bind(this));
   }
 };
 
 
 
 module.exports = {
-  Loader: Loader
+  Loader: Loader,
+  getJSON: getJSON
 };
-},{"jquery":5}],14:[function(_dereq_,module,exports){
+},{"jquery":5,"lodash":6}],14:[function(_dereq_,module,exports){
 _ = _dereq_("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -38542,7 +38592,7 @@ __p+='\n  <option value="'+
 ((__t=( source.name ))==null?'':__t)+
 '</option>\n';
  }); 
-__p+='\n</select>\n<button id="loadSource">Load Source</button>\n<br>\nUpload CSV: <input id="csv" type="file" accept=".csv">';
+__p+='\n</select>\n<button id="loadSource">Load Source</button>\n<br><br>\nUpload CSV: <input id="csv" type="file" accept=".csv">';
 }
 return __p;
 };
@@ -38552,7 +38602,7 @@ _ = _dereq_("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
-__p+='<aside id="tools">\n</aside>\n\n<main>\n<table></table>\n</main>\n';
+__p+='<aside id="tools">\n</aside>\n\n<main>\n<div id="loading-messages">\n  <div class="spinner">\n    <div class="bounce1"></div>\n    <div class="bounce2"></div>\n    <div class="bounce3"></div>\n  </div>\n  <div id="messages"></div>\n</div>\n\n<div id="grid"></div>\n</main>\n\n';
 }
 return __p;
 };
@@ -38696,7 +38746,7 @@ var $ = _dereq_('jquery'),
 
 
 var GridView = Backbone.View.extend({
-  el : '.datacomposer main',
+  el : '.datacomposer main > #grid',
   template: _dereq_('../templates/grid.tpl'),
 
   initialize : function() {
@@ -38815,8 +38865,8 @@ var SourceView = Backbone.View.extend({
         url = Dataset.sourceList[sourceID].value;
 
     Utils.Loader.loading(function() {
-      $.getJSON(url, this.importData);
-    }, this);
+      return Utils.getJSON(url).then(this.importData);
+    }, "Importing data", this);
   },
 
 

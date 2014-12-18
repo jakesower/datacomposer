@@ -1,11 +1,16 @@
 var gulp = require('gulp'),
     plugins = require('gulp-load-plugins')(),
-    browserify = require('gulp-browserify'),
+    browserify = require('browserify'),
     stylish = require('jshint-stylish'),
+
     tplTransform = require('node-underscorify').transform({
       extensions: ['tpl'],
       requires: [{variable: '_', module: 'lodash'}]
     });
+
+var uglify = require('gulp-uglify');
+var source = require('vinyl-source-stream');
+var buffer = require('vinyl-buffer');
 
 
 function handleError(err) {
@@ -25,15 +30,21 @@ gulp.task('styles', function() {
 });
 
 
+
 gulp.task('browserify', function() {
-  return gulp.src('src/scripts/app.js')
-    .pipe(browserify({
-      transform: [tplTransform],
+  var b = require('browserify')();
+
+  return browserify('./src/scripts/app.js', {
       standalone: 'DataComposer'
-    }))
-    .on('error', handleError)
-    .pipe(gulp.dest('dist/assets/js'))
+    })
+      .on('error', handleError)
+    .transform(tplTransform)
+    .bundle()
+    .pipe(source('datacomposer.js')) // gives streaming vinyl file object
+    .pipe(buffer()) // <----- convert from streaming to buffered vinyl file object
+    .pipe(gulp.dest('./dist/assets/js'));
 });
+
 
 
 gulp.task('lint', function() {
@@ -42,6 +53,20 @@ gulp.task('lint', function() {
       node: true
     }))
     .pipe(plugins.jshint.reporter(stylish))
+});
+
+
+
+gulp.task('package', function() {
+  return browserify('./src/scripts/app.js', {
+      standalone: 'DataComposer'
+    })
+    .transform(tplTransform)
+    .bundle()
+    .pipe(source('datacomposer.min.js')) // gives streaming vinyl file object
+    .pipe(buffer()) // <----- convert from streaming to buffered vinyl file object
+    .pipe(uglify()) // now gulp-uglify works 
+    .pipe(gulp.dest('./dist/assets/js'));
 });
 
 

@@ -54,7 +54,11 @@ var SourceView = Backbone.View.extend({
         url = Dataset.sourceList[sourceID].value;
 
     Utils.Loader.loading(function() {
-      return Utils.getJSON(url).then(this.importData);
+      return Utils.getJSON(url)
+        .then(this.importData,
+          function(error) {
+            console.log(error);
+          });
     }, "Importing data", this);
   },
 

@@ -1,4 +1,62 @@
-!function(e){if("object"==typeof exports)module.exports=e();else if("function"==typeof define&&define.amd)define(e);else{var o;"undefined"!=typeof window?o=window:"undefined"!=typeof global?o=global:"undefined"!=typeof self&&(o=self),o.DataComposer=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
+!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var o;"undefined"!=typeof window?o=window:"undefined"!=typeof global?o=global:"undefined"!=typeof self&&(o=self),o.DataComposer=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+// render the skeleton of the app, then initialize components
+
+var $         = require('jquery'),
+    _         = require('lodash'),
+    Accordion = require('./lib/accordion.js'),
+    Backbone  = require('backbone'),
+    Grid      = require('./views/grid.js'),
+    Dataset   = require('./lib/dataset.js'),
+    views     = {},
+    templates = {};
+
+Backbone.$ = $;
+
+views = {
+  source: {name: "Source", view: require('./views/source.js')},
+  columns: {name: 'Columns', view: require('./views/columns.js')},
+  filters: {name: "Filters", view: require('./views/filters.js')},
+  save: {name: "Save", view: require('./views/save.js')}
+};
+
+templates.datacomposer = require('./templates/datacomposer.tpl');
+templates.control = require('./templates/control.tpl');
+
+
+function DataComposer(el, options) {
+  this.el = el;
+  this.options = options;
+  Dataset.setSourceList(options.sources || {});
+  this.render();
+}
+
+
+DataComposer.prototype = {
+  el: null,
+  options: {},
+
+  render: function() {
+    $(this.el).addClass("datacomposer").empty().append(templates.datacomposer());
+    var sidebar = $(this.el).find('aside#tools');
+
+    // render the controls
+    _.each(views, function(viewData) {
+      var control = $(templates.control(viewData));
+      $(sidebar).append(control);
+
+      var viewEl = control.children()[1];
+      new viewData.view({el: viewEl});
+    });
+
+    // render the grid
+    new Grid();
+    new Accordion(sidebar);
+  }
+};
+
+
+module.exports = DataComposer;
+},{"./lib/accordion.js":9,"./lib/dataset.js":12,"./templates/control.tpl":14,"./templates/datacomposer.tpl":20,"./views/columns.js":22,"./views/filters.js":23,"./views/grid.js":24,"./views/save.js":25,"./views/source.js":26,"backbone":3,"jquery":6,"lodash":7}],2:[function(require,module,exports){
 /*
 	Baby Parse
 	v0.2.1
@@ -754,7 +812,7 @@
 
 }( typeof window !== 'undefined' ? window : this ));
 
-},{}],2:[function(_dereq_,module,exports){
+},{}],3:[function(require,module,exports){
 //     Backbone.js 1.1.2
 
 //     (c) 2010-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -774,7 +832,7 @@
 
   // Next for Node.js or CommonJS. jQuery may not be needed as a module.
   } else if (typeof exports !== 'undefined') {
-    var _ = _dereq_('underscore');
+    var _ = require('underscore');
     factory(root, exports, _);
 
   // Finally, as a browser global.
@@ -2364,7 +2422,7 @@
 
 }));
 
-},{"underscore":3}],3:[function(_dereq_,module,exports){
+},{"underscore":4}],4:[function(require,module,exports){
 //     Underscore.js 1.7.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -3781,7 +3839,7 @@
   }
 }.call(this));
 
-},{}],4:[function(_dereq_,module,exports){
+},{}],5:[function(require,module,exports){
 /*! DataTables 1.10.5-dev
  * ©2008-2014 SpryMedia Ltd - datatables.net/license
  */
@@ -3819,7 +3877,7 @@
 	}
     else if ( typeof exports === 'object' ) {
         // Node/CommonJS
-        module.exports = factory( _dereq_( 'jquery' ) );
+        module.exports = factory( require( 'jquery' ) );
     }
 	else if ( jQuery && !jQuery.fn.dataTable ) {
 		// Define using browser globals otherwise
@@ -18627,7 +18685,7 @@
 }(window, document));
 
 
-},{"jquery":5}],5:[function(_dereq_,module,exports){
+},{"jquery":6}],6:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.1.1
  * http://jquery.com/
@@ -27819,7 +27877,7 @@ return jQuery;
 
 }));
 
-},{}],6:[function(_dereq_,module,exports){
+},{}],7:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -34607,8 +34665,8 @@ return jQuery;
   }
 }.call(this));
 
-}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],7:[function(_dereq_,module,exports){
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],8:[function(require,module,exports){
 (function (global){
 //! moment.js
 //! version : 2.8.4
@@ -35386,7 +35444,7 @@ return jQuery;
         if (!locales[name] && hasModule) {
             try {
                 oldLocale = moment.locale();
-                _dereq_('./locale/' + name);
+                require('./locale/' + name);
                 // because defineLocale currently also sets the global locale, we want to undo that for lazy loaded locales
                 moment.locale(oldLocale);
             } catch (e) { }
@@ -37533,7 +37591,7 @@ return jQuery;
     if (hasModule) {
         module.exports = moment;
     } else if (typeof define === 'function' && define.amd) {
-        define('moment', function (_dereq_, exports, module) {
+        define('moment', function (require, exports, module) {
             if (module.config && module.config() && module.config().noGlobal === true) {
                 // release the global variable
                 globalScope.moment = oldGlobalMoment;
@@ -37547,72 +37605,14 @@ return jQuery;
     }
 }).call(this);
 
-}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],8:[function(_dereq_,module,exports){
-// render the skeleton of the app, then initialize components
-
-var $         = _dereq_('jquery'),
-    _         = _dereq_('lodash'),
-    Accordion = _dereq_('./lib/accordion.js'),
-    Backbone  = _dereq_('backbone'),
-    Grid      = _dereq_('./views/grid.js'),
-    Dataset   = _dereq_('./lib/dataset.js'),
-    views     = {},
-    templates = {};
-
-Backbone.$ = $;
-
-views = {
-  source: {name: "Source", view: _dereq_('./views/source.js')},
-  columns: {name: 'Columns', view: _dereq_('./views/columns.js')},
-  filters: {name: "Filters", view: _dereq_('./views/filters.js')},
-  save: {name: "Save", view: _dereq_('./views/save.js')}
-};
-
-templates.datacomposer = _dereq_('./templates/datacomposer.tpl');
-templates.control = _dereq_('./templates/control.tpl');
-
-
-function DataComposer(el, options) {
-  this.el = el;
-  this.options = options;
-  Dataset.setSourceList(options.sources || {});
-  this.render();
-}
-
-
-DataComposer.prototype = {
-  el: null,
-  options: {},
-
-  render: function() {
-    $(this.el).addClass("datacomposer").empty().append(templates.datacomposer());
-    var sidebar = $(this.el).find('aside#tools');
-
-    // render the controls
-    _.each(views, function(viewData) {
-      var control = $(templates.control(viewData));
-      $(sidebar).append(control);
-
-      var viewEl = control.children()[1];
-      new viewData.view({el: viewEl});
-    });
-
-    // render the grid
-    new Grid();
-    new Accordion(sidebar);
-  }
-};
-
-
-module.exports = DataComposer;
-},{"./lib/accordion.js":9,"./lib/dataset.js":12,"./templates/control.tpl":14,"./templates/datacomposer.tpl":20,"./views/columns.js":22,"./views/filters.js":23,"./views/grid.js":24,"./views/save.js":25,"./views/source.js":26,"backbone":2,"jquery":5,"lodash":6}],9:[function(_dereq_,module,exports){
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],9:[function(require,module,exports){
 //*****************************************************************************
 // Accordion menu
 //*****************************************************************************
 
-var $ = _dereq_('jquery'),
-    _ = _dereq_('lodash');
+var $ = require('jquery'),
+    _ = require('lodash');
 
 /**
 * Accordion menu takes an element and makes an accordion with its children.
@@ -37717,10 +37717,10 @@ Accordion.prototype = {
 
 module.exports = Accordion;
 
-},{"jquery":5,"lodash":6}],10:[function(_dereq_,module,exports){
-var _ = _dereq_('lodash'),
-    Backbone = _dereq_('backbone'),
-    DataTypes = _dereq_('./data_types.js');
+},{"jquery":6,"lodash":7}],10:[function(require,module,exports){
+var _ = require('lodash'),
+    Backbone = require('backbone'),
+    DataTypes = require('./data_types.js');
 
 
 var Column = Backbone.Model.extend({
@@ -37755,7 +37755,7 @@ var Column = Backbone.Model.extend({
 
 
 module.exports = Column;
-},{"./data_types.js":11,"backbone":2,"lodash":6}],11:[function(_dereq_,module,exports){
+},{"./data_types.js":11,"backbone":3,"lodash":7}],11:[function(require,module,exports){
 /**
  * Provides methods for handline the different types of columns. Methods included:
  *
@@ -37767,8 +37767,8 @@ module.exports = Column;
  * filters : which filter types apply to the column
 */
 
-var _ = _dereq_('lodash'),
-    moment = _dereq_('moment');
+var _ = require('lodash'),
+    moment = require('moment');
 
 
 var DataTypes = {
@@ -38089,11 +38089,11 @@ var DataTypes = {
 
 
 module.exports = DataTypes;
-},{"lodash":6,"moment":7}],12:[function(_dereq_,module,exports){
-var _ = _dereq_('lodash'),
-    Backbone = _dereq_('backbone'),
-    Column = _dereq_('./column.js'),
-    DataTypes = _dereq_('./data_types.js');
+},{"lodash":7,"moment":8}],12:[function(require,module,exports){
+var _ = require('lodash'),
+    Backbone = require('backbone'),
+    Column = require('./column.js'),
+    DataTypes = require('./data_types.js');
 
 
 // preference order for data types in order of strictest to more lenient
@@ -38424,14 +38424,14 @@ _.extend(Dataset.prototype, Backbone.Events, {
 
 // This is a singleton for now
 module.exports = new Dataset();
-},{"./column.js":10,"./data_types.js":11,"backbone":2,"lodash":6}],13:[function(_dereq_,module,exports){
-var $ = _dereq_('jquery'),
-    _ = _dereq_('lodash');
+},{"./column.js":10,"./data_types.js":11,"backbone":3,"lodash":7}],13:[function(require,module,exports){
+var $ = require('jquery'),
+    _ = require('lodash');
 
 
 // use true promises, rather than jQuery
 var getJSON = function(url) {
-  return new Promise(function(resolve, rejct) {
+  return new Promise(function(resolve, reject) {
     var req = new XMLHttpRequest();
     req.open('GET', url);
 
@@ -38491,8 +38491,8 @@ module.exports = {
   Loader: Loader,
   getJSON: getJSON
 };
-},{"jquery":5,"lodash":6}],14:[function(_dereq_,module,exports){
-_ = _dereq_("lodash");
+},{"jquery":6,"lodash":7}],14:[function(require,module,exports){
+_ = require("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
@@ -38503,8 +38503,8 @@ __p+='<section>\n  <h1>'+
 return __p;
 };
 
-},{"lodash":6}],15:[function(_dereq_,module,exports){
-_ = _dereq_("lodash");
+},{"lodash":7}],15:[function(require,module,exports){
+_ = require("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
@@ -38519,8 +38519,8 @@ __p+='<tr class="column">\n  <td>'+
 return __p;
 };
 
-},{"lodash":6}],16:[function(_dereq_,module,exports){
-_ = _dereq_("lodash");
+},{"lodash":7}],16:[function(require,module,exports){
+_ = require("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
@@ -38543,8 +38543,8 @@ __p+='\n  </tbody>\n</table>\n';
 return __p;
 };
 
-},{"lodash":6}],17:[function(_dereq_,module,exports){
-_ = _dereq_("lodash");
+},{"lodash":7}],17:[function(require,module,exports){
+_ = require("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
@@ -38569,8 +38569,8 @@ __p+='\n    </select>\n\n    <select id="operator" name="operator" required>\n  
 return __p;
 };
 
-},{"lodash":6}],18:[function(_dereq_,module,exports){
-_ = _dereq_("lodash");
+},{"lodash":7}],18:[function(require,module,exports){
+_ = require("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
@@ -38579,8 +38579,8 @@ __p+='<button id="exportCSV">Export CSV</button>';
 return __p;
 };
 
-},{"lodash":6}],19:[function(_dereq_,module,exports){
-_ = _dereq_("lodash");
+},{"lodash":7}],19:[function(require,module,exports){
+_ = require("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
@@ -38597,8 +38597,8 @@ __p+='\n</select>\n<button id="loadSource">Load Source</button>\n<br><br>\nUploa
 return __p;
 };
 
-},{"lodash":6}],20:[function(_dereq_,module,exports){
-_ = _dereq_("lodash");
+},{"lodash":7}],20:[function(require,module,exports){
+_ = require("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
@@ -38607,8 +38607,8 @@ __p+='<aside id="tools">\n</aside>\n\n<main>\n<div id="loading-messages">\n  <di
 return __p;
 };
 
-},{"lodash":6}],21:[function(_dereq_,module,exports){
-_ = _dereq_("lodash");
+},{"lodash":7}],21:[function(require,module,exports){
+_ = require("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
@@ -38617,13 +38617,13 @@ __p+='<table id="grid">\n</table>';
 return __p;
 };
 
-},{"lodash":6}],22:[function(_dereq_,module,exports){
-var $ = _dereq_('jquery'),
-    _ = _dereq_('lodash'),
-    Backbone = _dereq_('backbone'),
-    Dataset = _dereq_('../lib/dataset.js'),
-    template = _dereq_('../templates/controls/columns.tpl'),
-    columnTemplate = _dereq_('../templates/controls/columns-column.tpl');
+},{"lodash":7}],22:[function(require,module,exports){
+var $ = require('jquery'),
+    _ = require('lodash'),
+    Backbone = require('backbone'),
+    Dataset = require('../lib/dataset.js'),
+    template = require('../templates/controls/columns.tpl'),
+    columnTemplate = require('../templates/controls/columns-column.tpl');
 
 
 var FiltersView = Backbone.View.extend({
@@ -38659,12 +38659,12 @@ var FiltersView = Backbone.View.extend({
 
 
 module.exports = FiltersView;
-},{"../lib/dataset.js":12,"../templates/controls/columns-column.tpl":15,"../templates/controls/columns.tpl":16,"backbone":2,"jquery":5,"lodash":6}],23:[function(_dereq_,module,exports){
-var $ = _dereq_('jquery'),
-    _ = _dereq_('lodash'),
-    Backbone = _dereq_('backbone'),
-    Dataset = _dereq_('../lib/dataset.js'),
-    template = _dereq_('../templates/controls/filters.tpl');
+},{"../lib/dataset.js":12,"../templates/controls/columns-column.tpl":15,"../templates/controls/columns.tpl":16,"backbone":3,"jquery":6,"lodash":7}],23:[function(require,module,exports){
+var $ = require('jquery'),
+    _ = require('lodash'),
+    Backbone = require('backbone'),
+    Dataset = require('../lib/dataset.js'),
+    template = require('../templates/controls/filters.tpl');
 
 
 var FiltersView = Backbone.View.extend({
@@ -38737,17 +38737,17 @@ var FiltersView = Backbone.View.extend({
 
 
 module.exports = FiltersView;
-},{"../lib/dataset.js":12,"../templates/controls/filters.tpl":17,"backbone":2,"jquery":5,"lodash":6}],24:[function(_dereq_,module,exports){
-var $ = _dereq_('jquery'),
-    _ = _dereq_('lodash'),
-    Backbone = _dereq_('backbone'),
-    DataTables = _dereq_('datatables'),    // will do for now, but slow and limited
-    Dataset = _dereq_('../lib/dataset.js');
+},{"../lib/dataset.js":12,"../templates/controls/filters.tpl":17,"backbone":3,"jquery":6,"lodash":7}],24:[function(require,module,exports){
+var $ = require('jquery'),
+    _ = require('lodash'),
+    Backbone = require('backbone'),
+    DataTables = require('datatables'),    // will do for now, but slow and limited
+    Dataset = require('../lib/dataset.js');
 
 
 var GridView = Backbone.View.extend({
   el : '.datacomposer main > #grid',
-  template: _dereq_('../templates/grid.tpl'),
+  template: require('../templates/grid.tpl'),
 
   initialize : function() {
     Dataset.on('change', this.render, this);
@@ -38774,17 +38774,17 @@ var GridView = Backbone.View.extend({
 
 module.exports = GridView;
 
-},{"../lib/dataset.js":12,"../templates/grid.tpl":21,"backbone":2,"datatables":4,"jquery":5,"lodash":6}],25:[function(_dereq_,module,exports){
-var $ = _dereq_('jquery'),
-    _ = _dereq_('lodash'),
-    Backbone = _dereq_('backbone'),
-    Dataset = _dereq_('../lib/dataset.js'),
-    BabyParse = _dereq_('babyparse');
+},{"../lib/dataset.js":12,"../templates/grid.tpl":21,"backbone":3,"datatables":5,"jquery":6,"lodash":7}],25:[function(require,module,exports){
+var $ = require('jquery'),
+    _ = require('lodash'),
+    Backbone = require('backbone'),
+    Dataset = require('../lib/dataset.js'),
+    BabyParse = require('babyparse');
 
 
 var SaveView = Backbone.View.extend({
   el : 'main',
-  template: _dereq_('../templates/controls/save.tpl'),
+  template: require('../templates/controls/save.tpl'),
   events: {
     "click #exportCSV": "exportCSV"
   },
@@ -38808,14 +38808,14 @@ var SaveView = Backbone.View.extend({
 
 module.exports = SaveView;
 
-},{"../lib/dataset.js":12,"../templates/controls/save.tpl":18,"babyparse":1,"backbone":2,"jquery":5,"lodash":6}],26:[function(_dereq_,module,exports){
-var $ = _dereq_('jquery'),
-    _ = _dereq_('lodash'),
-    Backbone = _dereq_('backbone'),
-    Dataset = _dereq_('../lib/dataset.js'),
-    Utils = _dereq_('../lib/utils.js'),
-    template = _dereq_('../templates/controls/source.tpl'),
-    BabyParse = _dereq_('babyparse');
+},{"../lib/dataset.js":12,"../templates/controls/save.tpl":18,"babyparse":2,"backbone":3,"jquery":6,"lodash":7}],26:[function(require,module,exports){
+var $ = require('jquery'),
+    _ = require('lodash'),
+    Backbone = require('backbone'),
+    Dataset = require('../lib/dataset.js'),
+    Utils = require('../lib/utils.js'),
+    template = require('../templates/controls/source.tpl'),
+    BabyParse = require('babyparse');
 
 
 var SourceView = Backbone.View.extend({
@@ -38865,7 +38865,11 @@ var SourceView = Backbone.View.extend({
         url = Dataset.sourceList[sourceID].value;
 
     Utils.Loader.loading(function() {
-      return Utils.getJSON(url).then(this.importData);
+      return Utils.getJSON(url)
+        .then(this.importData,
+          function(error) {
+            console.log(error);
+          });
     }, "Importing data", this);
   },
 
@@ -38896,6 +38900,5 @@ var SourceView = Backbone.View.extend({
 
 
 module.exports = SourceView;
-},{"../lib/dataset.js":12,"../lib/utils.js":13,"../templates/controls/source.tpl":19,"babyparse":1,"backbone":2,"jquery":5,"lodash":6}]},{},[8])
-(8)
+},{"../lib/dataset.js":12,"../lib/utils.js":13,"../templates/controls/source.tpl":19,"babyparse":2,"backbone":3,"jquery":6,"lodash":7}]},{},[1])(1)
 });

@@ -4,7 +4,7 @@ var $ = require('jquery'),
 
 // use true promises, rather than jQuery
 var getJSON = function(url) {
-  return new Promise(function(resolve, rejct) {
+  return new Promise(function(resolve, reject) {
     var req = new XMLHttpRequest();
     req.open('GET', url);
 

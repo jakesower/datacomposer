@@ -1,6 +1,7 @@
 var _ = require('lodash'),
     Backbone = require('backbone'),
     Column = require('./column.js'),
+    Utils = require('../lib/utils.js'),
     DataTypes = require('./data_types.js');
 
 
@@ -231,13 +232,15 @@ _.extend(Dataset.prototype, Backbone.Events, {
     }, this);
 
     // run our data through the column types to force uniformity
-    data = _.map(data, function(datum) {
-      var out = {};
-      _.each(columns, function(column) {
-        out[column.name] = column.coerce(datum[column.name]);
+    Utils.Loader.loading(function() {
+      data = _.map(data, function(datum) {
+        var out = {};
+        _.each(columns, function(column) {
+          out[column.name] = column.coerce(datum[column.name]);
+        });
+        return out;
       });
-      return out;
-    });
+    }, "Setting columns", this);
 
     this.columns = columns;
 

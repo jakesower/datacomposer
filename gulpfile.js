@@ -21,10 +21,10 @@ function handleError(err) {
 
 gulp.task('styles', function() {
   return gulp.src('src/styles/*.scss')
-    .pipe(plugins.sourcemaps.init())
+    // .pipe(plugins.sourcemaps.init())
       .pipe(plugins.sass({ style: 'compact', cascade: false }))
       .pipe(plugins.autoprefixer({ browsers: 'last 2 version'}))
-    .pipe(plugins.sourcemaps.write('dist/assets/css'))
+    // .pipe(plugins.sourcemaps.write('dist/assets/css'))
     .pipe(plugins.concat("app.css"))
     .pipe(gulp.dest('dist/assets/css'))
 });

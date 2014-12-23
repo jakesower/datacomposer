@@ -156,11 +156,17 @@ _.extend(Dataset.prototype, Backbone.Events, {
    * Adds a type to columns
    *
    * @param {array} columns - Array of columns
-   * @param {object} sample - A few rows of data to detect the type from
+   * @param {object|array} sample - A few rows of data to detect the type from
    */
   _detectDataTypes: function(columns, sample) {
     return _.map(columns, function(column) {
-      var types, sampleRow = _.pluck(sample, column.name);
+      var types, sampleRow;
+
+      if(_.isArray(sample[0])) {
+        sampleRow = _.pluck(sample, _.indexOf(columns, column));
+      } else {
+        sampleRow = _.pluck(sample, column.name);
+      }
 
       types = _.map(sampleRow, function(sampleVal) {
         return _.find(dataTypeOrder, function(type) {
@@ -201,7 +207,9 @@ _.extend(Dataset.prototype, Backbone.Events, {
 
   loadSource: function(source) {
     var columns = source.columns,
-        data = source.data;
+        data = source.data,
+        useKeys,
+        dataKeys = [];
 
     // create column names if we're only given strings
     if(typeof columns[0] === 'string') {
@@ -230,11 +238,17 @@ _.extend(Dataset.prototype, Backbone.Events, {
       column.on('change', function() { this._applyColumns(); }, this);
     }, this);
 
+    // is the data an array or keyed object?
+    useKeys = !(data instanceof Array);
+    _.each(columns, function(column, idx) {
+      dataKeys.push((useKeys ? column.name : idx));
+    });
+
     // run our data through the column types to force uniformity
     data = _.map(data, function(datum) {
       var out = {};
-      _.each(columns, function(column) {
-        out[column.name] = column.coerce(datum[column.name]);
+      _.each(columns, function(column, idx) {
+        out[column.name] = column.coerce(datum[dataKeys[idx]]);
       });
       return out;
     });

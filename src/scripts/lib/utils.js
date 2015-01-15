@@ -49,7 +49,7 @@ var Loader = {
     this.check();
 
     thisArg = ((typeof thisArg == 'undefined') ? this : thisArg);
-    Promise
+    return Promise
       .resolve(func.apply(thisArg))
       .then(function(v) {
           delete this.registry[id];

@@ -57,7 +57,7 @@ var SourceView = Backbone.View.extend({
       return Utils.getJSON(url)
         .then(this.importData,
           function(error) {
-            console.log(error);
+            alert("There was an error:\n\n"+error);
           });
     }, "Importing data", this);
   },

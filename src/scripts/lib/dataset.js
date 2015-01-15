@@ -1,6 +1,7 @@
 var _ = require('lodash'),
     Backbone = require('backbone'),
     Column = require('./column.js'),
+    Utils = require('../lib/utils.js'),
     DataTypes = require('./data_types.js');
 
 
@@ -231,12 +232,11 @@ _.extend(Dataset.prototype, Backbone.Events, {
     _.each(columns, function(column) {
       this.columnsByName[column.name] = column;
       this.columnsById[column.id] = column;
-    }, this);
 
-    // set up listeners on columns to be propogated via Dataset
-    _.each(columns, function(column) {
+      // set up listeners on columns to be propogated via Dataset
       column.on('change', function() { this._applyColumns(); }, this);
     }, this);
+
 
     // is the data an array or keyed object?
     useKeys = !(data instanceof Array);

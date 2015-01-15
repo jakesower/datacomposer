@@ -2,6 +2,7 @@ var $ = require('jquery'),
     _ = require('lodash'),
     Backbone = require('backbone'),
     DataTables = require('datatables'),    // will do for now, but slow and limited
+    Utils = require('../lib/utils.js'),
     Dataset = require('../lib/dataset.js');
 
 
@@ -22,12 +23,14 @@ var GridView = Backbone.View.extend({
       };
     });
     
-    this.$el.html( this.template({ dataset: Dataset }) );
-    this.$('table').dataTable({
-      columns: cols,
-      data: Dataset.set,
-      destroy: true
-    });
+    Utils.Loader.loading(function() {
+      this.$el.html( this.template({ dataset: Dataset }) );
+      this.$('table').dataTable({
+        columns: cols,
+        data: Dataset.set,
+        destroy: true
+      });
+    }, "Rending grid", this);
   }
 });
 

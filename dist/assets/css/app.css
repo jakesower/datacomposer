@@ -1,4 +1,3 @@
-{"version":3,"sources":["datatable.css"],"names":[],"mappings":"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","file":"datatable.css","sourcesContent":["/*\n * Table styles\n */\ntable.dataTable {\n  width: 100%;\n  margin: 0 auto;\n  clear: both;\n  border-collapse: separate;\n  border-spacing: 0;\n  /*\n     * Header and footer styles\n     */\n  /*\n     * Body styles\n     */ }\n  table.dataTable thead th, table.dataTable tfoot th {\n    font-weight: bold; }\n  table.dataTable thead th, table.dataTable thead td {\n    padding: 10px 18px;\n    border-bottom: 1px solid #111111; }\n    table.dataTable thead th:active, table.dataTable thead td:active {\n      outline: none; }\n  table.dataTable tfoot th, table.dataTable tfoot td {\n    padding: 10px 18px 6px 18px;\n    border-top: 1px solid #111111; }\n  table.dataTable thead .sorting_asc, table.dataTable thead .sorting_desc, table.dataTable thead .sorting {\n    cursor: pointer;\n    *cursor: hand; }\n  table.dataTable thead .sorting {\n    background: url('/assets/images/datatable/sort_both.png') no-repeat center right; }\n  table.dataTable thead .sorting_asc {\n    background: url('/assets/images/datatable/sort_asc.png') no-repeat center right; }\n  table.dataTable thead .sorting_desc {\n    background: url('/assets/images/datatable/sort_desc.png') no-repeat center right; }\n  table.dataTable thead .sorting_asc_disabled {\n    background: url('/assets/images/datatable/sort_asc_disabled.png') no-repeat center right; }\n  table.dataTable thead .sorting_desc_disabled {\n    background: url('/assets/images/datatable/sort_desc_disabled.png') no-repeat center right; }\n  table.dataTable tbody tr {\n    background-color: #ffffff; }\n    table.dataTable tbody tr.selected {\n      background-color: #b0bed9; }\n  table.dataTable tbody th, table.dataTable tbody td {\n    padding: 8px 10px; }\n  table.dataTable.row-border tbody th, table.dataTable.row-border tbody td, table.dataTable.display tbody th, table.dataTable.display tbody td {\n    border-top: 1px solid #dddddd; }\n  table.dataTable.row-border tbody tr:first-child th, table.dataTable.row-border tbody tr:first-child td, table.dataTable.display tbody tr:first-child th, table.dataTable.display tbody tr:first-child td {\n    border-top: none; }\n  table.dataTable.cell-border tbody th, table.dataTable.cell-border tbody td {\n    border-top: 1px solid #dddddd;\n    border-right: 1px solid #dddddd; }\n  table.dataTable.cell-border tbody tr th:first-child, table.dataTable.cell-border tbody tr td:first-child {\n    border-left: 1px solid #dddddd; }\n  table.dataTable.cell-border tbody tr:first-child th, table.dataTable.cell-border tbody tr:first-child td {\n    border-top: none; }\n  table.dataTable.stripe tbody tr.odd, table.dataTable.display tbody tr.odd {\n    background-color: #f9f9f9; }\n    table.dataTable.stripe tbody tr.odd.selected, table.dataTable.display tbody tr.odd.selected {\n      background-color: #abb9d3; }\n  table.dataTable.hover tbody tr:hover, table.dataTable.hover tbody tr.odd:hover, table.dataTable.hover tbody tr.even:hover, table.dataTable.display tbody tr:hover, table.dataTable.display tbody tr.odd:hover, table.dataTable.display tbody tr.even:hover {\n    background-color: whitesmoke; }\n    table.dataTable.hover tbody tr:hover.selected, table.dataTable.hover tbody tr.odd:hover.selected, table.dataTable.hover tbody tr.even:hover.selected, table.dataTable.display tbody tr:hover.selected, table.dataTable.display tbody tr.odd:hover.selected, table.dataTable.display tbody tr.even:hover.selected {\n      background-color: #a9b7d1; }\n  table.dataTable.order-column tbody tr > .sorting_1, table.dataTable.order-column tbody tr > .sorting_2, table.dataTable.order-column tbody tr > .sorting_3, table.dataTable.display tbody tr > .sorting_1, table.dataTable.display tbody tr > .sorting_2, table.dataTable.display tbody tr > .sorting_3 {\n    background-color: #f9f9f9; }\n  table.dataTable.order-column tbody tr.selected > .sorting_1, table.dataTable.order-column tbody tr.selected > .sorting_2, table.dataTable.order-column tbody tr.selected > .sorting_3, table.dataTable.display tbody tr.selected > .sorting_1, table.dataTable.display tbody tr.selected > .sorting_2, table.dataTable.display tbody tr.selected > .sorting_3 {\n    background-color: #acbad4; }\n  table.dataTable.display tbody tr.odd > .sorting_1, table.dataTable.order-column.stripe tbody tr.odd > .sorting_1 {\n    background-color: #f1f1f1; }\n  table.dataTable.display tbody tr.odd > .sorting_2, table.dataTable.order-column.stripe tbody tr.odd > .sorting_2 {\n    background-color: #f3f3f3; }\n  table.dataTable.display tbody tr.odd > .sorting_3, table.dataTable.order-column.stripe tbody tr.odd > .sorting_3 {\n    background-color: whitesmoke; }\n  table.dataTable.display tbody tr.odd.selected > .sorting_1, table.dataTable.order-column.stripe tbody tr.odd.selected > .sorting_1 {\n    background-color: #a6b3cd; }\n  table.dataTable.display tbody tr.odd.selected > .sorting_2, table.dataTable.order-column.stripe tbody tr.odd.selected > .sorting_2 {\n    background-color: #a7b5ce; }\n  table.dataTable.display tbody tr.odd.selected > .sorting_3, table.dataTable.order-column.stripe tbody tr.odd.selected > .sorting_3 {\n    background-color: #a9b6d0; }\n  table.dataTable.display tbody tr.even > .sorting_1, table.dataTable.order-column.stripe tbody tr.even > .sorting_1 {\n    background-color: #f9f9f9; }\n  table.dataTable.display tbody tr.even > .sorting_2, table.dataTable.order-column.stripe tbody tr.even > .sorting_2 {\n    background-color: #fbfbfb; }\n  table.dataTable.display tbody tr.even > .sorting_3, table.dataTable.order-column.stripe tbody tr.even > .sorting_3 {\n    background-color: #fdfdfd; }\n  table.dataTable.display tbody tr.even.selected > .sorting_1, table.dataTable.order-column.stripe tbody tr.even.selected > .sorting_1 {\n    background-color: #acbad4; }\n  table.dataTable.display tbody tr.even.selected > .sorting_2, table.dataTable.order-column.stripe tbody tr.even.selected > .sorting_2 {\n    background-color: #adbbd6; }\n  table.dataTable.display tbody tr.even.selected > .sorting_3, table.dataTable.order-column.stripe tbody tr.even.selected > .sorting_3 {\n    background-color: #afbdd8; }\n  table.dataTable.display tbody tr:hover > .sorting_1, table.dataTable.display tbody tr.odd:hover > .sorting_1, table.dataTable.display tbody tr.even:hover > .sorting_1, table.dataTable.order-column.hover tbody tr:hover > .sorting_1, table.dataTable.order-column.hover tbody tr.odd:hover > .sorting_1, table.dataTable.order-column.hover tbody tr.even:hover > .sorting_1 {\n    background-color: #eaeaea; }\n  table.dataTable.display tbody tr:hover > .sorting_2, table.dataTable.display tbody tr.odd:hover > .sorting_2, table.dataTable.display tbody tr.even:hover > .sorting_2, table.dataTable.order-column.hover tbody tr:hover > .sorting_2, table.dataTable.order-column.hover tbody tr.odd:hover > .sorting_2, table.dataTable.order-column.hover tbody tr.even:hover > .sorting_2 {\n    background-color: #ebebeb; }\n  table.dataTable.display tbody tr:hover > .sorting_3, table.dataTable.display tbody tr.odd:hover > .sorting_3, table.dataTable.display tbody tr.even:hover > .sorting_3, table.dataTable.order-column.hover tbody tr:hover > .sorting_3, table.dataTable.order-column.hover tbody tr.odd:hover > .sorting_3, table.dataTable.order-column.hover tbody tr.even:hover > .sorting_3 {\n    background-color: #eeeeee; }\n  table.dataTable.display tbody tr:hover.selected > .sorting_1, table.dataTable.display tbody tr.odd:hover.selected > .sorting_1, table.dataTable.display tbody tr.even:hover.selected > .sorting_1, table.dataTable.order-column.hover tbody tr:hover.selected > .sorting_1, table.dataTable.order-column.hover tbody tr.odd:hover.selected > .sorting_1, table.dataTable.order-column.hover tbody tr.even:hover.selected > .sorting_1 {\n    background-color: #a1aec7; }\n  table.dataTable.display tbody tr:hover.selected > .sorting_2, table.dataTable.display tbody tr.odd:hover.selected > .sorting_2, table.dataTable.display tbody tr.even:hover.selected > .sorting_2, table.dataTable.order-column.hover tbody tr:hover.selected > .sorting_2, table.dataTable.order-column.hover tbody tr.odd:hover.selected > .sorting_2, table.dataTable.order-column.hover tbody tr.even:hover.selected > .sorting_2 {\n    background-color: #a2afc8; }\n  table.dataTable.display tbody tr:hover.selected > .sorting_3, table.dataTable.display tbody tr.odd:hover.selected > .sorting_3, table.dataTable.display tbody tr.even:hover.selected > .sorting_3, table.dataTable.order-column.hover tbody tr:hover.selected > .sorting_3, table.dataTable.order-column.hover tbody tr.odd:hover.selected > .sorting_3, table.dataTable.order-column.hover tbody tr.even:hover.selected > .sorting_3 {\n    background-color: #a4b2cb; }\n  table.dataTable.no-footer {\n    border-bottom: 1px solid #111111; }\n  table.dataTable.nowrap th, table.dataTable.nowrap td {\n    white-space: nowrap; }\n  table.dataTable.compact thead th, table.dataTable.compact thead td {\n    padding: 5px 9px; }\n  table.dataTable.compact tfoot th, table.dataTable.compact tfoot td {\n    padding: 5px 9px 3px 9px; }\n  table.dataTable.compact tbody th, table.dataTable.compact tbody td {\n    padding: 4px 5px; }\n  table.dataTable th.dt-left, table.dataTable td.dt-left {\n    text-align: left; }\n  table.dataTable th.dt-center, table.dataTable td.dt-center, table.dataTable td.dataTables_empty {\n    text-align: center; }\n  table.dataTable th.dt-right, table.dataTable td.dt-right {\n    text-align: right; }\n  table.dataTable th.dt-justify, table.dataTable td.dt-justify {\n    text-align: justify; }\n  table.dataTable th.dt-nowrap, table.dataTable td.dt-nowrap {\n    white-space: nowrap; }\n  table.dataTable thead th.dt-head-left, table.dataTable thead td.dt-head-left, table.dataTable tfoot th.dt-head-left, table.dataTable tfoot td.dt-head-left {\n    text-align: left; }\n  table.dataTable thead th.dt-head-center, table.dataTable thead td.dt-head-center, table.dataTable tfoot th.dt-head-center, table.dataTable tfoot td.dt-head-center {\n    text-align: center; }\n  table.dataTable thead th.dt-head-right, table.dataTable thead td.dt-head-right, table.dataTable tfoot th.dt-head-right, table.dataTable tfoot td.dt-head-right {\n    text-align: right; }\n  table.dataTable thead th.dt-head-justify, table.dataTable thead td.dt-head-justify, table.dataTable tfoot th.dt-head-justify, table.dataTable tfoot td.dt-head-justify {\n    text-align: justify; }\n  table.dataTable thead th.dt-head-nowrap, table.dataTable thead td.dt-head-nowrap, table.dataTable tfoot th.dt-head-nowrap, table.dataTable tfoot td.dt-head-nowrap {\n    white-space: nowrap; }\n  table.dataTable tbody th.dt-body-left, table.dataTable tbody td.dt-body-left {\n    text-align: left; }\n  table.dataTable tbody th.dt-body-center, table.dataTable tbody td.dt-body-center {\n    text-align: center; }\n  table.dataTable tbody th.dt-body-right, table.dataTable tbody td.dt-body-right {\n    text-align: right; }\n  table.dataTable tbody th.dt-body-justify, table.dataTable tbody td.dt-body-justify {\n    text-align: justify; }\n  table.dataTable tbody th.dt-body-nowrap, table.dataTable tbody td.dt-body-nowrap {\n    white-space: nowrap; }\n\ntable.dataTable, table.dataTable th, table.dataTable td {\n  -webkit-box-sizing: content-box;\n  -moz-box-sizing: content-box;\n  box-sizing: content-box; }\n\n/*\n * Control feature layout\n */\n.dataTables_wrapper {\n  position: relative;\n  clear: both;\n  *zoom: 1;\n  zoom: 1; }\n  .dataTables_wrapper .dataTables_length {\n    float: left; }\n  .dataTables_wrapper .dataTables_filter {\n    float: right;\n    text-align: right; }\n    .dataTables_wrapper .dataTables_filter input {\n      margin-left: 0.5em; }\n  .dataTables_wrapper .dataTables_info {\n    clear: both;\n    float: left;\n    padding-top: 0.755em; }\n  .dataTables_wrapper .dataTables_paginate {\n    float: right;\n    text-align: right;\n    padding-top: 0.25em; }\n    .dataTables_wrapper .dataTables_paginate .paginate_button {\n      box-sizing: border-box;\n      display: inline-block;\n      min-width: 1.5em;\n      padding: 0.5em 1em;\n      margin-left: 2px;\n      text-align: center;\n      text-decoration: none !important;\n      cursor: pointer;\n      *cursor: hand;\n      color: #333333 !important;\n      border: 1px solid transparent; }\n      .dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {\n        color: #333333 !important;\n        border: 1px solid #cacaca;\n        background-color: white;\n        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ffffff), color-stop(100%, #dcdcdc));\n        /* Chrome,Safari4+ */\n        background: -webkit-linear-gradient(top, #ffffff 0%, #dcdcdc 100%);\n        /* Chrome10+,Safari5.1+ */\n        background: -moz-linear-gradient(top, #ffffff 0%, #dcdcdc 100%);\n        /* FF3.6+ */\n        background: -ms-linear-gradient(top, #ffffff 0%, #dcdcdc 100%);\n        /* IE10+ */\n        background: -o-linear-gradient(top, #ffffff 0%, #dcdcdc 100%);\n        /* Opera 11.10+ */\n        background: linear-gradient(to bottom, #ffffff 0%, #dcdcdc 100%);\n        /* W3C */ }\n      .dataTables_wrapper .dataTables_paginate .paginate_button.disabled, .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover, .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active {\n        cursor: default;\n        color: #666 !important;\n        border: 1px solid transparent;\n        background: transparent;\n        box-shadow: none; }\n      .dataTables_wrapper .dataTables_paginate .paginate_button:hover {\n        color: white !important;\n        border: 1px solid #111111;\n        background-color: #585858;\n        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #585858), color-stop(100%, #111111));\n        /* Chrome,Safari4+ */\n        background: -webkit-linear-gradient(top, #585858 0%, #111111 100%);\n        /* Chrome10+,Safari5.1+ */\n        background: -moz-linear-gradient(top, #585858 0%, #111111 100%);\n        /* FF3.6+ */\n        background: -ms-linear-gradient(top, #585858 0%, #111111 100%);\n        /* IE10+ */\n        background: -o-linear-gradient(top, #585858 0%, #111111 100%);\n        /* Opera 11.10+ */\n        background: linear-gradient(to bottom, #585858 0%, #111111 100%);\n        /* W3C */ }\n      .dataTables_wrapper .dataTables_paginate .paginate_button:active {\n        outline: none;\n        background-color: #2b2b2b;\n        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #2b2b2b), color-stop(100%, #0c0c0c));\n        /* Chrome,Safari4+ */\n        background: -webkit-linear-gradient(top, #2b2b2b 0%, #0c0c0c 100%);\n        /* Chrome10+,Safari5.1+ */\n        background: -moz-linear-gradient(top, #2b2b2b 0%, #0c0c0c 100%);\n        /* FF3.6+ */\n        background: -ms-linear-gradient(top, #2b2b2b 0%, #0c0c0c 100%);\n        /* IE10+ */\n        background: -o-linear-gradient(top, #2b2b2b 0%, #0c0c0c 100%);\n        /* Opera 11.10+ */\n        background: linear-gradient(to bottom, #2b2b2b 0%, #0c0c0c 100%);\n        /* W3C */\n        box-shadow: inset 0 0 3px #111; }\n  .dataTables_wrapper .dataTables_processing {\n    position: absolute;\n    top: 50%;\n    left: 50%;\n    width: 100%;\n    height: 40px;\n    margin-left: -50%;\n    margin-top: -25px;\n    padding-top: 20px;\n    text-align: center;\n    font-size: 1.2em;\n    background-color: white;\n    background: -webkit-gradient(linear, left top, right top, color-stop(0%, rgba(255, 255, 255, 0)), color-stop(25%, rgba(255, 255, 255, 0.9)), color-stop(75%, rgba(255, 255, 255, 0.9)), color-stop(100%, rgba(255, 255, 255, 0)));\n    /* Chrome,Safari4+ */\n    background: -webkit-linear-gradient(left, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.9) 25%, rgba(255, 255, 255, 0.9) 75%, rgba(255, 255, 255, 0) 100%);\n    /* Chrome10+,Safari5.1+ */\n    background: -moz-linear-gradient(left, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.9) 25%, rgba(255, 255, 255, 0.9) 75%, rgba(255, 255, 255, 0) 100%);\n    /* FF3.6+ */\n    background: -ms-linear-gradient(left, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.9) 25%, rgba(255, 255, 255, 0.9) 75%, rgba(255, 255, 255, 0) 100%);\n    /* IE10+ */\n    background: -o-linear-gradient(left, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.9) 25%, rgba(255, 255, 255, 0.9) 75%, rgba(255, 255, 255, 0) 100%);\n    /* Opera 11.10+ */\n    background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.9) 25%, rgba(255, 255, 255, 0.9) 75%, rgba(255, 255, 255, 0) 100%);\n    /* W3C */ }\n  .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_processing, .dataTables_wrapper .dataTables_paginate {\n    color: #333333; }\n  .dataTables_wrapper .dataTables_scroll {\n    clear: both; }\n    .dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody {\n      *margin-top: -1px;\n      -webkit-overflow-scrolling: touch; }\n      .dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody th > div.dataTables_sizing, .dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody td > div.dataTables_sizing {\n        height: 0;\n        overflow: hidden;\n        margin: 0 !important;\n        padding: 0 !important; }\n  .dataTables_wrapper.no-footer .dataTables_scrollBody {\n    border-bottom: 1px solid #111111; }\n  .dataTables_wrapper.no-footer div.dataTables_scrollHead table, .dataTables_wrapper.no-footer div.dataTables_scrollBody table {\n    border-bottom: none; }\n  .dataTables_wrapper:after {\n    visibility: hidden;\n    display: block;\n    content: \"\";\n    clear: both;\n    height: 0; }\n\n@media screen and (max-width: 767px) {\n  .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_paginate {\n    float: none;\n    text-align: center; }\n  .dataTables_wrapper .dataTables_paginate {\n    margin-top: 0.5em; } }\n\n@media screen and (max-width: 640px) {\n  .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter {\n    float: none;\n    text-align: center; }\n  .dataTables_wrapper .dataTables_filter {\n    margin-top: 0.5em; } }\n\n"],"sourceRoot":"/source/"}
 /*
  * Table styles
  */
@@ -276,9 +275,6 @@ table.dataTable, table.dataTable th, table.dataTable td {
   .dataTables_wrapper .dataTables_filter {
     margin-top: 0.5em; } }
 
-
-/*# sourceMappingURL=dist/assets/css/datatable.css.map */
-{"version":3,"sources":["main.css"],"names":[],"mappings":"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","file":"main.css","sourcesContent":["@font-face {\n  font-family: 'Lato';\n  src: url('/assets/fonts/Lato.woff2') format('woff2'), url('/assets/fonts/Lato.woff') format('woff'); }\n\n@font-face {\n  font-family: 'Oswald';\n  font-style: normal;\n  font-weight: 300;\n  src: url('/assets/fonts/oswald-light.woff2') format('woff2');\n  unicode-range: U100 -24F, U1E00-1EFF, U20A0-20AB, U20AD-20CF, U2C60-2C7F, UA720-A7FF; }\n\n@font-face {\n  font-family: 'Oswald';\n  font-style: normal;\n  font-weight: 400;\n  src: url('/assets/fonts/oswald-regular.woff2') format('woff2');\n  unicode-range: U100 -24F, U1E00-1EFF, U20A0-20AB, U20AD-20CF, U2C60-2C7F, UA720-A7FF; }\n\n@font-face {\n  font-family: 'Oswald';\n  font-style: normal;\n  font-weight: 700;\n  src: url('/assets/fonts/oswald-bold.woff2') format('woff2');\n  unicode-range: U100 -24F, U1E00-1EFF, U20A0-20AB, U20AD-20CF, U2C60-2C7F, UA720-A7FF; }\n\nbody {\n  position: relative;\n  background-color: #999; }\n\naside {\n  background-color: #222;\n  height: 100%;\n  width: 400px;\n  position: fixed;\n  z-index: 5;\n  overflow: hidden;\n  border-right: 1px #222 solid; }\n  aside select {\n    outline: none;\n    margin: 3px 2px;\n    padding: 3px;\n    font-size: 100%; }\n  aside input[type=text] {\n    font-size: 100%;\n    background-color: #999;\n    color: #600;\n    border: 3px solid #222;\n    outline: none;\n    padding: 3px;\n    margin: 3px 2px; }\n  aside input[type=submit], aside button {\n    font-size: 70%;\n    padding: 6px;\n    margin-left: 3px; }\n  aside table {\n    width: 100%; }\n    aside table tbody tr:hover {\n      background-color: #222; }\n      aside table tbody tr:hover td {\n        color: #eee; }\n    aside table th {\n      font-size: 70%;\n      color: #600;\n      text-transform: uppercase;\n      padding: 0 8px; }\n    aside table td {\n      padding: 1px 4px; }\n    aside table td.input {\n      text-align: center; }\n  aside section {\n    border-bottom: #999 dashed 1px;\n    border-top: #999 dashed 1px;\n    font-family: 'Lato';\n    padding: 8px 0 8px 15px;\n    cursor: pointer; }\n    aside section:first-child {\n      border-top: none; }\n  aside h1 {\n    font-size: 25px;\n    color: #B22;\n    text-transform: uppercase; }\n  aside h2 {\n    font-size: 15px;\n    margin-bottom: 8px; }\n  aside section.active {\n    background-color: #999;\n    border: none;\n    cursor: default;\n    overflow-y: hidden; }\n    aside section.active h1 {\n      color: #600;\n      margin-bottom: 10px; }\n    aside section.active > div {\n      opacity: 1;\n      line-height: 144%; }\n  aside section > div {\n    overflow-y: auto;\n    line-height: 1.1;\n    padding: 1px;\n    opacity: 0.2; }\n    aside section > div .separated {\n      border-top: #222 1px dashed;\n      margin-top: 0.5em;\n      padding-top: 0.5em; }\n  aside section.minor {\n    float: left; }\n    aside section.minor h1 {\n      font-size: 50%; }\n  aside ul#existing-filters li {\n    float: left;\n    margin: 3px 7px 3px 0;\n    border: 3px solid #222;\n    border-radius: 7px; }\n    aside ul#existing-filters li span {\n      float: left;\n      padding: 2px 7px;\n      color: #600; }\n    aside ul#existing-filters li .remover {\n      color: #B22;\n      background-color: #222;\n      overflow: hidden;\n      cursor: pointer; }\n  aside #data .field {\n    float: left;\n    margin: 3px 10px 3px 0;\n    background-color: #600;\n    color: #999;\n    padding: 3px 6px;\n    border-radius: 3px;\n    cursor: pointer; }\n\nbody.loading #grid {\n  opacity: 0.6; }\n\n#loading-messages {\n  display: none;\n  padding: 8px;\n  font-family: 'Oswald';\n  position: fixed;\n  bottom: 0;\n  height: 30px;\n  width: 100%;\n  font-size: 30px;\n  z-index: 6;\n  background-color: #222;\n  color: #B22; }\n  #loading-messages > div {\n    float: left; }\n\nbody.loading #loading-messages {\n  display: block; }\n\nmain {\n  min-height: 100vh;\n  margin-left: 400px;\n  position: relative;\n  background-color: #eee; }\n  main #gridContainer {\n    overflow: auto; }\n  main table {\n    margin-left: 1px; }\n    main table thead th {\n      font-family: 'Lato';\n      padding: 2px 8px;\n      font-size: 90%;\n      text-align: left;\n      vertical-align: bottom;\n      background-color: #bbb; }\n      main table thead th.number, main table thead th.currency {\n        text-align: right; }\n    main table tbody tr td {\n      padding: 2px 8px;\n      font-family: 'Lato';\n      font-size: 70%;\n      text-align: left;\n      font-family: 'Lato'; }\n      main table tbody tr td.number {\n        font-family: 'Inconsolata', monospace;\n        text-align: right; }\n      main table tbody tr td.currency {\n        font-family: 'Inconsolata', monospace;\n        text-align: right; }\n      main table tbody tr td.time {\n        white-space: nowrap; }\n      main table tbody tr td:nth-child(2n) {\n        background-color: #ddd; }\n    main table tbody tr:hover td {\n      background-color: #EBB; }\n      main table tbody tr:hover td:nth-child(2n) {\n        background-color: #EAA; }\n\n.expandable {\n  padding-left: 8px; }\n  .expandable > .content {\n    display: none; }\n  .expandable.expanded > .content {\n    display: block; }\n  .expandable.expanded > .collapsed {\n    display: none; }\n  .expandable:hover {\n    border-left: 4px solid #600;\n    padding-left: 4px; }\n\n.clear {\n  clear: both; }\n\n.button {\n  border-radius: 3px;\n  background-color: #600;\n  padding: 5px;\n  color: #999;\n  float: left;\n  font-size: 80%; }\n\n.right {\n  float: right; }\n\n.spinner {\n  margin: 0 10px;\n  text-align: center;\n  position: relative;\n  height: 100%; }\n\n.spinner > div {\n  width: 12px;\n  height: 12px;\n  margin: 9px auto;\n  background-color: #B22;\n  border-radius: 100%;\n  display: inline-block;\n  -webkit-animation: bouncedelay 1.4s infinite ease-in-out;\n  animation: bouncedelay 1.4s infinite ease-in-out;\n  /* Prevent first frame from flickering when animation starts */\n  -webkit-animation-fill-mode: both;\n  animation-fill-mode: both; }\n\n.spinner .bounce1 {\n  -webkit-animation-delay: -0.32s;\n  animation-delay: -0.32s; }\n\n.spinner .bounce2 {\n  -webkit-animation-delay: -0.16s;\n  animation-delay: -0.16s; }\n\n@-webkit-keyframes bouncedelay {\n  0%, 80%, 100% {\n    -webkit-transform: scale(0); }\n\n  40% {\n    -webkit-transform: scale(1); } }\n\n@keyframes bouncedelay {\n  0%, 80%, 100% {\n    transform: scale(0);\n    -webkit-transform: scale(0); }\n\n  40% {\n    transform: scale(1);\n    -webkit-transform: scale(1); } }\n\n"],"sourceRoot":"/source/"}
 @font-face {
   font-family: 'Lato';
   src: url('/assets/fonts/Lato.woff2') format('woff2'), url('/assets/fonts/Lato.woff') format('woff'); }
@@ -304,197 +300,165 @@ table.dataTable, table.dataTable th, table.dataTable td {
   src: url('/assets/fonts/oswald-bold.woff2') format('woff2');
   unicode-range: U100 -24F, U1E00-1EFF, U20A0-20AB, U20AD-20CF, U2C60-2C7F, UA720-A7FF; }
 
-body {
+.datacomposer {
   position: relative;
   background-color: #999; }
-
-aside {
-  background-color: #222;
-  height: 100%;
-  width: 400px;
-  position: fixed;
-  z-index: 5;
-  overflow: hidden;
-  border-right: 1px #222 solid; }
-  aside select {
-    outline: none;
-    margin: 3px 2px;
-    padding: 3px;
-    font-size: 100%; }
-  aside input[type=text] {
-    font-size: 100%;
-    background-color: #999;
-    color: #600;
-    border: 3px solid #222;
-    outline: none;
-    padding: 3px;
-    margin: 3px 2px; }
-  aside input[type=submit], aside button {
-    font-size: 70%;
-    padding: 6px;
-    margin-left: 3px; }
-  aside table {
-    width: 100%; }
-    aside table tbody tr:hover {
-      background-color: #222; }
-      aside table tbody tr:hover td {
-        color: #eee; }
-    aside table th {
+  .datacomposer aside {
+    background-color: #222;
+    height: 100%;
+    width: 400px;
+    position: fixed;
+    z-index: 5;
+    overflow: hidden;
+    border-right: 1px #222 solid; }
+    .datacomposer aside select {
+      outline: none;
+      margin: 3px 2px;
+      padding: 3px;
+      font-size: 100%;
+      max-width: 310px; }
+    .datacomposer aside input[type=text] {
+      font-size: 100%; }
+    .datacomposer aside input[type=submit], .datacomposer aside button {
       font-size: 70%;
-      color: #600;
-      text-transform: uppercase;
-      padding: 0 8px; }
-    aside table td {
-      padding: 1px 4px; }
-    aside table td.input {
-      text-align: center; }
-  aside section {
-    border-bottom: #999 dashed 1px;
-    border-top: #999 dashed 1px;
-    font-family: 'Lato';
-    padding: 8px 0 8px 15px;
-    cursor: pointer; }
-    aside section:first-child {
-      border-top: none; }
-  aside h1 {
-    font-size: 25px;
-    color: #B22;
-    text-transform: uppercase; }
-  aside h2 {
-    font-size: 15px;
-    margin-bottom: 8px; }
-  aside section.active {
-    background-color: #999;
-    border: none;
-    cursor: default;
-    overflow-y: hidden; }
-    aside section.active h1 {
-      color: #600;
-      margin-bottom: 10px; }
-    aside section.active > div {
-      opacity: 1;
-      line-height: 144%; }
-  aside section > div {
-    overflow-y: auto;
-    line-height: 1.1;
-    padding: 1px;
-    opacity: 0.2; }
-    aside section > div .separated {
-      border-top: #222 1px dashed;
-      margin-top: 0.5em;
-      padding-top: 0.5em; }
-  aside section.minor {
-    float: left; }
-    aside section.minor h1 {
-      font-size: 50%; }
-  aside ul#existing-filters li {
-    float: left;
-    margin: 3px 7px 3px 0;
-    border: 3px solid #222;
-    border-radius: 7px; }
-    aside ul#existing-filters li span {
-      float: left;
-      padding: 2px 7px;
-      color: #600; }
-    aside ul#existing-filters li .remover {
-      color: #B22;
-      background-color: #222;
-      overflow: hidden;
+      padding: 6px;
+      margin-left: 3px; }
+    .datacomposer aside table {
+      width: 100%; }
+      .datacomposer aside table tbody tr:hover {
+        background-color: #222; }
+        .datacomposer aside table tbody tr:hover td {
+          color: #eee; }
+      .datacomposer aside table th {
+        font-size: 70%;
+        color: #600;
+        text-transform: uppercase;
+        padding: 0 8px; }
+      .datacomposer aside table td {
+        padding: 1px 4px; }
+      .datacomposer aside table td.input {
+        text-align: center; }
+    .datacomposer aside section {
+      border-bottom: #999 dashed 1px;
+      border-top: #999 dashed 1px;
+      font-family: 'Lato';
+      padding: 8px 0 8px 15px;
       cursor: pointer; }
-  aside #data .field {
-    float: left;
-    margin: 3px 10px 3px 0;
-    background-color: #600;
-    color: #999;
-    padding: 3px 6px;
+      .datacomposer aside section:first-child {
+        border-top: none; }
+    .datacomposer aside h1 {
+      font-size: 25px;
+      color: #B22;
+      text-transform: uppercase; }
+    .datacomposer aside h2 {
+      font-size: 15px;
+      margin-bottom: 8px; }
+    .datacomposer aside section.active {
+      background-color: #999;
+      border: none;
+      cursor: default;
+      overflow-y: hidden; }
+      .datacomposer aside section.active h1 {
+        color: #600;
+        margin-bottom: 10px; }
+      .datacomposer aside section.active > div {
+        opacity: 1;
+        line-height: 144%; }
+    .datacomposer aside section > div {
+      overflow-y: auto;
+      line-height: 1.1;
+      padding: 1px;
+      opacity: 0.2; }
+      .datacomposer aside section > div .separated {
+        border-top: #222 1px dashed;
+        margin-top: 0.5em;
+        padding-top: 0.5em; }
+    .datacomposer aside section.minor {
+      float: left; }
+      .datacomposer aside section.minor h1 {
+        font-size: 50%; }
+    .datacomposer aside ul#existing-filters li {
+      float: left;
+      margin: 3px 7px 3px 0;
+      border: 3px solid #222;
+      border-radius: 7px; }
+      .datacomposer aside ul#existing-filters li span {
+        float: left;
+        padding: 2px 7px;
+        color: #600; }
+      .datacomposer aside ul#existing-filters li .remover {
+        color: #B22;
+        background-color: #222;
+        overflow: hidden;
+        cursor: pointer; }
+    .datacomposer aside #data .field {
+      float: left;
+      margin: 3px 10px 3px 0;
+      background-color: #600;
+      color: #999;
+      padding: 3px 6px;
+      border-radius: 3px;
+      cursor: pointer; }
+  .datacomposer main {
+    min-height: 100vh;
+    margin-left: 400px;
+    position: relative;
+    background-color: #eee; }
+    .datacomposer main #gridContainer {
+      overflow: auto; }
+    .datacomposer main table {
+      margin-left: 1px; }
+      .datacomposer main table thead th {
+        font-family: 'Lato';
+        padding: 2px 8px;
+        font-size: 90%;
+        text-align: left;
+        vertical-align: bottom;
+        background-color: #bbb; }
+        .datacomposer main table thead th.number, .datacomposer main table thead th.currency {
+          text-align: right; }
+      .datacomposer main table tbody tr td {
+        padding: 2px 8px;
+        font-family: 'Lato';
+        font-size: 70%;
+        text-align: left;
+        font-family: 'Lato'; }
+        .datacomposer main table tbody tr td.number {
+          font-family: 'Inconsolata', monospace;
+          text-align: right; }
+        .datacomposer main table tbody tr td.currency {
+          font-family: 'Inconsolata', monospace;
+          text-align: right; }
+        .datacomposer main table tbody tr td.time {
+          white-space: nowrap; }
+        .datacomposer main table tbody tr td:nth-child(2n) {
+          background-color: #ddd; }
+      .datacomposer main table tbody tr:hover td {
+        background-color: #EBB; }
+        .datacomposer main table tbody tr:hover td:nth-child(2n) {
+          background-color: #EAA; }
+  .datacomposer .expandable {
+    padding-left: 8px; }
+    .datacomposer .expandable > .content {
+      display: none; }
+    .datacomposer .expandable.expanded > .content {
+      display: block; }
+    .datacomposer .expandable.expanded > .collapsed {
+      display: none; }
+    .datacomposer .expandable:hover {
+      border-left: 4px solid #600;
+      padding-left: 4px; }
+  .datacomposer .clear {
+    clear: both; }
+  .datacomposer .button {
     border-radius: 3px;
-    cursor: pointer; }
-
-body.loading #grid {
-  opacity: 0.6; }
-
-#loading-messages {
-  display: none;
-  padding: 8px;
-  font-family: 'Oswald';
-  position: fixed;
-  bottom: 0;
-  height: 30px;
-  width: 100%;
-  font-size: 30px;
-  z-index: 6;
-  background-color: #222;
-  color: #B22; }
-  #loading-messages > div {
-    float: left; }
-
-body.loading #loading-messages {
-  display: block; }
-
-main {
-  min-height: 100vh;
-  margin-left: 400px;
-  position: relative;
-  background-color: #eee; }
-  main #gridContainer {
-    overflow: auto; }
-  main table {
-    margin-left: 1px; }
-    main table thead th {
-      font-family: 'Lato';
-      padding: 2px 8px;
-      font-size: 90%;
-      text-align: left;
-      vertical-align: bottom;
-      background-color: #bbb; }
-      main table thead th.number, main table thead th.currency {
-        text-align: right; }
-    main table tbody tr td {
-      padding: 2px 8px;
-      font-family: 'Lato';
-      font-size: 70%;
-      text-align: left;
-      font-family: 'Lato'; }
-      main table tbody tr td.number {
-        font-family: 'Inconsolata', monospace;
-        text-align: right; }
-      main table tbody tr td.currency {
-        font-family: 'Inconsolata', monospace;
-        text-align: right; }
-      main table tbody tr td.time {
-        white-space: nowrap; }
-      main table tbody tr td:nth-child(2n) {
-        background-color: #ddd; }
-    main table tbody tr:hover td {
-      background-color: #EBB; }
-      main table tbody tr:hover td:nth-child(2n) {
-        background-color: #EAA; }
-
-.expandable {
-  padding-left: 8px; }
-  .expandable > .content {
-    display: none; }
-  .expandable.expanded > .content {
-    display: block; }
-  .expandable.expanded > .collapsed {
-    display: none; }
-  .expandable:hover {
-    border-left: 4px solid #600;
-    padding-left: 4px; }
-
-.clear {
-  clear: both; }
-
-.button {
-  border-radius: 3px;
-  background-color: #600;
-  padding: 5px;
-  color: #999;
-  float: left;
-  font-size: 80%; }
-
-.right {
-  float: right; }
+    background-color: #600;
+    padding: 5px;
+    color: #999;
+    float: left;
+    font-size: 80%; }
+  .datacomposer .right {
+    float: right; }
 
 .spinner {
   margin: 0 10px;
@@ -539,5 +503,21 @@ main {
     transform: scale(1);
     -webkit-transform: scale(1); } }
 
-
-/*# sourceMappingURL=dist/assets/css/main.css.map */
+body.loading #loading-messages {
+  display: block; }
+body.loading #grid {
+  opacity: 0.6; }
+body #loading-messages {
+  display: none;
+  padding: 8px;
+  font-family: 'Oswald';
+  position: fixed;
+  bottom: 0;
+  height: 30px;
+  width: 100%;
+  font-size: 30px;
+  z-index: 6;
+  background-color: #222;
+  color: #B22; }
+  body #loading-messages > div {
+    float: left; }

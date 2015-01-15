@@ -44,7 +44,7 @@ var FiltersView = Backbone.View.extend({
       this.$("select#operator").append(
         $("<option/>").val(operator).html(operator)
       );
-    });
+    }, this);
   },
 
 

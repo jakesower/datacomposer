@@ -6,6 +6,7 @@ var $         = require('jquery'),
     Backbone  = require('backbone'),
     Grid      = require('./views/grid.js'),
     Dataset   = require('./lib/dataset.js'),
+    Importer  = require('./lib/importer.js'),
     views     = {},
     templates = {};
 
@@ -25,6 +26,9 @@ function DataComposer(el, options) {
   this.options = options;
   Dataset.setSourceList(options.sources || {});
   this.render();
+  if( _.has(options, "initialSource") ) {
+    Importer.import(options.initialSource).then( Dataset.loadSource.bind(Dataset) );
+  }
 }
 
 

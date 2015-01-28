@@ -19,8 +19,11 @@
     new DataComposer($(".datacomposer"),
       {
         sources: {
-          "All Applicants" : "http://smart.local/admin/applicants/reports/94.json"
-        }
+          "Chess Players": "/test/ratinglist.json"
+        },
+
+        initialSource: "/test/ratinglist.json"
+        // initialSource: [["C1","C2","C3"],[1,2,3]]
       }
     );
   });

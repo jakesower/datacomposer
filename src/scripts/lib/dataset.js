@@ -1,3 +1,7 @@
+//
+// Core class. All meaningful state should be in this module.
+//
+
 var _ = require('lodash'),
     Backbone = require('backbone'),
     Column = require('./column.js'),
@@ -5,8 +9,6 @@ var _ = require('lodash'),
     DataTypes = require('./data_types.js');
 
 
-// preference order for data types in order of strictest to more lenient
-var dataTypeOrder = ['boolean', 'number', 'currency', 'time', 'string'];
 
 var Dataset = function(options) {
   this.options = options;
@@ -14,6 +16,7 @@ var Dataset = function(options) {
 };
 
 _.extend(Dataset.prototype, Backbone.Events, {
+  // state goes here!
   _cache: {
     source: [],
     filter: [],
@@ -153,37 +156,6 @@ _.extend(Dataset.prototype, Backbone.Events, {
 
   // end cache, calculate, callback, cascade methods
 
-  /**
-   * Adds a type to columns
-   *
-   * @param {array} columns - Array of columns
-   * @param {object|array} sample - A few rows of data to detect the type from
-   */
-  _detectDataTypes: function(columns, sample) {
-    return _.map(columns, function(column) {
-      var types, sampleRow;
-
-      if(_.isArray(sample[0])) {
-        sampleRow = _.pluck(sample, _.indexOf(columns, column));
-      } else {
-        sampleRow = _.pluck(sample, column.name);
-      }
-
-      types = _.map(sampleRow, function(sampleVal) {
-        return _.find(dataTypeOrder, function(type) {
-          return DataTypes[type].test(sampleVal);
-        });
-      });
-
-      if(_.every(types, function(x){ return x === types[0]; })) {
-        // all the data types are the same; run with it
-        column.type = types[0];
-      } else {
-        column.type = 'string';
-      }
-      return column;
-    });
-  },
 
 
   initialize: function() {
@@ -206,29 +178,15 @@ _.extend(Dataset.prototype, Backbone.Events, {
   },
 
 
+  // expects an object of the form:
+  //  columns: [array, of, Column, objects]
+  //  data: [array, of, coerced, objects]
   loadSource: function(source) {
     var columns = source.columns,
-        data = source.data,
-        useKeys,
-        dataKeys = [];
-
-    // create column names if we're only given strings
-    if(typeof columns[0] === 'string') {
-      columns = _.map(columns, function(c) { return {name: c}; });
-    }
-
-    // check to see if we need to autodetect column types
-    if(!_.has(columns[0], 'type')) {
-      columns = this._detectDataTypes(columns, data.slice(1, 6));
-    }
-
-    // we're now assured of the minimum info needed for proper columns
-    columns = _.map(columns, function(column) {
-      column.id = _.uniqueId();
-      return new Column(column);
-    });
+        data = source.data;
 
     this.columnsByName = {};
+    this.columnsById = {};
     _.each(columns, function(column) {
       this.columnsByName[column.name] = column;
       this.columnsById[column.id] = column;
@@ -237,24 +195,7 @@ _.extend(Dataset.prototype, Backbone.Events, {
       column.on('change', function() { this._applyColumns(); }, this);
     }, this);
 
-
-    // is the data an array or keyed object?
-    useKeys = !(data instanceof Array);
-    _.each(columns, function(column, idx) {
-      dataKeys.push((useKeys ? column.name : idx));
-    });
-
-    // run our data through the column types to force uniformity
-    data = _.map(data, function(datum) {
-      var out = {};
-      _.each(columns, function(column, idx) {
-        out[column.name] = column.coerce(datum[dataKeys[idx]]);
-      });
-      return out;
-    });
-
     this.columns = columns;
-
     this._applySource(data);
   },
 

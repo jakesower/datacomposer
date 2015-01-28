@@ -13,7 +13,7 @@ var Column = Backbone.Model.extend({
     // immutable attributes
     this.type = options.type;
     this.name = options.name;
-    this.id = options.id;
+    this.id   = _.uniqueId();
 
     return this;
   },

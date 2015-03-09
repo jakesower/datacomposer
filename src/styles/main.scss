@@ -117,7 +117,6 @@ $salmon: #B22;
 
     h2 {
       font-size: 15px;
-      margin-bottom: 8px;
     }
 
 
@@ -218,10 +217,10 @@ $salmon: #B22;
       thead {
 
         th {
-          font-family: 'Lato';
-          padding: 2px 8px;
-          // font-family: 'Oswald';
-          font-size: 90%;
+          // font-family: 'Lato';
+          padding: 8px 30px 8px 12px;
+          font-family: 'Oswald';
+          font-size: 120%;
           text-align: left;
           vertical-align: bottom;
           background-color: #bbb;
@@ -237,7 +236,7 @@ $salmon: #B22;
         tr {
 
           td {
-            padding: 2px 8px;
+            padding: 8px 12px;
             font-family: 'Lato';
             font-size: 70%;
             text-align: left;
@@ -261,6 +260,7 @@ $salmon: #B22;
               background-color: #ddd;
             }
           }
+
 
           &:hover td {
             background-color: #EBB;

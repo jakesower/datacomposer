@@ -47,7 +47,6 @@
     "jquery": "~2.1.1",
     "backbone": "~1.1.2",
     "babyparse": "~0.2.1",
-    "datatables": "git+https://github.com/DataTables/DataTables.git",
     "moment": "~2.8.4"
   }
 }

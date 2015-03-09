@@ -26,7 +26,7 @@ gulp.task('styles', function() {
       .pipe(plugins.autoprefixer({ browsers: 'last 2 version'}))
     // .pipe(plugins.sourcemaps.write('dist/assets/css'))
     .pipe(plugins.concat("app.css"))
-    .pipe(gulp.dest('dist/assets/css'))
+    .pipe(gulp.dest('dist/assets/css'));
 });
 
 
@@ -52,7 +52,7 @@ gulp.task('lint', function() {
     .pipe(plugins.jshint({
       node: true
     }))
-    .pipe(plugins.jshint.reporter(stylish))
+    .pipe(plugins.jshint.reporter(stylish));
 });
 
 
@@ -62,6 +62,7 @@ gulp.task('package', function() {
       standalone: 'DataComposer'
     })
     .transform(tplTransform)
+    .transform(babelify)
     .bundle()
     .pipe(source('datacomposer.min.js')) // gives streaming vinyl file object
     .pipe(buffer()) // <----- convert from streaming to buffered vinyl file object
@@ -76,7 +77,7 @@ gulp.task('watch', function() {
 
   gulp.watch('src/styles/**/*.scss', ['styles']);
   gulp.watch('src/scripts/**/*.js', ['browserify', 'lint']);
-  gulp.watch('src/scripts/templates/**/*', ['browserify'])
+  gulp.watch('src/scripts/templates/**/*', ['browserify']);
 
   gulp.watch('dist/**').on('change', plugins.livereload.changed);
 });

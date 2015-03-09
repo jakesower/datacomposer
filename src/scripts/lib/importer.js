@@ -30,7 +30,7 @@ var Importers = {
 
       if( _.isString( source ) ) {
 
-        // does it look like a CSV (needs better matcher...)
+        // does it look like a CSV? (needs better matcher...)
         if( source.match( /\n/ ) ) {
           resolve( this.importCSV( source ) );
         } else {

@@ -52,9 +52,9 @@ var Loader = {
     return Promise
       .resolve(func.apply(thisArg))
       .then(function(v) {
-          delete this.registry[id];
-          this.check();
-        }.bind(this));
+        delete this.registry[id];
+        this.check();
+      }.bind(this));
   }
 };
 

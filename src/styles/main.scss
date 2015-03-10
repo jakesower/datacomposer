@@ -1,9 +1,13 @@
+/* Colors */
 $dark-red: #600;
 $dark-grey: #222;
 $light-grey: #999;
 $salmon: #B22;
 
+/* Dimensions */
+$grid-header-height: 30px;
 
+/* Fonts */
 @font-face {
   font-family: 'Lato';
   src: url('/assets/fonts/Lato.woff2') format('woff2'),
@@ -207,70 +211,81 @@ $salmon: #B22;
     position: relative;
     background-color: #eee;
 
-    #gridContainer {
+    #grid {
       overflow: auto;
-    }
+      height: 100vh;
 
-    table {
-      margin-left: 1px;
-
-      thead {
-
-        th {
-          // font-family: 'Lato';
-          padding: 8px 30px 8px 12px;
-          font-family: 'Oswald';
-          font-size: 120%;
-          text-align: left;
-          vertical-align: bottom;
-          background-color: #bbb;
-
-          &.number, &.currency {
-            text-align: right;
-          }
-        }
+      header {
+        height: $grid-header-height;
+        position: absolute;
+        background-color: #fff;
+        width: 100%;
+        background-color: #f4f4f4;
       }
-      
-      tbody {
 
-        tr {
+      table {
+        margin-top: $grid-header-height;
+        margin-left: 1px;
 
-          td {
-            padding: 8px 12px;
-            font-family: 'Lato';
-            font-size: 70%;
+        thead {
+
+          th {
+            // font-family: 'Lato';
+            padding: 8px 30px 8px 12px;
+            font-family: 'Oswald';
+            font-size: 120%;
             text-align: left;
-            font-family: 'Lato';
+            vertical-align: bottom;
+            background-color: #bbb;
 
-            &.number {
-              font-family: 'Inconsolata', monospace;
+            &.number, &.currency {
               text-align: right;
-            }
-
-            &.currency {
-              font-family: 'Inconsolata', monospace;
-              text-align: right;
-            }
-
-            &.time {
-              white-space: nowrap;
-            }
-
-            &:nth-child(2n) {
-              background-color: #ddd;
-            }
-          }
-
-
-          &:hover td {
-            background-color: #EBB;
-
-            &:nth-child(2n) {
-              background-color: #EAA;
             }
           }
         }
+        
+        tbody {
 
+          tr {
+
+            td {
+              padding: 8px 12px;
+              font-family: 'Lato';
+              font-size: 70%;
+              text-align: left;
+              font-family: 'Lato';
+              background-color: #f4f4f4;
+
+              &.number {
+                font-family: 'Inconsolata', monospace;
+                text-align: right;
+              }
+
+              &.currency {
+                font-family: 'Inconsolata', monospace;
+                text-align: right;
+              }
+
+              &.time {
+                white-space: nowrap;
+              }
+
+              &:nth-child(2n) {
+                background-color: #ddd;
+              }
+            }
+
+
+            &:hover td {
+              background-color: #EBB;
+
+              &:nth-child(2n) {
+                background-color: #EAA;
+              }
+            }
+          }
+
+        }
       }
 
     }
@@ -321,8 +336,19 @@ $salmon: #B22;
 
 
 
+}
 
 
+
+.button {
+  border: 2px solid #333;
+  display: inline-block;
+  text-align: center;
+  vertical-align: middle;
+  padding: 3px 8px;
+  border: 1px solid #333;
+  border-radius: 2px;
+  background: linear-gradient(to bottom, #eee, $salmon);
 }
 
 

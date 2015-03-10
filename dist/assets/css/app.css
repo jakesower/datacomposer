@@ -6,7 +6,7 @@ table.dataTable {
   margin: 0 auto;
   clear: both;
   border-collapse: separate;
-  border-spacing: 0;
+  border-spacing: 0
   /*
      * Header and footer styles
      */
@@ -189,7 +189,7 @@ table.dataTable, table.dataTable th, table.dataTable td {
         /* FF3.6+ */
         /* IE10+ */
         /* Opera 11.10+ */
-        background: linear-gradient(to bottom, #ffffff 0%, #dcdcdc 100%);
+        background: linear-gradient(to bottom, #ffffff 0%, #dcdcdc 100%)
         /* W3C */ }
       .dataTables_wrapper .dataTables_paginate .paginate_button.disabled, .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover, .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active {
         cursor: default;
@@ -206,7 +206,7 @@ table.dataTable, table.dataTable th, table.dataTable td {
         /* FF3.6+ */
         /* IE10+ */
         /* Opera 11.10+ */
-        background: linear-gradient(to bottom, #585858 0%, #111111 100%);
+        background: linear-gradient(to bottom, #585858 0%, #111111 100%)
         /* W3C */ }
       .dataTables_wrapper .dataTables_paginate .paginate_button:active {
         outline: none;
@@ -236,7 +236,7 @@ table.dataTable, table.dataTable th, table.dataTable td {
     /* FF3.6+ */
     /* IE10+ */
     /* Opera 11.10+ */
-    background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.9) 25%, rgba(255, 255, 255, 0.9) 75%, rgba(255, 255, 255, 0) 100%);
+    background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.9) 25%, rgba(255, 255, 255, 0.9) 75%, rgba(255, 255, 255, 0) 100%)
     /* W3C */ }
   .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_processing, .dataTables_wrapper .dataTables_paginate {
     color: #333333; }
@@ -275,6 +275,9 @@ table.dataTable, table.dataTable th, table.dataTable td {
   .dataTables_wrapper .dataTables_filter {
     margin-top: 0.5em; } }
 
+/* Colors */
+/* Dimensions */
+/* Fonts */
 @font-face {
   font-family: 'Lato';
   src: url('/assets/fonts/Lato.woff2') format('woff2'), url('/assets/fonts/Lato.woff') format('woff'); }
@@ -403,39 +406,48 @@ table.dataTable, table.dataTable th, table.dataTable td {
     margin-left: 400px;
     position: relative;
     background-color: #eee; }
-    .datacomposer main #gridContainer {
-      overflow: auto; }
-    .datacomposer main table {
-      margin-left: 1px; }
-      .datacomposer main table thead th {
-        padding: 8px 30px 8px 12px;
-        font-family: 'Oswald';
-        font-size: 120%;
-        text-align: left;
-        vertical-align: bottom;
-        background-color: #bbb; }
-        .datacomposer main table thead th.number, .datacomposer main table thead th.currency {
-          text-align: right; }
-      .datacomposer main table tbody tr td {
-        padding: 8px 12px;
-        font-family: 'Lato';
-        font-size: 70%;
-        text-align: left;
-        font-family: 'Lato'; }
-        .datacomposer main table tbody tr td.number {
-          font-family: 'Inconsolata', monospace;
-          text-align: right; }
-        .datacomposer main table tbody tr td.currency {
-          font-family: 'Inconsolata', monospace;
-          text-align: right; }
-        .datacomposer main table tbody tr td.time {
-          white-space: nowrap; }
-        .datacomposer main table tbody tr td:nth-child(2n) {
-          background-color: #ddd; }
-      .datacomposer main table tbody tr:hover td {
-        background-color: #EBB; }
-        .datacomposer main table tbody tr:hover td:nth-child(2n) {
-          background-color: #EAA; }
+    .datacomposer main #grid {
+      overflow: auto;
+      height: 100vh; }
+      .datacomposer main #grid header {
+        height: 30px;
+        position: absolute;
+        background-color: #fff;
+        width: 100%;
+        background-color: #f4f4f4; }
+      .datacomposer main #grid table {
+        margin-top: 30px;
+        margin-left: 1px; }
+        .datacomposer main #grid table thead th {
+          padding: 8px 30px 8px 12px;
+          font-family: 'Oswald';
+          font-size: 120%;
+          text-align: left;
+          vertical-align: bottom;
+          background-color: #bbb; }
+          .datacomposer main #grid table thead th.number, .datacomposer main #grid table thead th.currency {
+            text-align: right; }
+        .datacomposer main #grid table tbody tr td {
+          padding: 8px 12px;
+          font-family: 'Lato';
+          font-size: 70%;
+          text-align: left;
+          font-family: 'Lato';
+          background-color: #f4f4f4; }
+          .datacomposer main #grid table tbody tr td.number {
+            font-family: 'Inconsolata', monospace;
+            text-align: right; }
+          .datacomposer main #grid table tbody tr td.currency {
+            font-family: 'Inconsolata', monospace;
+            text-align: right; }
+          .datacomposer main #grid table tbody tr td.time {
+            white-space: nowrap; }
+          .datacomposer main #grid table tbody tr td:nth-child(2n) {
+            background-color: #ddd; }
+        .datacomposer main #grid table tbody tr:hover td {
+          background-color: #EBB; }
+          .datacomposer main #grid table tbody tr:hover td:nth-child(2n) {
+            background-color: #EAA; }
   .datacomposer .expandable {
     padding-left: 8px; }
     .datacomposer .expandable > .content {
@@ -458,6 +470,16 @@ table.dataTable, table.dataTable th, table.dataTable td {
     font-size: 80%; }
   .datacomposer .right {
     float: right; }
+
+.button {
+  border: 2px solid #333;
+  display: inline-block;
+  text-align: center;
+  vertical-align: middle;
+  padding: 3px 8px;
+  border: 1px solid #333;
+  border-radius: 2px;
+  background: linear-gradient(to bottom, #eee, #B22); }
 
 .spinner {
   margin: 0 10px;

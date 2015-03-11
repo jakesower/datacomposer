@@ -12,6 +12,11 @@ var GridView = Backbone.View.extend({
   page: 1,
   perPage: 20,
 
+  events: {
+    "click .page" : "changePage",
+    "click #goToPage" : "goToPage"
+  },
+
 
   initialize : function() {
     Dataset.on( 'change', this.render, this );
@@ -20,23 +25,39 @@ var GridView = Backbone.View.extend({
 
   render : function() {
     var cols, rows,
-        page = this.page,
-        perPage = this.perPage;
+        perPage = this.perPage,
+        numPages = Math.ceil(Dataset.set.length / perPage),
+        page = Math.max( Math.min( this.page, numPages ), 1 );
 
     cols = Dataset.visibleColumns().map( function(col) {
       return col.name;
     });
 
-    rows = Dataset.set.slice( (page - 1)*perPage, perPage );
+    rows = Dataset.set.slice( (page - 1)*perPage, page*perPage );
 
     this.$el.html( this.template({ 
       columns: cols,
       rows: rows,
       page: page,
-      perPage: perPage
+      perPage: perPage,
+      numPages: numPages
     }) );
     
+  },
+
+
+  changePage: function( e ) {
+    this.page = parseInt( e.target.dataset.page );
+    this.render();
+  },
+
+
+  goToPage: function( e ) {
+    var page = parseInt( this.$( "#setPage" ).val() );
+    if( page ) { this.page = page; }
+    this.render();
   }
+
 });
 
 

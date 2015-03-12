@@ -2,6 +2,7 @@ var $ = require('jquery'),
     _ = require('lodash'),
     Backbone = require('backbone'),
     Dataset = require('../lib/dataset.js'),
+    GroupFunctions = require('../lib/group-functions.js'),
     template = require('../templates/controls/groups.tpl');
 
 
@@ -28,7 +29,10 @@ var FiltersView = Backbone.View.extend({
   },
 
   render: function() {
-    this.$el.html(template({dataset: Dataset}));
+    this.$el.html( template( {
+      dataset: Dataset,
+      groupFunctions: GroupFunctions
+    }));
   },
 
 

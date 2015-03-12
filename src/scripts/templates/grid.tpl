@@ -36,9 +36,14 @@
     }
 
     if( showToPage ) {
-      %><input id="setPage" type="number" min="1" max="<%- numPages %>"><button id="goToPage">Go</button><%
+      %><input id="setPage" type="number" min="1" max="<%- numPages %>" value="<%- page %>"><button id="goToPage">Go</button><%
     }
 
+    %><select id="perPage"><%
+      [10, 20, 50, 100].forEach( function ( x ) { 
+        %><option value="<%- x %>"<%- (x === perPage) ? " selected" : "" %>><%- x %> per page</option><%
+      });
+    %></select><%
   }
 
   %>

@@ -14,7 +14,8 @@ var GridView = Backbone.View.extend({
 
   events: {
     "click .page" : "changePage",
-    "click #goToPage" : "goToPage"
+    "click #goToPage" : "goToPage",
+    "change #perPage" : "setPerPage"
   },
 
 
@@ -55,6 +56,12 @@ var GridView = Backbone.View.extend({
   goToPage: function( e ) {
     var page = parseInt( this.$( "#setPage" ).val() );
     if( page ) { this.page = page; }
+    this.render();
+  },
+
+
+  setPerPage: function( e ) {
+    this.perPage = parseInt( ( $( e.target ).val() ) );
     this.render();
   }
 

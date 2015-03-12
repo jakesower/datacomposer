@@ -5,7 +5,7 @@ $light-grey: #999;
 $salmon: #B22;
 
 /* Dimensions */
-$grid-header-height: 35px;
+$grid-header-height: 25px;
 
 /* Fonts */
 @font-face {
@@ -228,15 +228,15 @@ $grid-header-height: 35px;
         }
 
         input {
-          padding: 8px 12px 8px 12px;
+          padding: 3px 12px 3px 12px;
           width: 50px;
         }
 
 
         button {
           font-size: 80%;
-          padding: 8px 12px 8px 12px;
-          margin: 0 6px;
+          padding: 3px 8px 3px 8px;
+          margin: 0 4px;
           display: inline-block;
           text-align: center;
           vertical-align: middle;
@@ -251,11 +251,15 @@ $grid-header-height: 35px;
           color: black;
 
           &.selected {
-            border: 3px solid #333;
             background: linear-gradient(to bottom, #311, #111);
             color: white;
-            padding: 6px 10px 6px 10px;
           }
+        }
+
+        select {
+          background: linear-gradient(to bottom, #eee, #edd);
+          padding: 3px 8px;
+          font-size: 75%;
         }
 
       }
@@ -274,6 +278,7 @@ $grid-header-height: 35px;
             text-align: left;
             vertical-align: bottom;
             background-color: #bbb;
+            border-right: 1px #b2b2b2 solid;
 
             &.number, &.currency {
               text-align: right;
@@ -292,6 +297,7 @@ $grid-header-height: 35px;
               text-align: left;
               font-family: 'Lato';
               background-color: #f4f4f4;
+              border-right: 1px #ddd solid;
 
               &.number {
                 font-family: 'Inconsolata', monospace;

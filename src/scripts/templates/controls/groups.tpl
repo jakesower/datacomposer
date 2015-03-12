@@ -1,27 +1,27 @@
-<ul id="existing-filters">
-<% _.each(dataset.filters, function(filter) { %>
-  <li class="filter">
-    <span class="text"><%- filter.string %></span>
-    <span class="remover" data-filterid="<%- filter.id %>">✕</span>
+<ul id="existing-groups">
+<% _.each(dataset.groups, function( group ) { %>
+  <li class="group">
+    <span class="text"><%- group %></span>
+    <span class="remover" data-groupid="<%- group %>">✕</span>
   </li>
 <% }); %>
 </ul>
 <div class="clear"></div>
 
 <div class="separated">
-  <form id="new-filter">
+  <form id="new-group">
     <select id="column" name="column" required>
-      <option class="blank" value="" default>New Filter</option>
+      <option class="blank" value="" default>New Group</option>
       <% _.each(dataset.columns, function(column) { %>
         <option value="<%- column.name %>"><%- column.name %></option>
       <% }) %>
     </select>
-
-    <select id="operator" name="operator" required>
-    </select>
-
-    <input type="text" id="operand" name="operand" required>
     
-    <input type="submit" value="Add Filter">
+    <input type="submit" value="Add Group">
   </form>
 </div>
+
+<div class="separated">
+  Hi
+</div>
+

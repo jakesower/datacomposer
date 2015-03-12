@@ -6,7 +6,7 @@ table.dataTable {
   margin: 0 auto;
   clear: both;
   border-collapse: separate;
-  border-spacing: 0;
+  border-spacing: 0
   /*
      * Header and footer styles
      */
@@ -189,7 +189,7 @@ table.dataTable, table.dataTable th, table.dataTable td {
         /* FF3.6+ */
         /* IE10+ */
         /* Opera 11.10+ */
-        background: linear-gradient(to bottom, #ffffff 0%, #dcdcdc 100%);
+        background: linear-gradient(to bottom, #ffffff 0%, #dcdcdc 100%)
         /* W3C */ }
       .dataTables_wrapper .dataTables_paginate .paginate_button.disabled, .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover, .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active {
         cursor: default;
@@ -206,7 +206,7 @@ table.dataTable, table.dataTable th, table.dataTable td {
         /* FF3.6+ */
         /* IE10+ */
         /* Opera 11.10+ */
-        background: linear-gradient(to bottom, #585858 0%, #111111 100%);
+        background: linear-gradient(to bottom, #585858 0%, #111111 100%)
         /* W3C */ }
       .dataTables_wrapper .dataTables_paginate .paginate_button:active {
         outline: none;
@@ -236,7 +236,7 @@ table.dataTable, table.dataTable th, table.dataTable td {
     /* FF3.6+ */
     /* IE10+ */
     /* Opera 11.10+ */
-    background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.9) 25%, rgba(255, 255, 255, 0.9) 75%, rgba(255, 255, 255, 0) 100%);
+    background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.9) 25%, rgba(255, 255, 255, 0.9) 75%, rgba(255, 255, 255, 0) 100%)
     /* W3C */ }
   .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_processing, .dataTables_wrapper .dataTables_paginate {
     color: #333333; }
@@ -411,7 +411,7 @@ table.dataTable, table.dataTable th, table.dataTable td {
       overflow: auto;
       height: 100vh; }
       .datacomposer main #grid header {
-        height: 35px;
+        height: 25px;
         position: absolute;
         padding: 3px 8px;
         font-family: Lato;
@@ -419,12 +419,12 @@ table.dataTable, table.dataTable th, table.dataTable td {
         .datacomposer main #grid header div {
           display: inline-block; }
         .datacomposer main #grid header input {
-          padding: 8px 12px 8px 12px;
+          padding: 3px 12px 3px 12px;
           width: 50px; }
         .datacomposer main #grid header button {
           font-size: 80%;
-          padding: 8px 12px 8px 12px;
-          margin: 0 6px;
+          padding: 3px 8px 3px 8px;
+          margin: 0 4px;
           display: inline-block;
           text-align: center;
           vertical-align: middle;
@@ -435,12 +435,14 @@ table.dataTable, table.dataTable th, table.dataTable td {
           background: linear-gradient(to bottom, #eee, #edd);
           color: black; }
           .datacomposer main #grid header button.selected {
-            border: 3px solid #333;
             background: linear-gradient(to bottom, #311, #111);
-            color: white;
-            padding: 6px 10px 6px 10px; }
+            color: white; }
+        .datacomposer main #grid header select {
+          background: linear-gradient(to bottom, #eee, #edd);
+          padding: 3px 8px;
+          font-size: 75%; }
       .datacomposer main #grid table {
-        margin-top: 41px;
+        margin-top: 31px;
         margin-left: 1px; }
         .datacomposer main #grid table thead th {
           padding: 8px 30px 8px 12px;
@@ -448,7 +450,8 @@ table.dataTable, table.dataTable th, table.dataTable td {
           font-size: 120%;
           text-align: left;
           vertical-align: bottom;
-          background-color: #bbb; }
+          background-color: #bbb;
+          border-right: 1px #b2b2b2 solid; }
           .datacomposer main #grid table thead th.number, .datacomposer main #grid table thead th.currency {
             text-align: right; }
         .datacomposer main #grid table tbody tr td {
@@ -457,7 +460,8 @@ table.dataTable, table.dataTable th, table.dataTable td {
           font-size: 70%;
           text-align: left;
           font-family: 'Lato';
-          background-color: #f4f4f4; }
+          background-color: #f4f4f4;
+          border-right: 1px #ddd solid; }
           .datacomposer main #grid table tbody tr td.number {
             font-family: 'Inconsolata', monospace;
             text-align: right; }

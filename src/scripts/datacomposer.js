@@ -14,6 +14,7 @@ views = {
   source: {name: "Source", view: require('./views/source.js')},
   columns: {name: 'Columns', view: require('./views/columns.js')},
   filters: {name: "Filters", view: require('./views/filters.js')},
+  groups: {name: "Groups", view: require('./views/groups.js')},
   save: {name: "Save", view: require('./views/save.js')}
 };
 

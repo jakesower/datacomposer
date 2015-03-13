@@ -12,7 +12,7 @@
  */
 
 
-var groupFunctions = {
+var GroupFunctions = {
 
   count: {
     args: [],  // doesn't matter what we get passed in
@@ -25,4 +25,4 @@ var groupFunctions = {
 
 
 
-module.exports = groupFunctions;
+module.exports = GroupFunctions;

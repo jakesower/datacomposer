@@ -1,34 +1,25 @@
 // render the skeleton of the app, then initialize components
 
-var $         = require('jquery'),
-    _         = require('lodash'),
-    Accordion = require('./lib/accordion.js'),
-    Backbone  = require('backbone'),
-    Grid      = require('./views/grid.js'),
-    Dataset   = require('./lib/dataset.js'),
-    Importer  = require('./lib/importer.js'),
-    views     = {},
-    templates = {};
-
-views = {
-  source: {name: "Source", view: require('./views/source.js')},
-  columns: {name: 'Columns', view: require('./views/columns.js')},
-  filters: {name: "Filters", view: require('./views/filters.js')},
-  groups: {name: "Groups", view: require('./views/groups.js')},
-  save: {name: "Save", view: require('./views/save.js')}
-};
-
-templates.datacomposer = require('./templates/datacomposer.tpl');
-templates.control = require('./templates/control.tpl');
+var $          = require('jquery'),
+    _          = require('lodash'),
+    Backbone   = require('backbone'),
+    Controls   = require('./views/controls.js'),
+    Grid       = require('./views/grid.js'),
+    Dataset    = require('./lib/dataset.js'),
+    Importer   = require('./lib/importer.js'),
+    views      = {},
+    DCTemplate = require('./templates/datacomposer.tpl');
 
 
 function DataComposer(el, options) {
   this.el = el;
   this.options = options;
-  Dataset.setSourceList(options.sources || {});
+
+  Dataset.setSourceList(options.sources || {});  
   this.render();
+
   if( _.has(options, "initialSource") ) {
-    Importer.import(options.initialSource).then( Dataset.loadSource.bind(Dataset) );
+    Importer.import( options.initialSource ).then( Dataset.loadSource.bind( Dataset ) );
   }
 }
 
@@ -36,23 +27,13 @@ function DataComposer(el, options) {
 DataComposer.prototype = {
   el: null,
   options: {},
+  controls: null,
 
   render: function() {
-    $(this.el).addClass("datacomposer").empty().append(templates.datacomposer());
-    var sidebar = $(this.el).find('aside#tools');
-
-    // render the controls
-    _.each(views, function(viewData) {
-      var control = $(templates.control(viewData));
-      $(sidebar).append(control);
-
-      var viewEl = control.children()[1];
-      new viewData.view({el: viewEl});
-    });
-
-    // render the grid
+    $( this.el ).addClass( "datacomposer" ).empty().append( DCTemplate() );
+    
+    new Controls( { el: $( this.el ).find( 'aside#tools' ) });
     new Grid();
-    new Accordion(sidebar);
   }
 };
 

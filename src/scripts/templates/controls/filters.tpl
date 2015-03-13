@@ -1,4 +1,4 @@
-<ul id="existing-filters">
+<ul class="removable-list" id="existing-filters">
 <% _.each(dataset.filters, function(filter) { %>
   <li class="filter">
     <span class="text"><%- filter.string %></span>

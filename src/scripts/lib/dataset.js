@@ -10,17 +10,17 @@ var _ = require('lodash'),
 
 
 
-var Dataset = function(options) {
+var Dataset = function( options ) {
   this.options = options;
   this.initialize();
 };
 
-_.extend(Dataset.prototype, Backbone.Events, {
+_.extend( Dataset.prototype, Backbone.Events, {
   // state goes here!
   _cache: {
     source: [],
     filter: [],
-    group: [],
+    grouping: [],
     groupFilter: [],
     columns: []
   },
@@ -31,6 +31,7 @@ _.extend(Dataset.prototype, Backbone.Events, {
   columnsByName: {},
   columnsById: {},
   filters: {},
+  groupings: [],
 
 
   //
@@ -45,7 +46,7 @@ _.extend(Dataset.prototype, Backbone.Events, {
   // source -> filters -> groupings -> group filters -> columns
   //
 
-  _applySource: function(set) {
+  _applySource: function( set ) {
     // cache
     this._cache.source = set;
 
@@ -53,52 +54,64 @@ _.extend(Dataset.prototype, Backbone.Events, {
     this.set = set;
 
     // callback
-    this.trigger('change:source', set);
+    this.trigger( 'change:source', set );
 
     // cascade
-    this._applyFilters(set);
+    this._applyFilters( set );
   },
 
 
-  _applyFilters: function(set) {
+  _applyFilters: function( set ) {
     // cache
-    if(set) {
+    if( set ) {
       this._cache.filter = set;
     } else {
       set = this._cache.filter;
     }
 
     // calculate
-    set = _.reduce(_.values(this.filters), function(remaining, filter) {
-      return _.filter(remaining, filter.filter);
+    set = _.reduce( _.values( this.filters ), function( remaining, filter ) {
+      return _.filter( remaining, filter.filter );
     }, set);
     this.set = set;
 
     // callback
-    this.trigger('change:filters', set);
+    this.trigger( 'change:filters', set );
 
     // cascade
-    this._applyGroupings(set);
+    this._applyGroupings( set );
   },
 
 
-  _applyGroupings: function(set) {
+  _applyGroupings: function( set ) {
+    var groupedSet;
+
     // cache
-    if(set) {
+    if( set ) {
       this._cache.grouping = set;
     } else {
       set = this._cache.grouping;
     }
 
+
+    // we can go one of two ways here, depending on if we're grouping or not
+    if( this.groupings.length === 0 ) {
+      // no groupings--just use columns as provided
+      this.set = set;
+      this.applyColumns( set );
+    }
+    else {
+      // reconstruct the set based on groupings and group functions
+      // groups are cartesian products of unique values of grouped columns
+      grouped
+    }
     // calculate
-    // NOOP for now
-    this.set = set;
 
     // callback
-    this.trigger('change:groupings', set);
+    this.trigger( 'change:groupings', set );
 
     // cascade
-    this._applyGroupFilters(set);    
+    this._applyGroupFilters( set );
   },
 
 
@@ -240,6 +253,27 @@ _.extend(Dataset.prototype, Backbone.Events, {
     delete this.filters[filterId];
     this._applyFilters();
   },
+
+
+  /**
+   * Adds a grouping that aggregates the data, switching DC into group mode
+   *
+   * @param {string} grouping - the column name to group on
+   */
+  addGrouping: function( grouping ) {
+    this.groupings.push( grouping );
+    this._applyGroupings();
+  },
+
+
+  removeGrouping: function( grouping ) {
+    this.groupings = _.filter( this.groupings, function( g ){
+      return grouping != g;
+    });
+    this._applyGroupings();
+  },
+
+
 
   applyFilters: function(set) {
     return _.reduce(_.values(this.filters), function(remaining, filter) {

@@ -17,8 +17,11 @@ var $ = require('jquery'),
 * Note that the elements need not be divs or h1 tags--anything tags will work
 * so long as they follow that nesting pattern.
 */
-function Accordion(el) {
+function Accordion(el, options) {
+  options = options || {};
+
   this.el = el;
+  this.activeSection = options.activeSection || $(el).find('>')[0];
   this.initialize();
   this.bind();
 }
@@ -33,10 +36,10 @@ Accordion.prototype = {
   initialize : function() {
     _.each($(this.el).find('>'), function(e) {
       $(e).find(this.panelSelector).hide();
-      this.showSection(e, false);
+      this.showSection(e, false, true);
     }, this);
     this.applyMaxHeight();
-    this.activateSection($(this.el).find('>')[0]);
+    this.showSection( this.activeSection, true, true );
   },
 
 
@@ -73,11 +76,11 @@ Accordion.prototype = {
     }
  
     if(this.activeSection) {
-      this.showSection($(this.activeSection), false);
+      this.showSection($(this.activeSection), false, false);
     }
 
     this.activeSection = section;
-    this.showSection(section, true);
+    this.showSection(section, true, false);
   },
 
 
@@ -86,7 +89,12 @@ Accordion.prototype = {
 
     if(visible) {
       $(section).addClass('active');
-      panel.slideDown();
+      if( skipAnimation ) {
+        panel.show();
+      }
+      else {
+        panel.slideDown();
+      }
     } else {
       $(section).removeClass('active');
       panel.slideUp();

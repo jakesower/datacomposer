@@ -29,3 +29,5 @@ node_modules
 
 # figure a better way to deal with this
 .sass-cache
+.tags
+.tags_sorted*

@@ -6,6 +6,7 @@ var _ = require('lodash'),
     Backbone = require('backbone'),
     Column = require('./column.js'),
     Utils = require('../lib/utils.js'),
+    GroupedDataset = require('./grouped-dataset.js'),
     DataTypes = require('./data_types.js');
 
 
@@ -84,7 +85,8 @@ _.extend( Dataset.prototype, Backbone.Events, {
 
 
   _applyGroupings: function( set ) {
-    var groupedSet;
+    var groupedSet,
+        nextAction;
 
     // cache
     if( set ) {
@@ -94,24 +96,25 @@ _.extend( Dataset.prototype, Backbone.Events, {
     }
 
 
+    // calculate
     // we can go one of two ways here, depending on if we're grouping or not
     if( this.groupings.length === 0 ) {
       // no groupings--just use columns as provided
-      this.set = set;
-      this.applyColumns( set );
+      set = set;
+      nextAction = this._applyColumns.bind( this );
     }
     else {
       // reconstruct the set based on groupings and group functions
       // groups are cartesian products of unique values of grouped columns
-      grouped
+      set = new GroupedDataset( set, this.groupings );
+      nextAction = this._applyGroupFilters.bind( this );
     }
-    // calculate
 
     // callback
     this.trigger( 'change:groupings', set );
 
-    // cascade
-    this._applyGroupFilters( set );
+    // cascade -- branch on if we're grouping or not
+    nextAction( set );
   },
 
 
@@ -131,7 +134,7 @@ _.extend( Dataset.prototype, Backbone.Events, {
     this.trigger('change:groupFilters', set);
 
     // cascade
-    this._applyColumns(set);    
+    this._finishCascade(set);
   },
 
 
@@ -163,6 +166,7 @@ _.extend( Dataset.prototype, Backbone.Events, {
 
 
   _finishCascade: function(set) {
+    this.set = set;
     this.trigger('change', set);
   },
 

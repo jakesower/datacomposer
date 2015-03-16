@@ -22771,7 +22771,7 @@ DataComposer.prototype = {
 
 module.exports = DataComposer;
 
-},{"./lib/dataset.js":12,"./lib/importer.js":14,"./templates/datacomposer.tpl":25,"./views/controls.js":28,"./views/grid.js":30,"backbone":3,"jquery":5,"lodash":6}],9:[function(require,module,exports){
+},{"./lib/dataset.js":12,"./lib/importer.js":15,"./templates/datacomposer.tpl":26,"./views/controls.js":29,"./views/grid.js":31,"backbone":3,"jquery":5,"lodash":6}],9:[function(require,module,exports){
 //*****************************************************************************
 // Accordion menu
 //*****************************************************************************
@@ -23271,6 +23271,7 @@ var _ = require('lodash'),
     Backbone = require('backbone'),
     Column = require('./column.js'),
     Utils = require('../lib/utils.js'),
+    GroupedDataset = require('./grouped-dataset.js'),
     DataTypes = require('./data_types.js');
 
 
@@ -23349,7 +23350,8 @@ _.extend( Dataset.prototype, Backbone.Events, {
 
 
   _applyGroupings: function( set ) {
-    var groupedSet;
+    var groupedSet,
+        nextAction;
 
     // cache
     if( set ) {
@@ -23359,24 +23361,25 @@ _.extend( Dataset.prototype, Backbone.Events, {
     }
 
 
+    // calculate
     // we can go one of two ways here, depending on if we're grouping or not
     if( this.groupings.length === 0 ) {
       // no groupings--just use columns as provided
-      this.set = set;
-      this.applyColumns( set );
+      set = set;
+      nextAction = this._applyColumns.bind( this );
     }
     else {
       // reconstruct the set based on groupings and group functions
       // groups are cartesian products of unique values of grouped columns
-      grouped
+      set = new GroupedDataset( set, this.groupings );
+      nextAction = this._applyGroupFilters.bind( this );
     }
-    // calculate
 
     // callback
     this.trigger( 'change:groupings', set );
 
-    // cascade
-    this._applyGroupFilters( set );
+    // cascade -- branch on if we're grouping or not
+    nextAction( set );
   },
 
 
@@ -23396,7 +23399,7 @@ _.extend( Dataset.prototype, Backbone.Events, {
     this.trigger('change:groupFilters', set);
 
     // cascade
-    this._applyColumns(set);    
+    this._finishCascade(set);
   },
 
 
@@ -23428,6 +23431,7 @@ _.extend( Dataset.prototype, Backbone.Events, {
 
 
   _finishCascade: function(set) {
+    this.set = set;
     this.trigger('change', set);
   },
 
@@ -23586,15 +23590,15 @@ _.extend( Dataset.prototype, Backbone.Events, {
 
 // This is a singleton for now
 module.exports = new Dataset();
-},{"../lib/utils.js":15,"./column.js":10,"./data_types.js":11,"backbone":3,"lodash":6}],13:[function(require,module,exports){
+},{"../lib/utils.js":16,"./column.js":10,"./data_types.js":11,"./grouped-dataset.js":14,"backbone":3,"lodash":6}],13:[function(require,module,exports){
 /*
  * These are functions that can be applied to any collection of rows, reducing
  * them to a single value.  These are used in conjunction with Groups.
  *
  * Arguments:
  *   - args: array of arguments by type--see ./data_types.js
- *   - func: reducing function, for arguments, see description of callback
- *           function: (previousValue, currentValue, index, array)
+ *   - func: function that takes in a collection of rows to be reduced into a
+ *           single value
  *           https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce
  *   - initialValue: an optional value to be passed into func as the initial
  *                   memo value
@@ -23605,8 +23609,17 @@ var GroupFunctions = {
 
   count: {
     args: [],  // doesn't matter what we get passed in
-    func: function( memo, n ) {
-      return memo + 1;
+    func: function( group ) {
+      return group.length;
+    }
+  },
+
+  sum: {
+    args: [ "number" ],
+    func: function( group, args ) {
+      return group.reduce( function( memo, row ){
+        return memo + row[args[0]];
+      });
     }
   }
 
@@ -23617,6 +23630,61 @@ var GroupFunctions = {
 module.exports = GroupFunctions;
 
 },{}],14:[function(require,module,exports){
+var _ = require('lodash'),
+    GroupFunctions = require('./group-functions.js');
+
+var GroupedDataset = function( baseSet, groupings, columnFunctions ) {
+  this.baseSet = baseSet;
+  this.groupings = groupings;
+  this.columnFunctions = columnFunctions || [];
+  this.initialize();
+};
+
+
+GroupedDataset.prototype = {
+  baseSet: null,
+  groupings: null,
+  groups: null,
+  columnFunctions: [],
+
+
+  initialize: function() {
+    // place each row into a groups based on groupings
+    this.groups = _.groupBy( this.baseSet, function( row ){
+      return this.groupings.map( function(g) { return row[g]; } );
+    }, this);
+  },
+
+
+  set: function() {
+    // composed of two things: grouping values and functionals
+    return this.groups.map( function( group ) {
+      var out = [];
+
+      // extract groupings from group
+      this.groupings.forEach( function( grouping ) {
+        out.push( group[0][grouping] );
+      });
+
+      // apply column functions -- column functions are composed of a
+      // GroupFunction as well as column names to be used as arguments in the
+      // function
+      this.columnFunctions.forEach( function( columnFunction ){
+        var funcName = columnFunction.name,
+            args = columnFunction.args;
+
+        out.push( GroupFunctions[ funcName ].func( group, args ) );
+      });
+
+      return out;
+    });
+  }
+
+};
+
+module.exports = GroupedDataset;
+
+},{"./group-functions.js":13,"lodash":6}],15:[function(require,module,exports){
 //
 // Raw data comes in, structured data goes out.
 // Incoming formats:
@@ -23811,7 +23879,7 @@ var Importers = {
 
 
 module.exports = Importers;
-},{"./column.js":10,"./data_types.js":11,"./utils.js":15,"babyparse":2,"lodash":6}],15:[function(require,module,exports){
+},{"./column.js":10,"./data_types.js":11,"./utils.js":16,"babyparse":2,"lodash":6}],16:[function(require,module,exports){
 var $ = require('jquery'),
     _ = require('lodash');
 
@@ -23878,7 +23946,7 @@ module.exports = {
   Loader: Loader,
   getJSON: getJSON
 };
-},{"jquery":5,"lodash":6}],16:[function(require,module,exports){
+},{"jquery":5,"lodash":6}],17:[function(require,module,exports){
 _ = require("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -23890,7 +23958,7 @@ __p+='<section>\n  <h1>'+
 return __p;
 };
 
-},{"lodash":6}],17:[function(require,module,exports){
+},{"lodash":6}],18:[function(require,module,exports){
 _ = require("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -23906,7 +23974,7 @@ __p+='<tr class="column">\n  <td>'+
 return __p;
 };
 
-},{"lodash":6}],18:[function(require,module,exports){
+},{"lodash":6}],19:[function(require,module,exports){
 _ = require("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -23930,7 +23998,7 @@ __p+='\n  </tbody>\n</table>\n';
 return __p;
 };
 
-},{"lodash":6}],19:[function(require,module,exports){
+},{"lodash":6}],20:[function(require,module,exports){
 _ = require("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -23956,7 +24024,7 @@ __p+='\n    </select>\n\n    <select id="operator" name="operator" required>\n  
 return __p;
 };
 
-},{"lodash":6}],20:[function(require,module,exports){
+},{"lodash":6}],21:[function(require,module,exports){
 _ = require("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -23966,7 +24034,7 @@ __p+='\n<div class="separated">\n  <div id="new-column">\n    \n  </div>\n</div>
 return __p;
 };
 
-},{"lodash":6}],21:[function(require,module,exports){
+},{"lodash":6}],22:[function(require,module,exports){
 _ = require("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -23992,7 +24060,7 @@ __p+='\n  </select>\n    \n  <button id="add-grouping">Add Grouping</button>\n</
 return __p;
 };
 
-},{"lodash":6}],22:[function(require,module,exports){
+},{"lodash":6}],23:[function(require,module,exports){
 _ = require("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -24002,7 +24070,7 @@ __p+='<button id="exportCSV">Export CSV</button>';
 return __p;
 };
 
-},{"lodash":6}],23:[function(require,module,exports){
+},{"lodash":6}],24:[function(require,module,exports){
 _ = require("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -24012,7 +24080,7 @@ __p+='Upload CSV: <input id="csv" type="file" accept=".csv">\n<br><br>\n\n<ul id
 return __p;
 };
 
-},{"lodash":6}],24:[function(require,module,exports){
+},{"lodash":6}],25:[function(require,module,exports){
 _ = require("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -24030,7 +24098,7 @@ __p+='\n</select>\n<button id="loadSource">Load Source</button>\n';
 return __p;
 };
 
-},{"lodash":6}],25:[function(require,module,exports){
+},{"lodash":6}],26:[function(require,module,exports){
 _ = require("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -24040,7 +24108,7 @@ __p+='<aside id="tools">\n</aside>\n\n<main>\n<div id="loading-messages">\n  <di
 return __p;
 };
 
-},{"lodash":6}],26:[function(require,module,exports){
+},{"lodash":6}],27:[function(require,module,exports){
 _ = require("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
@@ -24153,7 +24221,7 @@ __p+='\n  </tbody>\n\n</table>\n';
 return __p;
 };
 
-},{"lodash":6}],27:[function(require,module,exports){
+},{"lodash":6}],28:[function(require,module,exports){
 var $ = require('jquery'),
     _ = require('lodash'),
     Backbone = require('backbone'),
@@ -24195,7 +24263,7 @@ var FiltersView = Backbone.View.extend({
 
 
 module.exports = FiltersView;
-},{"../lib/dataset.js":12,"../templates/controls/columns-column.tpl":17,"../templates/controls/columns.tpl":18,"backbone":3,"jquery":5,"lodash":6}],28:[function(require,module,exports){
+},{"../lib/dataset.js":12,"../templates/controls/columns-column.tpl":18,"../templates/controls/columns.tpl":19,"backbone":3,"jquery":5,"lodash":6}],29:[function(require,module,exports){
 var $ = require('jquery'),
     _ = require('lodash'),
     Accordion  = require('../lib/accordion.js'),
@@ -24282,7 +24350,7 @@ var ControlsView = Backbone.View.extend({
 
 module.exports = ControlsView;
 
-},{"../lib/accordion.js":9,"../lib/dataset.js":12,"../templates/control.tpl":16,"./columns.js":27,"./filters.js":29,"./group-columns.js":31,"./groupings.js":32,"./save.js":33,"./source.js":34,"backbone":3,"jquery":5,"lodash":6}],29:[function(require,module,exports){
+},{"../lib/accordion.js":9,"../lib/dataset.js":12,"../templates/control.tpl":17,"./columns.js":28,"./filters.js":30,"./group-columns.js":32,"./groupings.js":33,"./save.js":34,"./source.js":35,"backbone":3,"jquery":5,"lodash":6}],30:[function(require,module,exports){
 var $ = require('jquery'),
     _ = require('lodash'),
     Backbone = require('backbone'),
@@ -24360,7 +24428,7 @@ var FiltersView = Backbone.View.extend({
 
 
 module.exports = FiltersView;
-},{"../lib/dataset.js":12,"../templates/controls/filters.tpl":19,"backbone":3,"jquery":5,"lodash":6}],30:[function(require,module,exports){
+},{"../lib/dataset.js":12,"../templates/controls/filters.tpl":20,"backbone":3,"jquery":5,"lodash":6}],31:[function(require,module,exports){
 var $ = require('jquery'),
     _ = require('lodash'),
     Backbone = require('backbone'),
@@ -24387,7 +24455,7 @@ var GridView = Backbone.View.extend({
   },
 
 
-  render : function() {
+  render : function( collection ) {
     var cols, rows,
         perPage = this.perPage,
         numPages = Math.ceil(Dataset.set.length / perPage),
@@ -24444,7 +24512,7 @@ module.exports = GridView;
  *
  * Search over visible text fields
 */
-},{"../lib/dataset.js":12,"../lib/utils.js":15,"../templates/grid.tpl":26,"backbone":3,"jquery":5,"lodash":6}],31:[function(require,module,exports){
+},{"../lib/dataset.js":12,"../lib/utils.js":16,"../templates/grid.tpl":27,"backbone":3,"jquery":5,"lodash":6}],32:[function(require,module,exports){
 var $ = require('jquery'),
     _ = require('lodash'),
     Backbone = require('backbone'),
@@ -24481,7 +24549,7 @@ var GroupColumnsView = Backbone.View.extend({
 
 module.exports = GroupColumnsView;
 
-},{"../lib/dataset.js":12,"../lib/group-functions.js":13,"../templates/controls/group-columns.tpl":20,"backbone":3,"jquery":5,"lodash":6}],32:[function(require,module,exports){
+},{"../lib/dataset.js":12,"../lib/group-functions.js":13,"../templates/controls/group-columns.tpl":21,"backbone":3,"jquery":5,"lodash":6}],33:[function(require,module,exports){
 var $ = require('jquery'),
     _ = require('lodash'),
     Backbone = require('backbone'),
@@ -24537,7 +24605,7 @@ var GroupsView = Backbone.View.extend({
 
 module.exports = GroupsView;
 
-},{"../lib/dataset.js":12,"../templates/controls/groupings.tpl":21,"backbone":3,"jquery":5,"lodash":6}],33:[function(require,module,exports){
+},{"../lib/dataset.js":12,"../templates/controls/groupings.tpl":22,"backbone":3,"jquery":5,"lodash":6}],34:[function(require,module,exports){
 var $ = require('jquery'),
     _ = require('lodash'),
     Backbone = require('backbone'),
@@ -24571,7 +24639,7 @@ var SaveView = Backbone.View.extend({
 
 module.exports = SaveView;
 
-},{"../lib/dataset.js":12,"../templates/controls/save.tpl":22,"babyparse":2,"backbone":3,"jquery":5,"lodash":6}],34:[function(require,module,exports){
+},{"../lib/dataset.js":12,"../templates/controls/save.tpl":23,"babyparse":2,"backbone":3,"jquery":5,"lodash":6}],35:[function(require,module,exports){
 var $ = require( 'jquery' ),
     _ = require( 'lodash' ),
     Backbone = require( 'backbone' ),
@@ -24681,5 +24749,5 @@ var SourceView = Backbone.View.extend( {
 
 
 module.exports = SourceView;
-},{"../lib/dataset.js":12,"../lib/importer.js":14,"../lib/utils.js":15,"../templates/controls/source-tree.tpl":23,"../templates/controls/source.tpl":24,"backbone":3,"jquery":5,"lodash":6}]},{},[1])(1)
+},{"../lib/dataset.js":12,"../lib/importer.js":15,"../lib/utils.js":16,"../templates/controls/source-tree.tpl":24,"../templates/controls/source.tpl":25,"backbone":3,"jquery":5,"lodash":6}]},{},[1])(1)
 });

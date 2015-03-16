@@ -24,7 +24,7 @@ var GridView = Backbone.View.extend({
   },
 
 
-  render : function() {
+  render : function( collection ) {
     var cols, rows,
         perPage = this.perPage,
         numPages = Math.ceil(Dataset.set.length / perPage),

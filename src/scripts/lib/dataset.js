@@ -6,8 +6,8 @@ var _ = require('lodash'),
     Backbone = require('backbone'),
     Column = require('./column.js'),
     Utils = require('../lib/utils.js'),
-    GroupedDataset = require('./grouped-dataset.js'),
-    DataTypes = require('./data_types.js');
+    GroupedDataCollection = require('./grouped-data-collection.js'),
+    DataTypes = require('./data-types.js');
 
 
 
@@ -106,7 +106,7 @@ _.extend( Dataset.prototype, Backbone.Events, {
     else {
       // reconstruct the set based on groupings and group functions
       // groups are cartesian products of unique values of grouped columns
-      set = new GroupedDataset( set, this.groupings );
+      set = new GroupedDataCollection( set, this.groupings );
       nextAction = this._applyGroupFilters.bind( this );
     }
 

@@ -1,7 +1,7 @@
 var $ = require( 'jquery' ),
     _ = require( 'lodash' ),
     Backbone = require( 'backbone' ),
-    Dataset = require( '../lib/dataset.js' ),
+    DataComposer = require( '../datacomposer.js' ),
     Utils = require( '../lib/utils.js' ),
     template = require( '../templates/controls/source.tpl' ),
     treetemplate = require( '../templates/controls/source-tree.tpl' ),
@@ -19,22 +19,22 @@ var SourceView = Backbone.View.extend( {
   },
 
   initialize: function( options ) {
-    Dataset.on( 'change:sourceList', this.render, this );
+    DataComposer.on( 'change:sourceList', this.render, this );
     this.viewMode = options.viewMode || 'flat';
     this.render();
   },
 
+
   render: function() {
-
     if( this.viewMode === 'tree' ) {
-      this.$el.html( treetemplate( {dataset: Dataset} ) );
-      this.addNodes();
+      // this.$el.html( treetemplate( {dataset: DataComposer} ) );
+      // this.addNodes();
+    }
 
-    } else {
-      this.$el.html( template( {dataset: Dataset} ) );
+    else {
+      this.$el.html( template( {sourceList: DataComposer.sourceList} ) );
     }
   },
-
 
 
   importCSV: function() {
@@ -45,7 +45,7 @@ var SourceView = Backbone.View.extend( {
 
     reader.onload = _.bind( function() {
       var imported = Importer.importCSV( reader.result );
-      Dataset.loadSource( imported );
+      DataComposer.loadSource( imported );
     }, this );
     
     reader.readAsText( file );
@@ -54,7 +54,7 @@ var SourceView = Backbone.View.extend( {
 
   importPredefinedURL: function() {
     var sourceID = this.$( "#predefinedURL" ).val(),
-        url = Dataset.sourceList[sourceID].value;
+        url = DataComposer.sourceList[sourceID].value;
     this.importURL(url);
   },
 
@@ -68,7 +68,7 @@ var SourceView = Backbone.View.extend( {
   importURL: function( url ) {
     Utils.Loader.loading(function() {
       return Importer.importURL( url ).then(
-        function( imported ) { Dataset.loadSource( imported ); },
+        function( imported ) { DataComposer.loadSource( imported ); },
         function() { console.log ('Error importing '+url); }
       );
     }, "Importing", this );
@@ -78,7 +78,7 @@ var SourceView = Backbone.View.extend( {
   addNodes: function() {
     var ul = this.$el.find( 'ul#source' )[0];
     console.log(ul);
-    _.each( Dataset.sourceList, function( source ) {
+    _.each( DataComposer.sourceList, function( source ) {
       ul.appendChild( this.addNode( source ) );
     }, this);
   },

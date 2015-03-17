@@ -9,7 +9,7 @@
 <h2>Pick Predefined</h2>
 <select id="predefinedURL">
 <option value=""></option>
-<% _.each(dataset.sourceList, function(source) { %>
+<% _.each( sourceList, function( source ) { %>
   <option value="<%= source.id %>"><%= source.name %></option>
 <% }); %>
 </select>

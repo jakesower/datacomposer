@@ -1,6 +1,6 @@
 var _ = require('lodash'),
     Backbone = require('backbone'),
-    DataTypes = require('./data_types.js');
+    DataTypes = require('./data-types.js');
 
 
 var Column = Backbone.Model.extend({

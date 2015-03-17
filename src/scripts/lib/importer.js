@@ -6,13 +6,14 @@
 //   An object with appropriate metadata geared to DataComposer
 //   A URL returning one of the above with appropriate MIME type
 // Outgoing format:
-//   An object of columns and properly coerced data for use by Dataset
+//   An object of columns and properly coerced data for DataCollections
 //
 
 var _ = require( 'lodash' ),
     Utils = require( './utils.js' ),
     Column = require( './column.js' ),
-    DataTypes = require( './data_types.js' ),
+    DataTypes = require( './data-types.js' ),
+    DataCollection = require( './data-collection.js' ),
     BabyParse = require( 'babyparse' );
 
 
@@ -43,7 +44,7 @@ var Importers = {
       } else {
         resolve( this.importObject( source ) );
       }
-    }.bind(this) );
+    }.bind( this ) );
 
   },
 
@@ -75,10 +76,10 @@ var Importers = {
       data.push( datum );
     });
 
-    return { 
+    return new DataCollection({
       columns: columns,
-      data: data
-    };
+      rows: data
+    });
   },
 
 
@@ -109,10 +110,10 @@ var Importers = {
       return out;
     });
 
-    return {
+    return new DataCollection({
       columns: columns,
-      data: data
-    };
+      rows: data
+    });
   },
 
 

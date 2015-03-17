@@ -6,5 +6,4 @@ var $            = require('jquery'),
 
 Backbone.$ = $;
 
-
 module.exports = DataComposer;

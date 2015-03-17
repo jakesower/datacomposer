@@ -25,21 +25,22 @@ var GridView = Backbone.View.extend({
 
 
   render : function( collection ) {
+    console.log( collection );
     var cols, rows,
         perPage = this.perPage,
         numPages = Math.ceil(Dataset.set.length / perPage),
         page = Math.max( Math.min( this.page, numPages ), 1 );
 
-    cols = Dataset.visibleColumns().map( function(col) {
+    cols = collection.columns.map( function(col) {
       return col.name;
     });
 
-    rows = Dataset.set.slice( (page - 1)*perPage, page*perPage );
+    rows = collection.rows().slice( (page - 1)*perPage, page*perPage );
 
     this.$el.html( this.template({ 
       columns: cols,
       rows: rows,
-      page: page,
+      page: page, 
       perPage: perPage,
       numPages: numPages
     }) );

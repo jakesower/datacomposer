@@ -1,7 +1,7 @@
 var $ = require('jquery'),
     _ = require('lodash'),
     Backbone = require('backbone'),
-    Dataset = require('../lib/dataset.js'),
+    DataComposer = require('../lib/datacomposer.js'),
     template = require('../templates/controls/columns.tpl'),
     columnTemplate = require('../templates/controls/columns-column.tpl');
 
@@ -14,11 +14,13 @@ var FiltersView = Backbone.View.extend({
   },
 
   initialize: function() {
-    Dataset.on('change:groupFilters', this.render, this);
+    DataComposer.on('change:groupFilters', this.render, this);
   },
 
-  render: function() {
-    this.$el.html(template({dataset: Dataset}));
+  render: function( collection ) {
+    this.$el.html(template({
+      columns: collection.columns
+    }));
   },
 
 
@@ -27,7 +29,7 @@ var FiltersView = Backbone.View.extend({
     var elt = e.target,
         columnId = elt.dataset.columnid,
         field = elt.dataset.field,
-        column = Dataset.columnsById[columnId],
+        column = DataComposer.columnsById[columnId],
         changes = {};
 
     changes[field] = $(elt).prop('checked');

@@ -201,6 +201,11 @@ _.extend( DataComposer.prototype, Backbone.Events, {
     this._applySource( source );
   },
 
+
+  setColumns: function( columns ) {
+
+  },
+
   /**
    * Creates a new filter to be applied to the universe
    *

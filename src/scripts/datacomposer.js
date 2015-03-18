@@ -1,14 +1,7 @@
-// render the skeleton of the app, then initialize components
-
 var $                     = require('jquery'),
     _                     = require('lodash'),
     Backbone              = require('backbone'),
-    Controls              = require('./views/controls.js'),
-    Grid                  = require('./views/grid.js'),
-    DataCollection        = require('./lib/data-collection.js'),
-    Importer              = require('./lib/importer.js'),
-    views                 = {},
-    DCTemplate            = require('./templates/datacomposer.tpl');
+    DataCollection        = require('./lib/data-collection.js');
 
 
 
@@ -16,37 +9,21 @@ var $                     = require('jquery'),
 // Core singular class. All meaningful state should be in this module.
 //
 
-function DataComposer(el, options) {
-  this.el = el;
-  this.options = options;
-
-  this.setSourceList = options.sources || {};
-  this.render();
-
-  // if( _.has( options, "initialSource" ) ) {
-  //   Importer.import( options.initialSource ).then( Dataset.loadSource.bind( Dataset ) );
-  // }
-}
+function DataComposer() { }
 
 
 _.extend( DataComposer.prototype, Backbone.Events, {
-  el: null,
-  options: {},
-  controls: null,
-
   _cache: {},
+  groupMode: null, // will be true/false later
 
   sourceList: [],
-  columns: [],
-  filters: {},
+  columns: [],    // only columns to be displayed
+  filters: [],
   groupings: [],
 
 
-  render: function() {
-    $( this.el ).addClass( "datacomposer" ).empty().append( DCTemplate() );
-    
-    new Controls( { el: $( this.el ).find( 'aside#tools' ) });
-    new Grid();
+  initialize: function( options ) {
+    this.setSourceList( options.sources || {} );
   },
 
 
@@ -65,6 +42,7 @@ _.extend( DataComposer.prototype, Backbone.Events, {
   _applySource: function( collection ) {
     // cache
     this._cache.source = collection;
+    this.columns = collection.columns;
 
     // callback
     this.trigger( 'change:source', collection );
@@ -108,8 +86,9 @@ _.extend( DataComposer.prototype, Backbone.Events, {
 
 
     // calculate
+    groupMode = (this.groupings.length === 0);
     // we can go one of two ways here, depending on if we're grouping or not
-    if( this.groupings.length === 0 ) {
+    if( groupMode ) {
       // no groupings--just use columns as provided
       nextAction = this._applyColumns.bind( this );
     }
@@ -119,6 +98,10 @@ _.extend( DataComposer.prototype, Backbone.Events, {
       // groups are cartesian products of unique values of grouped columns
       collection = collection.groupBy( this.groupings );
       nextAction = this._applyGroupFilters.bind( this );
+    }
+
+    if (groupMode !== this.groupMode ) {
+      this.columns = collection.columns;
     }
 
     // callback
@@ -157,15 +140,10 @@ _.extend( DataComposer.prototype, Backbone.Events, {
     }
 
     // calculate
-    var cols = this.visibleColumns();
-    collection = _.map(set, function(datum) {
-      var out = {};
-      _.each(cols, function(col) {
-        out[col.name] = datum[col.name];
-      });
-      return out;
-    });
-    this.collection = collection;
+    collection = new DataCollection({
+      columns: this.columns,
+      rows: collection.rows
+    })
 
     // callback
     this.trigger( 'change:columns', collection );
@@ -175,7 +153,7 @@ _.extend( DataComposer.prototype, Backbone.Events, {
   },
 
 
-  _finishCascade: function(set) {
+  _finishCascade: function( collection ) {
     this.collection = collection;
     this.trigger('change', collection);
   },
@@ -202,9 +180,10 @@ _.extend( DataComposer.prototype, Backbone.Events, {
   },
 
 
-  setColumns: function( columns ) {
+  addColumn: function( column ) {
 
   },
+
 
   /**
    * Creates a new filter to be applied to the universe
@@ -232,18 +211,18 @@ _.extend( DataComposer.prototype, Backbone.Events, {
     // we may be able to do a better job returning a pure function, rather than what lodash gives us
     filterFunc = _.curry(operator, 3)(column.name, operand);
 
-    this.filters[filterID] = {
+    this.filters.push({
       filter: filterFunc,
       id: filterID,
       string: filterData.column + " " + filterData.operator + " " + filterData.operand
-    };
+    });
 
     this._applyFilters();
   },
 
 
-  removeFilter: function(filterId) {
-    delete this.filters[filterId];
+  removeFilter: function(filter) {
+    this.filters = _.without( this.filters, filter );
     this._applyFilters();
   },
 
@@ -264,11 +243,9 @@ _.extend( DataComposer.prototype, Backbone.Events, {
       return grouping != g;
     });
     this._applyGroupings();
-  }
-
-
+  },
 
 });
 
 
-module.exports = DataComposer;
+module.exports = new DataComposer();

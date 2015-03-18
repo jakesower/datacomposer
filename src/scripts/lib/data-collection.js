@@ -69,52 +69,9 @@ _.extend( DataCollection.prototype, Backbone.Events, {
       rows: derivedRows,
       columns: derivedColumns
     });
-  },
-
-
-  // just pass along any events
-  columnEvent: function(event, column) {
-    this.trigger("column:change", column);
-  },
-
-
-  visibleColumns: function() {
-    return _.filter(this.columns, function(c){return c.get("visible");});
-  },
-
-
-  each: function(func) {
-    _.each(this.set, func);
-  },
-
-  eachColumn: function(func) {
-    _.each(this.columns, func);
-  },
-
-  eachVisibleColumn: function(func) {
-    var visible = _.filter(this.columns, function(c){return c.get("visible");});
-    _.each(visible, func);
-  },
-
-  getColumn: function(name) {
-    var out = {},
-        c = this._cache;
-
-    if( c.getColumn ) {
-      return c.getColumn[name];
-    }
-
-    this.columns.forEach( function( col ){
-      out[col.name] = col;
-    });
-
-    this._cache.getColumn = out;
-    return out[name];
-  },
-
-  rowCount: function() {
-    return this.set.length;
   }
+
+
 
 
 });

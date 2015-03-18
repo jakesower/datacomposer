@@ -2,7 +2,7 @@ var $ = require('jquery'),
     _ = require('lodash'),
     Accordion  = require('../lib/accordion.js'),
     Backbone = require('backbone'),
-    Dataset = require('../lib/dataset.js'),
+    DataComposer = require('../datacomposer.js'),
     ControlTemplate = require('../templates/control.tpl'),
 
     Views = {
@@ -14,6 +14,7 @@ var $ = require('jquery'),
       save: {name: "Save", view: require('./save.js')}
     };
 
+
 /**
  * Controls the sidebar columns--which are visible and which are not
  *
@@ -24,9 +25,7 @@ var ControlsView = Backbone.View.extend({
 
   // render everything--let render() show/hide things as needed
   initialize: function() {
-    Dataset.on( 'change', function(set) {
-      this.render();
-    }, this);
+    DataComposer.on( 'change', this.render, this);
 
     _.each( Views, function( viewData, viewName ) {
       // create the control
@@ -46,7 +45,7 @@ var ControlsView = Backbone.View.extend({
   },
 
 
-  render: function() {
+  render: function( collection ) {
     var controls = this.controls,
         visible = [];
 
@@ -57,11 +56,11 @@ var ControlsView = Backbone.View.extend({
     // always show source
     controls.source.show();
 
-    if( Dataset.set.length > 0 ) {
+    if( collection && collection.rows.length > 0 ) {
       controls.filters.show();
       controls.groupings.show();
 
-      if( Dataset.groupings.length === 0 ) {
+      if( DataComposer.groupings.length === 0 ) {
         controls.columns.show();
       }
       else {

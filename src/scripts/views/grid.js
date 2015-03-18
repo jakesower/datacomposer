@@ -2,12 +2,13 @@ var $ = require('jquery'),
     _ = require('lodash'),
     Backbone = require('backbone'),
     Utils = require('../lib/utils.js'),
-    Dataset = require('../lib/dataset.js');
+    DataComposer = require('../datacomposer.js');
 
 
 var GridView = Backbone.View.extend({
   el : '.datacomposer main > #grid',
   template: require('../templates/grid.tpl'),
+  collection: null, // cached version so we can manipulate in widget
 
   page: 1,
   perPage: 20,
@@ -20,22 +21,25 @@ var GridView = Backbone.View.extend({
 
 
   initialize : function() {
-    Dataset.on( 'change', this.render, this );
+    DataComposer.on( 'change', function( collection ) {
+      this.collection = collection;
+      this.render();
+    }, this );
   },
 
 
   render : function( collection ) {
-    console.log( collection );
     var cols, rows,
+        collection = this.collection,
         perPage = this.perPage,
-        numPages = Math.ceil(Dataset.set.length / perPage),
+        numPages = Math.ceil( collection.rows.length / perPage ),
         page = Math.max( Math.min( this.page, numPages ), 1 );
 
     cols = collection.columns.map( function(col) {
       return col.name;
     });
 
-    rows = collection.rows().slice( (page - 1)*perPage, page*perPage );
+    rows = collection.rows.slice( (page - 1)*perPage, page*perPage );
 
     this.$el.html( this.template({ 
       columns: cols,

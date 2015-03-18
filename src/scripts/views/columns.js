@@ -1,25 +1,26 @@
 var $ = require('jquery'),
     _ = require('lodash'),
     Backbone = require('backbone'),
-    DataComposer = require('../lib/datacomposer.js'),
+    DataComposer = require('../datacomposer.js'),
     template = require('../templates/controls/columns.tpl'),
     columnTemplate = require('../templates/controls/columns-column.tpl');
 
 
-var FiltersView = Backbone.View.extend({
+var ColumnsView = Backbone.View.extend({
 
   // pretty unhappy that I can't bind to each row--there must be a better way!
   events: {
-    "click input": "update",
+    "click tr": "update",
   },
 
   initialize: function() {
-    DataComposer.on('change:groupFilters', this.render, this);
+    DataComposer.on( 'change:columns', this.render, this );
   },
 
   render: function( collection ) {
     this.$el.html(template({
-      columns: collection.columns
+      columns: collection.columns,
+      selectedColumns: DataComposer.columns // can we separate concerns better?
     }));
   },
 
@@ -39,5 +40,4 @@ var FiltersView = Backbone.View.extend({
 });
 
 
-
-module.exports = FiltersView;
+module.exports = ColumnsView;

@@ -20,6 +20,7 @@ var SourceView = Backbone.View.extend( {
 
   initialize: function( options ) {
     DataComposer.on( 'change:sourceList', this.render, this );
+
     this.viewMode = options.viewMode || 'flat';
     this.render();
   },

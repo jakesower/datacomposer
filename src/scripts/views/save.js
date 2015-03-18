@@ -1,7 +1,7 @@
 var $ = require('jquery'),
     _ = require('lodash'),
     Backbone = require('backbone'),
-    Dataset = require('../lib/dataset.js'),
+    DataComposer = require('../datacomposer.js'),
     BabyParse = require('babyparse');
 
 
@@ -21,7 +21,7 @@ var SaveView = Backbone.View.extend({
   },
 
   exportCSV : function() {
-    var csv = BabyParse.unparse(Dataset.set),
+    var csv = BabyParse.unparse(DataComposer.set),
         blob = new Blob([csv], {type: 'text/csv'}),
         url = window.URL.createObjectURL(blob);
     location.href = url;

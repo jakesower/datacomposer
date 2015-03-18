@@ -1,7 +1,7 @@
 var $ = require('jquery'),
     _ = require('lodash'),
     Backbone = require('backbone'),
-    Dataset = require('../lib/dataset.js'),
+    DataComposer = require('../datacomposer.js'),
     template = require('../templates/controls/groupings.tpl');
 
 
@@ -14,7 +14,7 @@ var GroupsView = Backbone.View.extend({
 
 
   initialize: function() {
-    Dataset.on('change:source', function(set) {
+    DataComposer.on('change:source', function(set) {
       this.dataset = set;
       this.render();
     }, this);
@@ -25,7 +25,7 @@ var GroupsView = Backbone.View.extend({
 
   render: function() {
     this.$el.html( template( {
-      dataset: Dataset
+      dataset: DataComposer
     }));
   },
 
@@ -34,7 +34,7 @@ var GroupsView = Backbone.View.extend({
     var groupingColumn = this.$el.find( "#grouping-column" ),
         grouping = groupingColumn.val();
     
-    Dataset.addGrouping( grouping );
+    DataComposer.addGrouping( grouping );
     this.render();
   },
 
@@ -43,7 +43,7 @@ var GroupsView = Backbone.View.extend({
     var elt = e.target,
         grouping = elt.dataset.grouping;
     
-    Dataset.removeGrouping(grouping);
+    DataComposer.removeGrouping(grouping);
     this.render();
   }
 

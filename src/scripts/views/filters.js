@@ -1,7 +1,7 @@
 var $ = require('jquery'),
     _ = require('lodash'),
     Backbone = require('backbone'),
-    Dataset = require('../lib/dataset.js'),
+    DataComposer = require('../datacomposer.js'),
     template = require('../templates/controls/filters.tpl');
 
 
@@ -21,20 +21,20 @@ var FiltersView = Backbone.View.extend({
   },
 
   initialize: function() {
-    Dataset.on('change:filters', this.render, this);
+    DataComposer.on('change:filters', this.render, this);
     this.render();
   },
 
   render: function() {
-    // console.log(Dataset.filters);
-    this.$el.html(template({dataset: Dataset}));
+    // console.log(DataComposer.filters);
+    this.$el.html(template({dataset: DataComposer}));
   },
 
 
 
   setColumn: function() {
     var columnName = this.$("#column").val(),
-        column = Dataset.getColumn(columnName),
+        column = DataComposer.getColumn(columnName),
         filters = (column ? column.filters() : null);
     
     var operators = this.operators[filters];
@@ -59,7 +59,7 @@ var FiltersView = Backbone.View.extend({
     });
     
     this.$el.find("#new-filter")[0].reset();
-    Dataset.addFilter(filter);
+    DataComposer.addFilter(filter);
   },
 
 
@@ -67,7 +67,7 @@ var FiltersView = Backbone.View.extend({
     var elt = e.target,
         filterId = elt.dataset.filterid;
     
-    Dataset.removeFilter(filterId);
+    DataComposer.removeFilter(filterId);
   }
 
 });

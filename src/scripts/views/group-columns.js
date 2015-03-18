@@ -1,7 +1,7 @@
 var $ = require('jquery'),
     _ = require('lodash'),
     Backbone = require('backbone'),
-    Dataset = require('../lib/dataset.js'),
+    DataComposer = require('../datacomposer.js'),
     GroupFunctions = require('../lib/group-functions.js'),
     template = require('../templates/controls/group-columns.tpl');
 
@@ -13,12 +13,12 @@ var GroupColumnsView = Backbone.View.extend({
   },
 
   initialize: function() {
-    Dataset.on('change:groupings', this.render, this);
+    DataComposer.on('change:groupings', this.render, this);
   },
 
   render: function() {
     this.$el.html( template( {
-      dataset: Dataset,
+      dataset: DataComposer,
       groupFunctions: GroupFunctions
     }));
   },

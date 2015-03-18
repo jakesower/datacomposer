@@ -61,7 +61,7 @@ gulp.task('package', function() {
   return browserify('./src/scripts/app.js', {
       standalone: 'DataComposer'
     })
-    .transform(tplTransform)
+    // .transform(tplTransform)
     .transform(babelify)
     .bundle()
     .pipe(source('datacomposer.min.js')) // gives streaming vinyl file object

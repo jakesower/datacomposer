@@ -17,9 +17,9 @@ _.extend( DataComposer.prototype, Backbone.Events, {
   groupMode: null, // will be true/false later
 
   sourceList: [],
-  columns: [],    // only columns to be displayed
-  filters: [],
-  groupings: [],
+  columns: [],    // only columnIDs to be displayed
+  filters: {},
+  groupings: {},
 
 
   initialize: function( options ) {
@@ -61,7 +61,7 @@ _.extend( DataComposer.prototype, Backbone.Events, {
     }
 
     // calculate
-    collection = this.filters.reduce( function( remaining, filter ) {
+    collection = _.reduce( this.filters, function( remaining, filter ) {
       return remaining.filter( filter );
     }, collection );
 
@@ -89,19 +89,19 @@ _.extend( DataComposer.prototype, Backbone.Events, {
     groupMode = (this.groupings.length === 0);
     // we can go one of two ways here, depending on if we're grouping or not
     if( groupMode ) {
+      // reconstruct the collection based on groupings and group functions
+      // groups are cartesian products of unique values of grouped columns
+      collection = collection.groupTransform( this.groupings );
+      nextAction = this._applyGroupFilters.bind( this );
+    }
+
+    else {
       // no groupings--just use columns as provided
       nextAction = this._applyColumns.bind( this );
     }
 
-    else {
-      // reconstruct the collection based on groupings and group functions
-      // groups are cartesian products of unique values of grouped columns
-      collection = collection.groupBy( this.groupings );
-      nextAction = this._applyGroupFilters.bind( this );
-    }
-
     if (groupMode !== this.groupMode ) {
-      this.columns = collection.columns;
+      this.columns = _.pluck( collection.columns, 'id' );
     }
 
     // callback
@@ -140,22 +140,25 @@ _.extend( DataComposer.prototype, Backbone.Events, {
     }
 
     // calculate
-    collection = new DataCollection({
-      columns: this.columns,
+    newCollection = new DataCollection({
+      columns: _.pick( collection.columns, this.columns ),
       rows: collection.rows
-    })
+    });
 
     // callback
-    this.trigger( 'change:columns', collection );
+    this.trigger( 'change:columns', {
+      from: collection,
+      to: newCollection
+     });
 
     // cascade
-    this._finishCascade( collection );
+    this._finishCascade( newCollection );
   },
 
 
   _finishCascade: function( collection ) {
     this.collection = collection;
-    this.trigger('change', collection);
+    this.trigger( 'change', collection );
   },
 
   // end cache, calculate, callback, cascade methods
@@ -180,8 +183,15 @@ _.extend( DataComposer.prototype, Backbone.Events, {
   },
 
 
-  addColumn: function( column ) {
+  addColumn: function( columnID ) {
+    this.columns.push( columnID );
+    this._applyColumns();
+  },
 
+
+  removeColumn: function( columnID ) {
+    this.columns = _.without( this.columns, columnID );
+    this._applyColumns();
   },
 
 
@@ -208,21 +218,21 @@ _.extend( DataComposer.prototype, Backbone.Events, {
         operator = operatorMap[filterData.operator],
         operand = DataTypes[column.type].coerce(filterData.operand);
 
-    // we may be able to do a better job returning a pure function, rather than what lodash gives us
-    filterFunc = _.curry(operator, 3)(column.name, operand);
+    // curry with bind
+    filterFunc = operator.bind( undefined, column.name, operand );
 
-    this.filters.push({
+    this.filters[filterID] = {
       filter: filterFunc,
       id: filterID,
       string: filterData.column + " " + filterData.operator + " " + filterData.operand
-    });
+    };
 
     this._applyFilters();
   },
 
 
-  removeFilter: function(filter) {
-    this.filters = _.without( this.filters, filter );
+  removeFilter: function( filterID ) {
+    delete this.filters[filterID];
     this._applyFilters();
   },
 
@@ -233,15 +243,18 @@ _.extend( DataComposer.prototype, Backbone.Events, {
    * @param {string} grouping - the column name to group on
    */
   addGrouping: function( grouping ) {
-    this.groupings.push( grouping );
+    var groupingID = _.uniqueId();
+
+    this.groupings[groupingID] = {
+      id: groupingID,
+      grouping: grouping
+    };
     this._applyGroupings();
   },
 
 
-  removeGrouping: function( grouping ) {
-    this.groupings = _.filter( this.groupings, function( g ){
-      return grouping != g;
-    });
+  removeGrouping: function( groupingID ) {
+    delete this.groupings[groupingID];
     this._applyGroupings();
   },
 

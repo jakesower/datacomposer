@@ -64,13 +64,14 @@ var Importers = {
 
     // turn our columns into proper Column objects
     columns = this.prepColumns( columns, rawData.slice(0,5) );
-    console.log(columns);
+
+
     // coerce data by column
     _.each( rawData, function( row ) {
       var datum = {};
 
-      _.each( columns, function( col, idx ) {
-        datum[col.get( 'name' )] = col.coerce( row[idx] );
+      _.each( columns, function( col ) {
+        datum[col.get( 'name' )] = col.coerce( row[col.order] );
       });
 
       data.push( datum );
@@ -97,15 +98,13 @@ var Importers = {
 
     // create tools to let us iterate over an array or an object as needed
     useKeys = !( data[0] instanceof Array );
-    _.each( columns, function( column, idx ) {
-      dataKeys.push( ( useKeys ? column.name : idx ) );
-    });
 
     // coerce and normalize the data
     data = _.map( data, function( datum ) {
       var out = {};
-      _.each( columns, function( column, idx ) {
-        out[column.name] = column.coerce( datum[ dataKeys[idx] ] );
+      _.each( columns, function( column ) {
+        var key = useKeys ? column.name : column.order;
+        out[column.name] = column.coerce( datum[ key ] );
       });
       return out;
     });
@@ -174,6 +173,8 @@ var Importers = {
 
 
   prepColumns: function( columns, dataSample ) {
+    var finalColumns = {};
+
     // do we just have a pile of strings?
     if( _.isString( columns[0] ) ) {
       columns = _.map( columns, function( column ) { return { name: column }; });
@@ -183,11 +184,15 @@ var Importers = {
     columns = this.detectDataTypes( columns, dataSample );
 
     // create column objects
-    columns = _.map( columns, function( column ) {
-      return new Column( column );
+    var idx = 0;
+    columns = _.each( columns, function( column ) {
+      column.order = idx;
+      column = new Column( column );
+      finalColumns[column.id] = column;
+      ++idx;
     });
 
-    return columns;
+    return finalColumns;
   }
 };
 

@@ -60,7 +60,7 @@ var ControlsView = Backbone.View.extend({
       controls.filters.show();
       controls.groupings.show();
 
-      if( DataComposer.groupings.length === 0 ) {
+      if( _.size( DataComposer.groupings ) === 0 ) {
         controls.columns.show();
       }
       else {

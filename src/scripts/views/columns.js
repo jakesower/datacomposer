@@ -7,34 +7,40 @@ var $ = require('jquery'),
 
 
 var ColumnsView = Backbone.View.extend({
+  collection: null,
 
-  // pretty unhappy that I can't bind to each row--there must be a better way!
   events: {
     "click tr": "update",
   },
 
   initialize: function() {
+    // DataComposer.on( 'change:columns', function( collections ) {
+    //   console.log(collections);
+    //   this.collection = collections.from;
+    //   this.render();
+    // }, this );
     DataComposer.on( 'change:columns', this.render, this );
   },
 
-  render: function( collection ) {
+  render: function( collections ) {
     this.$el.html(template({
-      columns: collection.columns,
+      columns: collections.from.columns,
       selectedColumns: DataComposer.columns // can we separate concerns better?
     }));
   },
 
 
 
-  update: function(e) {
-    var elt = e.target,
-        columnId = elt.dataset.columnid,
-        field = elt.dataset.field,
-        column = DataComposer.columnsById[columnId],
-        changes = {};
+  update: function( e ) {
+    var elt = e.currentTarget,
+        columnID = elt.dataset.columnid;
 
-    changes[field] = $(elt).prop('checked');
-    column.set(changes);
+    if( _.include( DataComposer.columns, columnID ) ) {
+      DataComposer.removeColumn( columnID );
+    }
+    else {
+      DataComposer.addColumn( columnID );
+    }
   }
 
 });

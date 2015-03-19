@@ -7,7 +7,7 @@
     <% _.each( columns, function( column ) { %>
       <tr class="column" data-columnid="<%- column.id %>">
         <td><%- column.name %></td>
-        <td class="input"><input type="checkbox"<%- (selectedColumns.some( function( c ){ c == columns })) ? ' selected' : '' %>></td>
+        <td class="input"><input type="checkbox"<%- (_.include( selectedColumns, column.id )) ? ' checked' : '' %>></td>
       </tr>
     <% }); %>
   </tbody>

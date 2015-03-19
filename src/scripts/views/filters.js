@@ -21,13 +21,14 @@ var FiltersView = Backbone.View.extend({
   },
 
   initialize: function() {
-    DataComposer.on('change:filters', this.render, this);
-    this.render();
+    DataComposer.on( 'change:filters', this.render, this );
   },
 
-  render: function() {
-    // console.log(DataComposer.filters);
-    this.$el.html(template({dataset: DataComposer}));
+  render: function( collection ) {
+    this.$el.html( template({
+      filters: DataComposer.filters,
+      columns: collection.columns
+    }));
   },
 
 

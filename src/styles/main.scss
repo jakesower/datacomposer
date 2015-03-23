@@ -65,6 +65,8 @@ $grid-header-height: 25px;
 
     input[type=text] {
       font-size: 100%;
+      border: none;
+      padding: 3px;
     }
 
     input[type=submit], button {
@@ -300,12 +302,12 @@ $grid-header-height: 25px;
               border-right: 1px #ddd solid;
 
               &.number {
-                font-family: 'Inconsolata', monospace;
+                // font-family: 'Inconsolata', monospace;
                 text-align: right;
               }
 
               &.currency {
-                font-family: 'Inconsolata', monospace;
+                // font-family: 'Inconsolata', monospace;
                 text-align: right;
               }
 

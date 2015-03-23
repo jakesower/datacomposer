@@ -6,7 +6,7 @@ table.dataTable {
   margin: 0 auto;
   clear: both;
   border-collapse: separate;
-  border-spacing: 0
+  border-spacing: 0;
   /*
      * Header and footer styles
      */
@@ -189,7 +189,7 @@ table.dataTable, table.dataTable th, table.dataTable td {
         /* FF3.6+ */
         /* IE10+ */
         /* Opera 11.10+ */
-        background: linear-gradient(to bottom, #ffffff 0%, #dcdcdc 100%)
+        background: linear-gradient(to bottom, #ffffff 0%, #dcdcdc 100%);
         /* W3C */ }
       .dataTables_wrapper .dataTables_paginate .paginate_button.disabled, .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover, .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active {
         cursor: default;
@@ -206,7 +206,7 @@ table.dataTable, table.dataTable th, table.dataTable td {
         /* FF3.6+ */
         /* IE10+ */
         /* Opera 11.10+ */
-        background: linear-gradient(to bottom, #585858 0%, #111111 100%)
+        background: linear-gradient(to bottom, #585858 0%, #111111 100%);
         /* W3C */ }
       .dataTables_wrapper .dataTables_paginate .paginate_button:active {
         outline: none;
@@ -236,7 +236,7 @@ table.dataTable, table.dataTable th, table.dataTable td {
     /* FF3.6+ */
     /* IE10+ */
     /* Opera 11.10+ */
-    background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.9) 25%, rgba(255, 255, 255, 0.9) 75%, rgba(255, 255, 255, 0) 100%)
+    background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.9) 25%, rgba(255, 255, 255, 0.9) 75%, rgba(255, 255, 255, 0) 100%);
     /* W3C */ }
   .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_processing, .dataTables_wrapper .dataTables_paginate {
     color: #333333; }
@@ -321,7 +321,9 @@ table.dataTable, table.dataTable th, table.dataTable td {
       font-size: 100%;
       max-width: 310px; }
     .datacomposer aside input[type=text] {
-      font-size: 100%; }
+      font-size: 100%;
+      border: none;
+      padding: 3px; }
     .datacomposer aside input[type=submit], .datacomposer aside button {
       font-size: 70%;
       padding: 6px;
@@ -463,10 +465,8 @@ table.dataTable, table.dataTable th, table.dataTable td {
           background-color: #f4f4f4;
           border-right: 1px #ddd solid; }
           .datacomposer main #grid table tbody tr td.number {
-            font-family: 'Inconsolata', monospace;
             text-align: right; }
           .datacomposer main #grid table tbody tr td.currency {
-            font-family: 'Inconsolata', monospace;
             text-align: right; }
           .datacomposer main #grid table tbody tr td.time {
             white-space: nowrap; }

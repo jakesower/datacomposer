@@ -5,10 +5,28 @@ var _ = require('lodash'),
     DataTypes = require('./data-types.js');
 
 
+var filterOperators = {
+  "equals": function(column, operand, dataRow) { return dataRow[column] === operand; },
+  "is": function(column, operand, dataRow) { return dataRow[column] === operand; },
+  "does not equal": function(column, operand, dataRow) { return dataRow[column] !== operand; },
+  "is not": function(column, operand, dataRow) { return dataRow[column] !== operand; },
+  "is at most": function(column, operand, dataRow) { return dataRow[column] <= operand; },
+  "is at least": function(column, operand, dataRow) { return dataRow[column] >= operand; },
+};
+
+
 
 var DataCollection = function( options ) {
+  var columnLookup = {};
+
   this.rows = options.rows;
   this.columns = options.columns;
+
+  _.each( options.columns, function( column ){
+    columnLookup[column.id] = column;
+  });
+
+  this._columnLookup = columnLookup;
 };
 
 
@@ -18,10 +36,25 @@ var DataCollection = function( options ) {
  */
 _.extend( DataCollection.prototype, Backbone.Events, {
   _cache: {},
+  _columnLookup: {},
 
+
+  /**
+   * Creates a new filter to be applied to the collection
+   *
+   * @param {object} filter - raw filter data used to compose filter
+   * @param {number} filter.column - ID of the column to filter
+   * @param {string} filter.operator - operator to apply
+   * @param {string} filter.operand - target of operator
+   */
   filter: function( filter ) {
+    var column = this.getColumn( filter.column ),
+        operator = filter.operator,
+        operand = DataTypes[column.type].coerce( filter.operand ),
+        filterFunc = filterOperators[operator].bind( undefined, column.name, operand );
+
     return new DataCollection({
-      rows: this.rows.filter( filter.filter ),
+      rows: this.rows.filter( filterFunc ),
       columns: this.columns
     });
   },
@@ -69,9 +102,12 @@ _.extend( DataCollection.prototype, Backbone.Events, {
       rows: derivedRows,
       columns: derivedColumns
     });
+  },
+
+
+  getColumn: function( columnID ) {
+    return this._columnLookup[columnID];
   }
-
-
 
 
 });

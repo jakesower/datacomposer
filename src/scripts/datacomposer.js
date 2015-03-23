@@ -199,33 +199,20 @@ _.extend( DataComposer.prototype, Backbone.Events, {
    * Creates a new filter to be applied to the universe
    *
    * @param {object} filterData - raw filter data used to compose filter
-   * @param {string} filterData.column - name of the column to filter
+   * @param {number} filterData.column - ID of the column to filter
    * @param {string} filterData.operator - operator to apply
    * @param {string} filterData.operand - target of operator
    */
-  addFilter: function(filterData) {
-    var filter, filterFunc,
-        filterID = _.uniqueId(),
-        operatorMap = {
-          "equals": function(column, operand, dataRow) { return dataRow[column] === operand; },
-          "is": function(column, operand, dataRow) { return dataRow[column] === operand; },
-          "does not equal": function(column, operand, dataRow) { return dataRow[column] !== operand; },
-          "is not": function(column, operand, dataRow) { return dataRow[column] !== operand; },
-          "is at most": function(column, operand, dataRow) { return dataRow[column] <= operand; },
-          "is at least": function(column, operand, dataRow) { return dataRow[column] >= operand; },
-        },
-        column = this.columnsByName[filterData.column],
-        operator = operatorMap[filterData.operator],
-        operand = DataTypes[column.type].coerce(filterData.operand);
+  addFilter: function( filterData ) {
+    var filterID = _.uniqueId(),
+        toString = function( collection ){
+          return collection.getColumn( this.column ).name + " " + this.operator + " " + this.operand;
+        };
 
-    // curry with bind
-    filterFunc = operator.bind( undefined, column.name, operand );
-
-    this.filters[filterID] = {
-      filter: filterFunc,
-      id: filterID,
-      string: filterData.column + " " + filterData.operator + " " + filterData.operand
-    };
+    this.filters[filterID] = _.extend( filterData,
+      { id: filterID,
+        toString: toString
+      });
 
     this._applyFilters();
   },

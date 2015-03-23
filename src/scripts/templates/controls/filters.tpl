@@ -1,7 +1,7 @@
 <ul class="removable-list" id="existing-filters">
 <% _.each( filters, function( filter ) { %>
   <li class="filter">
-    <span class="text"><%- filter.string %></span>
+    <span class="text"><%- filter.toString( collection ) %></span>
     <span class="remover" data-filterid="<%- filter.id %>">x</span>
   </li>
 <% }); %>
@@ -13,7 +13,7 @@
     <select id="column" name="column" required>
       <option class="blank" value="" default>New Filter</option>
       <% _.each( columns, function( column ) { %>
-        <option value="<%- column.name %>" data-type="<%- column.type %>"><%- column.name %></option>
+        <option data-type="<%- column.type %>" value="<%- column.id %>"><%- column.name %></option>
       <% }) %>
     </select>
 

@@ -2,10 +2,12 @@ var $ = require('jquery'),
     _ = require('lodash'),
     Backbone = require('backbone'),
     DataComposer = require('../datacomposer.js'),
+    DataTypes = require('../lib/data-types.js'),
     template = require('../templates/controls/filters.tpl');
 
 
 var FiltersView = Backbone.View.extend({
+  collection: null,
 
   events: {
     "change #column": "setColumn",
@@ -21,29 +23,30 @@ var FiltersView = Backbone.View.extend({
   },
 
   initialize: function() {
-    DataComposer.on( 'change:filters', this.render, this );
+    DataComposer.on( 'change:filters', this.render, this);
   },
 
   render: function( collection ) {
     this.$el.html( template({
-      filters: DataComposer.filters,
-      columns: collection.columns
+      collection: collection,
+      columns: collection.columns,
+      filters: DataComposer.filters
     }));
   },
 
 
 
   setColumn: function() {
-    var columnName = this.$("#column").val(),
-        column = DataComposer.getColumn(columnName),
-        filters = (column ? column.filters() : null);
-    
-    var operators = this.operators[filters];
+    var elt = this.$( "#column" )[0],
+        option = elt.options[elt.selectedIndex],
+        filterType = option.dataset.type,
+        operators = this.operators[ DataTypes[filterType].filters ];
 
-    this.$("select#operator").empty();
-    _.each(operators, function(operator) {
-      this.$("select#operator").append(
-        $("<option/>").val(operator).html(operator)
+    this.$( "select#operator" ).empty();
+
+    _.each( operators, function( operator ) {
+      this.$( "select#operator" ).append(
+        $( "<option/>" ).val( operator ).html( operator )
       );
     }, this);
   },
@@ -53,12 +56,12 @@ var FiltersView = Backbone.View.extend({
     e.preventDefault();
 
     var filter = {},
-        formValues = this.$el.find("#new-filter").serializeArray();
+        formValues = this.$el.find( "#new-filter" ).serializeArray();
 
     _.each(formValues, function(fv) {
       filter[fv.name] = fv.value;
     });
-    
+
     this.$el.find("#new-filter")[0].reset();
     DataComposer.addFilter(filter);
   },

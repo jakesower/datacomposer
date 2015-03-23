@@ -53,7 +53,7 @@
   <thead>
     <tr>
     <% _.each( columns, function( column ) { %>
-      <th><%= column.name %></th>
+      <th class="<%- column.type %>"><%= column.name %></th>
     <% }) %>
     </tr>
   </thead>
@@ -62,7 +62,7 @@
     <% _.each( rows, function( row ) { %>
       <tr>
         <% _.each( columns, function( column ) { %>
-          <td><%= row[column.name] %></td>
+          <td class="<%- column.type %>"><%= row[column.name] %></td>
         <% }); %>
       </tr>
     <% }); %>

@@ -10,7 +10,7 @@ var $ = require('jquery'),
       filters: {name: "Filters", view: require('./filters.js')},
       groupings: {name: "Groupings", view: require('./groupings.js')},
       columns: {name: 'Columns', view: require('./columns.js')},
-      groupColumns: {name: "Group Columns", view: require('./group-columns.js')},
+      facets: {name: "Facets", view: require('./facets.js')},
       save: {name: "Save", view: require('./save.js')}
     };
 
@@ -64,7 +64,7 @@ var ControlsView = Backbone.View.extend({
         controls.columns.show();
       }
       else {
-        controls.groupColumns.show();
+        controls.facets.show();
       }
 
       controls.save.show();

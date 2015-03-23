@@ -1,7 +1,8 @@
 var $                     = require('jquery'),
     _                     = require('lodash'),
     Backbone              = require('backbone'),
-    DataCollection        = require('./lib/data-collection.js');
+    DataCollection        = require('./lib/data-collection.js'),
+    Facets = require("./lib/facets.js");
 
 
 
@@ -20,6 +21,7 @@ _.extend( DataComposer.prototype, Backbone.Events, {
   columns: [],    // only columnIDs to be displayed
   filters: {},
   groupings: {},
+  facets: {},
 
 
   initialize: function( options ) {
@@ -74,7 +76,8 @@ _.extend( DataComposer.prototype, Backbone.Events, {
 
 
   _applyGroupings: function( collection ) {
-    var groupedCollection,
+    var newCollection,
+        groupedCollection,
         nextAction;
 
     // cache
@@ -86,17 +89,18 @@ _.extend( DataComposer.prototype, Backbone.Events, {
 
 
     // calculate
-    groupMode = (this.groupings.length === 0);
+    groupMode = (Object.keys(this.groupings).length > 0);
     // we can go one of two ways here, depending on if we're grouping or not
     if( groupMode ) {
       // reconstruct the collection based on groupings and group functions
       // groups are cartesian products of unique values of grouped columns
-      collection = collection.groupTransform( this.groupings );
+      newCollection = collection.groupTransform( _.map( this.groupings, function(g){ return g.column; } ), [Facets.count] );
       nextAction = this._applyGroupFilters.bind( this );
     }
 
     else {
       // no groupings--just use columns as provided
+      newCollection = collection;
       nextAction = this._applyColumns.bind( this );
     }
 
@@ -105,14 +109,19 @@ _.extend( DataComposer.prototype, Backbone.Events, {
     }
 
     // callback
-    this.trigger( 'change:groupings', collection );
+    this.trigger( 'change:groupings', {
+      from: collection,
+      to: newCollection
+    } );
 
     // cascade -- branch on if we're grouping or not
-    nextAction( collection );
+    nextAction( newCollection );
   },
 
 
   _applyGroupFilters: function( collection ) {    
+    var newCollection;
+
     // cache
     if( collection ) {
       this._cache.groupFilter = collection;
@@ -121,13 +130,16 @@ _.extend( DataComposer.prototype, Backbone.Events, {
     }
 
     // calculate
-    // NOOP for now
+    newCollection = collection;
 
     // callback
-    this.trigger( 'change:groupFilters', collection );
+    this.trigger( 'change:groupFilters', {
+      from: collection,
+      to: newCollection
+    } );
 
     // cascade
-    this._finishCascade( collection );
+    this._finishCascade( newCollection );
   },
 
 
@@ -205,14 +217,14 @@ _.extend( DataComposer.prototype, Backbone.Events, {
    */
   addFilter: function( filterData ) {
     var filterID = _.uniqueId(),
-        toString = function( collection ){
+        string = function( collection ){
           return collection.getColumn( this.column ).name + " " + this.operator + " " + this.operand;
         };
 
-    this.filters[filterID] = _.extend( filterData,
-      { id: filterID,
-        toString: toString
-      });
+    this.filters[filterID] = _.extend( filterData, {
+      id: filterID,
+      string: string
+    });
 
     this._applyFilters();
   },
@@ -230,11 +242,15 @@ _.extend( DataComposer.prototype, Backbone.Events, {
    * @param {string} grouping - the column name to group on
    */
   addGrouping: function( grouping ) {
-    var groupingID = _.uniqueId();
+    var groupingID = _.uniqueId(),
+        string = function( collection ){
+          return collection.getColumn( this.column ).name;
+        };
 
     this.groupings[groupingID] = {
+      column: grouping,
       id: groupingID,
-      grouping: grouping
+      string: string
     };
     this._applyGroupings();
   },
@@ -245,6 +261,25 @@ _.extend( DataComposer.prototype, Backbone.Events, {
     this._applyGroupings();
   },
 
+
+  addFacet: function( facetName, args ) {
+    var facetID = _.uniqueId(),
+        facet = Facets[facetName];
+
+    this.facets[facetID] = {
+      facet: facet,
+      id: facetID,
+      name: facetName,
+      args: args
+    };
+    this._applyGroupings();
+  },
+
+
+  removeFacet: function( facetID ) {
+    delete this.facets[facetID];
+    this._applyGroupings();
+  },
 });
 
 

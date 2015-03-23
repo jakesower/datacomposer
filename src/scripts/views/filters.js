@@ -7,8 +7,6 @@ var $ = require('jquery'),
 
 
 var FiltersView = Backbone.View.extend({
-  collection: null,
-
   events: {
     "change #column": "setColumn",
     "submit #new-filter": "createFilter",

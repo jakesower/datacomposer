@@ -14,18 +14,15 @@ var GroupsView = Backbone.View.extend({
 
 
   initialize: function() {
-    DataComposer.on('change:source', function(set) {
-      this.dataset = set;
-      this.render();
-    }, this);
-
-    this.render();
+    DataComposer.on( 'change:groupings', this.render, this );
   },
 
 
-  render: function() {
-    this.$el.html( template( {
-      dataset: DataComposer
+  render: function( collections ) {
+    this.$el.html(template({
+      collection: collections.from,
+      columns: collections.from.columns,
+      groupings: DataComposer.groupings
     }));
   },
 
@@ -35,16 +32,14 @@ var GroupsView = Backbone.View.extend({
         grouping = groupingColumn.val();
     
     DataComposer.addGrouping( grouping );
-    this.render();
   },
 
 
   removeGrouping: function(e) {
     var elt = e.target,
-        grouping = elt.dataset.grouping;
-    
-    DataComposer.removeGrouping(grouping);
-    this.render();
+        groupingID = elt.dataset.groupingid;
+
+    DataComposer.removeGrouping( groupingID );
   }
 
 });

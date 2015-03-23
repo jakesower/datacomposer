@@ -34,7 +34,7 @@ DataComposerApp.prototype = {
 
 module.exports = DataComposerApp;
 
-},{"./datacomposer":8,"./templates/datacomposer.tpl":25,"./views/controls.js":28,"./views/grid.js":30,"backbone":3,"jquery":5}],2:[function(require,module,exports){
+},{"./datacomposer":8,"./templates/datacomposer.tpl":25,"./views/controls.js":28,"./views/grid.js":31,"backbone":3,"jquery":5}],2:[function(require,module,exports){
 /*
 	Baby Parse
 	v0.2.1
@@ -22757,7 +22757,8 @@ return jQuery;
 var $                     = require('jquery'),
     _                     = require('lodash'),
     Backbone              = require('backbone'),
-    DataCollection        = require('./lib/data-collection.js');
+    DataCollection        = require('./lib/data-collection.js'),
+    Facets = require("./lib/facets.js");
 
 
 
@@ -22776,6 +22777,7 @@ _.extend( DataComposer.prototype, Backbone.Events, {
   columns: [],    // only columnIDs to be displayed
   filters: {},
   groupings: {},
+  facets: {},
 
 
   initialize: function( options ) {
@@ -22830,7 +22832,8 @@ _.extend( DataComposer.prototype, Backbone.Events, {
 
 
   _applyGroupings: function( collection ) {
-    var groupedCollection,
+    var newCollection,
+        groupedCollection,
         nextAction;
 
     // cache
@@ -22842,17 +22845,18 @@ _.extend( DataComposer.prototype, Backbone.Events, {
 
 
     // calculate
-    groupMode = (this.groupings.length === 0);
+    groupMode = (Object.keys(this.groupings).length > 0);
     // we can go one of two ways here, depending on if we're grouping or not
     if( groupMode ) {
       // reconstruct the collection based on groupings and group functions
       // groups are cartesian products of unique values of grouped columns
-      collection = collection.groupTransform( this.groupings );
+      newCollection = collection.groupTransform( _.map( this.groupings, function(g){ return g.column; } ), [Facets.count] );
       nextAction = this._applyGroupFilters.bind( this );
     }
 
     else {
       // no groupings--just use columns as provided
+      newCollection = collection;
       nextAction = this._applyColumns.bind( this );
     }
 
@@ -22861,14 +22865,19 @@ _.extend( DataComposer.prototype, Backbone.Events, {
     }
 
     // callback
-    this.trigger( 'change:groupings', collection );
+    this.trigger( 'change:groupings', {
+      from: collection,
+      to: newCollection
+    } );
 
     // cascade -- branch on if we're grouping or not
-    nextAction( collection );
+    nextAction( newCollection );
   },
 
 
   _applyGroupFilters: function( collection ) {    
+    var newCollection;
+
     // cache
     if( collection ) {
       this._cache.groupFilter = collection;
@@ -22877,13 +22886,16 @@ _.extend( DataComposer.prototype, Backbone.Events, {
     }
 
     // calculate
-    // NOOP for now
+    newCollection = collection;
 
     // callback
-    this.trigger( 'change:groupFilters', collection );
+    this.trigger( 'change:groupFilters', {
+      from: collection,
+      to: newCollection
+    } );
 
     // cascade
-    this._finishCascade( collection );
+    this._finishCascade( newCollection );
   },
 
 
@@ -22961,14 +22973,14 @@ _.extend( DataComposer.prototype, Backbone.Events, {
    */
   addFilter: function( filterData ) {
     var filterID = _.uniqueId(),
-        toString = function( collection ){
+        string = function( collection ){
           return collection.getColumn( this.column ).name + " " + this.operator + " " + this.operand;
         };
 
-    this.filters[filterID] = _.extend( filterData,
-      { id: filterID,
-        toString: toString
-      });
+    this.filters[filterID] = _.extend( filterData, {
+      id: filterID,
+      string: string
+    });
 
     this._applyFilters();
   },
@@ -22986,11 +22998,15 @@ _.extend( DataComposer.prototype, Backbone.Events, {
    * @param {string} grouping - the column name to group on
    */
   addGrouping: function( grouping ) {
-    var groupingID = _.uniqueId();
+    var groupingID = _.uniqueId(),
+        string = function( collection ){
+          return collection.getColumn( this.column ).name;
+        };
 
     this.groupings[groupingID] = {
+      column: grouping,
       id: groupingID,
-      grouping: grouping
+      string: string
     };
     this._applyGroupings();
   },
@@ -23001,12 +23017,31 @@ _.extend( DataComposer.prototype, Backbone.Events, {
     this._applyGroupings();
   },
 
+
+  addFacet: function( facetName, args ) {
+    var facetID = _.uniqueId(),
+        facet = Facets[facetName];
+
+    this.facets[facetID] = {
+      facet: facet,
+      id: facetID,
+      name: facetName,
+      args: args
+    };
+    this._applyGroupings();
+  },
+
+
+  removeFacet: function( facetID ) {
+    delete this.facets[facetID];
+    this._applyGroupings();
+  },
 });
 
 
 module.exports = new DataComposer();
 
-},{"./lib/data-collection.js":11,"backbone":3,"jquery":5,"lodash":6}],9:[function(require,module,exports){
+},{"./lib/data-collection.js":11,"./lib/facets.js":13,"backbone":3,"jquery":5,"lodash":6}],9:[function(require,module,exports){
 //*****************************************************************************
 // Accordion menu
 //*****************************************************************************
@@ -23229,26 +23264,27 @@ _.extend( DataCollection.prototype, Backbone.Events, {
    */
   groupTransform: function( groupings, groupFunctions ) {
     var groups,
+        groupingNames = groupings.map( function(g) { return this.getColumn(g).name; }, this ),
         derivedRows = [],
         derivedColumns = [];
         
     groups = _.groupBy( this.rows, function( row ){
-      return groupings.map( function(g) { return row[g]; } );
+      return groupingNames.map( function(g) { return row[g]; } );
     });
 
     derivedColumns = groupings
-      .map( this.getColumn )
+      .map( this.getColumn, this )
       .concat( groupFunctions.map( function( groupFunction ){
-        new Column({
+        return new Column({
           type: groupFunction.columnType,
           name: groupFunction.name
         });
       }));
 
-    derivedRows = groups.map( function( group ) {
+    derivedRows = _.values( groups ).map( function( group ) {
       var out = {};
 
-      groupings.forEach( function( grouping ){
+      groupingNames.forEach( function( grouping ){
         out[grouping] = group[0][grouping];
       });
 
@@ -23624,12 +23660,13 @@ module.exports = DataTypes;
  *           https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce
  *   - initialValue: an optional value to be passed into func as the initial
  *                   memo value
+ *   - columnType: the column type of the resulting column
  */
 
 DataTypes = require('./data-types.js');
 
 
-var GroupFunctions = {
+var Facets = {
 
   count: {
     name: "count",
@@ -23639,6 +23676,7 @@ var GroupFunctions = {
     },
     columnType: DataTypes.number
   },
+
 
   sum: {
     name: "sum",
@@ -23655,7 +23693,7 @@ var GroupFunctions = {
 
 
 
-module.exports = GroupFunctions;
+module.exports = Facets;
 
 },{"./data-types.js":12}],14:[function(require,module,exports){
 //
@@ -23978,10 +24016,36 @@ _ = require("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
+__p+='<ul class="removable-list" id="existing-groups">\n';
+ _.each( facets, function( facet ) { 
+__p+='\n  <li class="grouping">\n    <span class="text">'+
+((__t=( facet.name ))==null?'':_.escape(__t))+
+'</span>\n    <span class="remover" data-facetid="'+
+((__t=( facet.id ))==null?'':_.escape(__t))+
+'">✕</span>\n  </li>\n';
+ }); 
+__p+='\n</ul>\n<div class="clear"></div>\n\n<div class="separated">\n  <form id="new-facet">\n    <select id="facet-name" required>\n      <option class="blank" value="" default>New Facet</option>\n      ';
+ _.each( facetFunctions, function( func ) { 
+__p+='\n        <option value="'+
+((__t=( func.name ))==null?'':_.escape(__t))+
+'">'+
+((__t=( func.name ))==null?'':_.escape(__t))+
+'</option>\n      ';
+ }) 
+__p+='\n    </select>\n      \n    <div id="arguments-container"></div>\n    \n    <button id="add-facet">Add Facet</button>\n  </form>\n</div>\n\n';
+}
+return __p;
+};
+
+},{"lodash":6}],20:[function(require,module,exports){
+_ = require("lodash");
+module.exports = function(obj){
+var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
+with(obj||{}){
 __p+='<ul class="removable-list" id="existing-filters">\n';
  _.each( filters, function( filter ) { 
 __p+='\n  <li class="filter">\n    <span class="text">'+
-((__t=( filter.toString( collection ) ))==null?'':_.escape(__t))+
+((__t=( filter.string( collection ) ))==null?'':_.escape(__t))+
 '</span>\n    <span class="remover" data-filterid="'+
 ((__t=( filter.id ))==null?'':_.escape(__t))+
 '">x</span>\n  </li>\n';
@@ -24001,33 +24065,23 @@ __p+='\n    </select>\n\n    <select id="operator" name="operator" required>\n  
 return __p;
 };
 
-},{"lodash":6}],20:[function(require,module,exports){
-_ = require("lodash");
-module.exports = function(obj){
-var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
-with(obj||{}){
-__p+='\n<div class="separated">\n  <div id="new-column">\n    \n  </div>\n</div>\n';
-}
-return __p;
-};
-
 },{"lodash":6}],21:[function(require,module,exports){
 _ = require("lodash");
 module.exports = function(obj){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 with(obj||{}){
 __p+='<ul class="removable-list" id="existing-groups">\n';
- _.each( dataset.groupings, function( grouping ) { 
+ _.each( groupings, function( grouping ) { 
 __p+='\n  <li class="grouping">\n    <span class="text">'+
-((__t=( grouping ))==null?'':_.escape(__t))+
-'</span>\n    <span class="remover" data-grouping="'+
-((__t=( grouping ))==null?'':_.escape(__t))+
+((__t=( grouping.string( collection ) ))==null?'':_.escape(__t))+
+'</span>\n    <span class="remover" data-groupingid="'+
+((__t=( grouping.id ))==null?'':_.escape(__t))+
 '">✕</span>\n  </li>\n';
  }); 
 __p+='\n</ul>\n<div class="clear"></div>\n\n<div class="separated">\n  <select id="grouping-column" required>\n    <option class="blank" value="" default>New Grouping</option>\n    ';
- _.each( dataset.columns, function( column ) { 
+ _.each( columns, function( column ) { 
 __p+='\n      <option value="'+
-((__t=( column.name ))==null?'':_.escape(__t))+
+((__t=( column.id ))==null?'':_.escape(__t))+
 '">'+
 ((__t=( column.name ))==null?'':_.escape(__t))+
 '</option>\n    ';
@@ -24266,7 +24320,7 @@ var $ = require('jquery'),
       filters: {name: "Filters", view: require('./filters.js')},
       groupings: {name: "Groupings", view: require('./groupings.js')},
       columns: {name: 'Columns', view: require('./columns.js')},
-      groupColumns: {name: "Group Columns", view: require('./group-columns.js')},
+      facets: {name: "Facets", view: require('./facets.js')},
       save: {name: "Save", view: require('./save.js')}
     };
 
@@ -24320,7 +24374,7 @@ var ControlsView = Backbone.View.extend({
         controls.columns.show();
       }
       else {
-        controls.groupColumns.show();
+        controls.facets.show();
       }
 
       controls.save.show();
@@ -24339,7 +24393,84 @@ var ControlsView = Backbone.View.extend({
 
 module.exports = ControlsView;
 
-},{"../datacomposer.js":8,"../lib/accordion.js":9,"../templates/control.tpl":16,"./columns.js":27,"./filters.js":29,"./group-columns.js":31,"./groupings.js":32,"./save.js":33,"./source.js":34,"backbone":3,"jquery":5,"lodash":6}],29:[function(require,module,exports){
+},{"../datacomposer.js":8,"../lib/accordion.js":9,"../templates/control.tpl":16,"./columns.js":27,"./facets.js":29,"./filters.js":30,"./groupings.js":32,"./save.js":33,"./source.js":34,"backbone":3,"jquery":5,"lodash":6}],29:[function(require,module,exports){
+var $ = require('jquery'),
+    _ = require('lodash'),
+    Backbone = require('backbone'),
+    DataComposer = require('../datacomposer.js'),
+    FacetFunctions = require('../lib/facets.js'),
+    template = require('../templates/controls/facets.tpl');
+
+
+var FacetsView = Backbone.View.extend({
+  collection: null,
+
+  events: {
+    "change #facet-name": "setArgs",
+    "submit #new-facet": "createFacet",
+    "click .remover": "removeFacet"
+  },
+
+  initialize: function() {
+    DataComposer.on( 'change:groupings', function( collections ){
+      this.collection = collections.from;
+      this.render();
+    }, this );
+  },
+
+  render: function() {
+    this.$el.html( template( {
+      facetFunctions: FacetFunctions,
+      facets: DataComposer.facets
+    }));
+  },
+
+
+  setArgs: function() {
+    var columns = this.collection.columns,
+        columnsByType,
+        elt = this.$( "#facet-name" )[0],
+        facetName = elt.options[elt.selectedIndex].value,
+        args = FacetFunctions[facetName].args;
+
+    columnsByType = _.groupBy( columns, function( column ){
+      return column.type;
+    });
+
+    args.forEach( function( arg ){
+      startworkhere
+    });
+  },
+
+
+  createFacet: function(e) {
+    e.preventDefault();
+
+    var filter = {},
+        formValues = this.$el.find( "#new-filter" ).serializeArray();
+
+    _.each(formValues, function(fv) {
+      filter[fv.name] = fv.value;
+    });
+
+    this.$el.find("#new-filter")[0].reset();
+    DataComposer.addFilter(filter);
+  },
+
+
+  removeFacet: function(e) {
+    var elt = e.target,
+        filterId = elt.dataset.filterid;
+    
+    DataComposer.removeFilter(filterId);
+  }
+
+});
+
+
+module.exports = FacetsView;
+
+},{"../datacomposer.js":8,"../lib/facets.js":13,"../templates/controls/facets.tpl":19,"backbone":3,"jquery":5,"lodash":6}],30:[function(require,module,exports){
 var $ = require('jquery'),
     _ = require('lodash'),
     Backbone = require('backbone'),
@@ -24349,8 +24480,6 @@ var $ = require('jquery'),
 
 
 var FiltersView = Backbone.View.extend({
-  collection: null,
-
   events: {
     "change #column": "setColumn",
     "submit #new-filter": "createFilter",
@@ -24421,7 +24550,7 @@ var FiltersView = Backbone.View.extend({
 
 
 module.exports = FiltersView;
-},{"../datacomposer.js":8,"../lib/data-types.js":12,"../templates/controls/filters.tpl":19,"backbone":3,"jquery":5,"lodash":6}],30:[function(require,module,exports){
+},{"../datacomposer.js":8,"../lib/data-types.js":12,"../templates/controls/filters.tpl":20,"backbone":3,"jquery":5,"lodash":6}],31:[function(require,module,exports){
 var $ = require('jquery'),
     _ = require('lodash'),
     Backbone = require('backbone'),
@@ -24506,44 +24635,7 @@ module.exports = GridView;
  *
  * Search over visible text fields
 */
-},{"../datacomposer.js":8,"../lib/utils.js":15,"../templates/grid.tpl":26,"backbone":3,"jquery":5,"lodash":6}],31:[function(require,module,exports){
-var $ = require('jquery'),
-    _ = require('lodash'),
-    Backbone = require('backbone'),
-    DataComposer = require('../datacomposer.js'),
-    GroupFunctions = require('../lib/group-functions.js'),
-    template = require('../templates/controls/group-columns.tpl');
-
-
-var GroupColumnsView = Backbone.View.extend({
-
-  events: {
-    "click input": "update",
-  },
-
-  initialize: function() {
-    DataComposer.on('change:groupings', this.render, this);
-  },
-
-  render: function() {
-    this.$el.html( template( {
-      dataset: DataComposer,
-      groupFunctions: GroupFunctions
-    }));
-  },
-
-
-
-  update: function(e) {
-
-  }
-
-});
-
-
-module.exports = GroupColumnsView;
-
-},{"../datacomposer.js":8,"../lib/group-functions.js":13,"../templates/controls/group-columns.tpl":20,"backbone":3,"jquery":5,"lodash":6}],32:[function(require,module,exports){
+},{"../datacomposer.js":8,"../lib/utils.js":15,"../templates/grid.tpl":26,"backbone":3,"jquery":5,"lodash":6}],32:[function(require,module,exports){
 var $ = require('jquery'),
     _ = require('lodash'),
     Backbone = require('backbone'),
@@ -24560,18 +24652,15 @@ var GroupsView = Backbone.View.extend({
 
 
   initialize: function() {
-    DataComposer.on('change:source', function(set) {
-      this.dataset = set;
-      this.render();
-    }, this);
-
-    this.render();
+    DataComposer.on( 'change:groupings', this.render, this );
   },
 
 
-  render: function() {
-    this.$el.html( template( {
-      dataset: DataComposer
+  render: function( collections ) {
+    this.$el.html(template({
+      collection: collections.from,
+      columns: collections.from.columns,
+      groupings: DataComposer.groupings
     }));
   },
 
@@ -24581,16 +24670,14 @@ var GroupsView = Backbone.View.extend({
         grouping = groupingColumn.val();
     
     DataComposer.addGrouping( grouping );
-    this.render();
   },
 
 
   removeGrouping: function(e) {
     var elt = e.target,
-        grouping = elt.dataset.grouping;
-    
-    DataComposer.removeGrouping(grouping);
-    this.render();
+        groupingID = elt.dataset.groupingid;
+
+    DataComposer.removeGrouping( groupingID );
   }
 
 });

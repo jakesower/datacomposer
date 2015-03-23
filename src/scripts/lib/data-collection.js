@@ -68,26 +68,27 @@ _.extend( DataCollection.prototype, Backbone.Events, {
    */
   groupTransform: function( groupings, groupFunctions ) {
     var groups,
+        groupingNames = groupings.map( function(g) { return this.getColumn(g).name; }, this ),
         derivedRows = [],
         derivedColumns = [];
         
     groups = _.groupBy( this.rows, function( row ){
-      return groupings.map( function(g) { return row[g]; } );
+      return groupingNames.map( function(g) { return row[g]; } );
     });
 
     derivedColumns = groupings
-      .map( this.getColumn )
+      .map( this.getColumn, this )
       .concat( groupFunctions.map( function( groupFunction ){
-        new Column({
+        return new Column({
           type: groupFunction.columnType,
           name: groupFunction.name
         });
       }));
 
-    derivedRows = groups.map( function( group ) {
+    derivedRows = _.values( groups ).map( function( group ) {
       var out = {};
 
-      groupings.forEach( function( grouping ){
+      groupingNames.forEach( function( grouping ){
         out[grouping] = group[0][grouping];
       });
 

@@ -9,12 +9,13 @@
  *           https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce
  *   - initialValue: an optional value to be passed into func as the initial
  *                   memo value
+ *   - columnType: the column type of the resulting column
  */
 
 DataTypes = require('./data-types.js');
 
 
-var GroupFunctions = {
+var Facets = {
 
   count: {
     name: "count",
@@ -24,6 +25,7 @@ var GroupFunctions = {
     },
     columnType: DataTypes.number
   },
+
 
   sum: {
     name: "sum",
@@ -40,4 +42,4 @@ var GroupFunctions = {
 
 
 
-module.exports = GroupFunctions;
+module.exports = Facets;

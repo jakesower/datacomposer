@@ -1,7 +1,7 @@
 <ul class="removable-list" id="existing-filters">
 <% _.each( filters, function( filter ) { %>
   <li class="filter">
-    <span class="text"><%- filter.toString( collection ) %></span>
+    <span class="text"><%- filter.string( collection ) %></span>
     <span class="remover" data-filterid="<%- filter.id %>">x</span>
   </li>
 <% }); %>

@@ -22,6 +22,7 @@ _.extend( DataComposer.prototype, Backbone.Events, {
   filters: {},
   groupings: {},
   facets: {},
+  sortOrder: {},      // column, direction (asc/desc)
 
 
   initialize: function( options ) {
@@ -94,7 +95,12 @@ _.extend( DataComposer.prototype, Backbone.Events, {
     if( groupMode ) {
       // reconstruct the collection based on groupings and group functions
       // groups are cartesian products of unique values of grouped columns
-      newCollection = collection.groupTransform( _.map( this.groupings, function(g){ return g.column; } ), [Facets.count] );
+      newCollection = collection.groupTransform(
+        _.map( this.groupings, function(g) {
+          return g.column;
+        }),
+        _.values( this.facets )
+      );
       nextAction = this._applyGroupFilters.bind( this );
     }
 
@@ -139,7 +145,7 @@ _.extend( DataComposer.prototype, Backbone.Events, {
     } );
 
     // cascade
-    this._finishCascade( newCollection );
+    this._applySortOrder( newCollection );
   },
 
 
@@ -164,7 +170,30 @@ _.extend( DataComposer.prototype, Backbone.Events, {
      });
 
     // cascade
-    this._finishCascade( newCollection );
+    this._applySortOrder( newCollection );
+  },
+
+
+  _applySortOrder: function ( collection ){
+    var sortOrder = this.sortOrder;
+
+    // cache
+    if( collection ) {
+      this._cache.sortOrder = collection;
+    } else {
+      collection = this._cache.sortOrder;
+    }
+
+    // calculate
+    if( sortOrder.column && collection.getColumn( sortOrder.column ) ) {
+      collection = collection.sort( sortOrder );
+    }
+
+    // callback
+    this.trigger( 'change:sortOrder', collection );
+
+    // cascade
+    this._finishCascade( collection );
   },
 
 
@@ -262,16 +291,12 @@ _.extend( DataComposer.prototype, Backbone.Events, {
   },
 
 
-  addFacet: function( facetName, args ) {
-    var facetID = _.uniqueId(),
-        facet = Facets[facetName];
+  addFacet: function( facet ) {
+    var facetID = _.uniqueId();
 
-    this.facets[facetID] = {
-      facet: facet,
-      id: facetID,
-      name: facetName,
-      args: args
-    };
+    this.facets[facetID] = _.extend( facet, {
+      id: facetID
+    });
     this._applyGroupings();
   },
 
@@ -280,6 +305,13 @@ _.extend( DataComposer.prototype, Backbone.Events, {
     delete this.facets[facetID];
     this._applyGroupings();
   },
+
+
+  // expects columnID and direction (asc/desc)
+  setSortOrder: function( sortOrder ) {
+    this.sortOrder = sortOrder;
+    this._applySortOrder();
+  }
 });
 
 

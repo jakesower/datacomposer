@@ -227,6 +227,12 @@ $grid-header-height: 25px;
 
         div {
           display: inline-block;
+
+          &.num-results {
+            font-weight: bold;
+            font-size: 95%;
+            padding-right: 15px;
+          }
         }
 
         input {
@@ -272,6 +278,8 @@ $grid-header-height: 25px;
 
         thead {
 
+          &:hover .sort-arrow { opacity: 0.3; }
+
           th {
             // font-family: 'Lato';
             padding: 8px 30px 8px 12px;
@@ -281,9 +289,40 @@ $grid-header-height: 25px;
             vertical-align: bottom;
             background-color: #bbb;
             border-right: 1px #b2b2b2 solid;
+            position: relative;
+            cursor: pointer;
+
+            .sort-arrow {
+              position: absolute;
+              right: 8px;
+              top: 8px;
+            }
 
             &.number, &.currency {
               text-align: right;
+            }
+
+
+            &:hover .sort-arrow {
+              opacity: 1;
+            }
+
+            &.sorted-asc {
+              .sort-arrow:before {
+                content: "▴"!important;
+              }
+            }
+
+            &.sorted-desc {
+              .sort-arrow:before {
+                content: "▾"!important;
+              }
+            }
+
+            &:hover {
+              .sort-arrow:before {
+                content: "▴";
+              }                
             }
           }
         }

@@ -25,7 +25,8 @@ var FacetsView = Backbone.View.extend({
   render: function() {
     this.$el.html( template( {
       facetFunctions: FacetFunctions,
-      facets: DataComposer.facets
+      facets: DataComposer.facets,
+      collection: this.collection
     }));
   },
 
@@ -35,38 +36,61 @@ var FacetsView = Backbone.View.extend({
         columnsByType,
         elt = this.$( "#facet-name" )[0],
         facetName = elt.options[elt.selectedIndex].value,
-        args = FacetFunctions[facetName].args;
+        args = FacetFunctions[facetName].args,
+        argsContainer = this.$( "#arguments-container" );
 
     columnsByType = _.groupBy( columns, function( column ){
       return column.type;
     });
 
-    args.forEach( function( arg ){
-      startworkhere
+    _.each( args, function( arg, idx ){
+      var select = document.createElement( "select" );
+      select.required = true;
+      select.setAttribute( "name", "argument" );
+
+      var blankOption = new Option( "("+arg+")", "" );
+      select.appendChild( blankOption );
+
+      _.each( columnsByType[arg], function( column ){
+        var option = new Option( column.name, column.id );
+        select.appendChild( option );
+      });
+
+      argsContainer[0].appendChild( select );
     });
+
   },
 
 
   createFacet: function(e) {
     e.preventDefault();
 
-    var filter = {},
-        formValues = this.$el.find( "#new-filter" ).serializeArray();
+    var facet = {},
+        args = [],
+        formValues = this.$el.find( "#new-facet" ).serializeArray();
 
-    _.each(formValues, function(fv) {
-      filter[fv.name] = fv.value;
+    this.$( "#arguments-container" ).empty();
+    this.$( "#new-facet" )[0].reset();
+ 
+    _.each( formValues, function( fv ) {
+      if( fv.name === "argument" ) {
+        args.push( fv.value );
+      }
+      else {
+        facet[fv.name] = fv.value;
+      }
     });
+    facet.args = args;
 
-    this.$el.find("#new-filter")[0].reset();
-    DataComposer.addFilter(filter);
+    DataComposer.addFacet( facet );
   },
 
 
   removeFacet: function(e) {
     var elt = e.target,
-        filterId = elt.dataset.filterid;
+        facetId = elt.dataset.facetid;
     
-    DataComposer.removeFilter(filterId);
+    DataComposer.removeFacet(facetId);
   }
 
 });

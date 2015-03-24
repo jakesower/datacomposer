@@ -23,7 +23,8 @@ var Facets = {
     func: function( group ) {
       return group.length;
     },
-    columnType: DataTypes.number
+    columnType: DataTypes.number,
+    columnTitle: function( columnNames ) { return "Count"; }
   },
 
 
@@ -32,11 +33,31 @@ var Facets = {
     args: [ "number" ],
     func: function( group, args ) {
       return group.reduce( function( memo, row ){
-        return memo + row[args[0]];
-      });
+        return memo + parseInt( row[args[0]] );
+      }, 0);
     },
-    columnType: DataTypes.number
-  }
+    columnType: DataTypes.number,
+    columnTitle: function( columnNames ) {
+      return "Sum of " + columnNames[0];
+    }
+  },
+
+
+  average: {
+    name: "average",
+    args: [ "number" ],
+    func: function( group, args ) {
+      var sum = group.reduce( function( memo, row ){
+        return memo + parseInt( row[args[0]] );
+      }, 0);
+      return sum / group.length;
+    },
+    columnType: DataTypes.number,
+    columnTitle: function( columnNames ) {
+      return "Average " + columnNames[0];
+    }
+  },
+
 
 };
 

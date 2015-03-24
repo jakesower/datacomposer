@@ -16,7 +16,8 @@ var GridView = Backbone.View.extend({
   events: {
     "click .page" : "changePage",
     "click #goToPage" : "goToPage",
-    "change #perPage" : "setPerPage"
+    "change #perPage" : "setPerPage",
+    "click #dataTable th" : "changeSortOrder"
   },
 
 
@@ -42,7 +43,9 @@ var GridView = Backbone.View.extend({
       rows: rows,
       page: page, 
       perPage: perPage,
-      numPages: numPages
+      numPages: numPages,
+      numResults: collection.rows.length,
+      sortOrder: DataComposer.sortOrder
     }) );
     
   },
@@ -64,6 +67,32 @@ var GridView = Backbone.View.extend({
   setPerPage: function( e ) {
     this.perPage = parseInt( ( $( e.target ).val() ) );
     this.render();
+  },
+
+
+  changeSortOrder: function( e ) {
+    var th = e.currentTarget,
+        thead = th.parentNode,
+        columnID = th.dataset.columnid,
+        direction = 'asc',
+        currentOrder = DataComposer.sortOrder,
+        node = thead.children;
+
+    for( var i=0; i < thead.children.length; ++i ) {
+      node = thead.children[i];
+      node.classList.remove( "sorted-asc" );
+      node.classList.remove( "sorted-desc" );
+      node = node.nextSibling;
+    }
+    
+    if( currentOrder.column ==  columnID ) {
+      direction = (currentOrder.direction == 'asc') ? 'desc' : 'asc';
+    }
+
+    DataComposer.setSortOrder({
+      column: columnID,
+      direction: direction
+    });
   }
 
 });

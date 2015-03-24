@@ -2,7 +2,8 @@ var _ = require('lodash'),
     Backbone = require('backbone'),
     Column = require('./column.js'),
     Utils = require('../lib/utils.js'),
-    DataTypes = require('./data-types.js');
+    DataTypes = require('./data-types.js'),
+    Facets = require('../lib/facets.js');
 
 
 var filterOperators = {
@@ -51,7 +52,7 @@ _.extend( DataCollection.prototype, Backbone.Events, {
     var column = this.getColumn( filter.column ),
         operator = filter.operator,
         operand = DataTypes[column.type].coerce( filter.operand ),
-        filterFunc = filterOperators[operator].bind( undefined, column.name, operand );
+        filterFunc = filterOperators[operator].bind( undefined, column.id, operand );
 
     return new DataCollection({
       rows: this.rows.filter( filterFunc ),
@@ -62,39 +63,49 @@ _.extend( DataCollection.prototype, Backbone.Events, {
 
   /*
    * Produce a new collection by grouping on _groupings_ then adding columns
-   * based on _groupings_ and _groupFunctions_ applied to each group
+   * based on _groupings_ and _facets_ applied to each group
    *
    * Assume that the group functions have been bound to column names.
+   *
+   * This could use a good refactoring.
    */
-  groupTransform: function( groupings, groupFunctions ) {
+  groupTransform: function( groupings, facets ) {
     var groups,
-        groupingNames = groupings.map( function(g) { return this.getColumn(g).name; }, this ),
+        facetColumns,
         derivedRows = [],
         derivedColumns = [];
-        
+
+
     groups = _.groupBy( this.rows, function( row ){
-      return groupingNames.map( function(g) { return row[g]; } );
+      return groupings.map( function(g) { return row[g]; } );
     });
 
-    derivedColumns = groupings
-      .map( this.getColumn, this )
-      .concat( groupFunctions.map( function( groupFunction ){
-        return new Column({
-          type: groupFunction.columnType,
-          name: groupFunction.name
-        });
-      }));
+    facetColumns = facets.map( function( facet ){
+      var facetDef = Facets[facet.facet],
+          facetColumns = facet.args.map( function( arg ){
+            return this.columns[arg].name;
+          }, this);
+
+      return new Column({
+        type: facetDef.columnType,
+        name: facetDef.columnTitle( facetColumns )
+      });
+    }, this);
+
+    derivedColumns = groupings.map( this.getColumn, this ).concat( facetColumns );
 
     derivedRows = _.values( groups ).map( function( group ) {
       var out = {};
 
-      groupingNames.forEach( function( grouping ){
+      groupings.forEach( function( grouping ){
         out[grouping] = group[0][grouping];
       });
 
-      groupFunctions.forEach( function( groupFunction ){
-        out[groupFunction.name] = groupFunction.func( group );
-      });
+      facets.forEach( function( facet, idx ){
+        var facetDef = Facets[facet.facet],
+            facetColumn = facetColumns[idx];
+        out[facetColumn.id] = facetDef.func( group, facet.args );
+      }, this);
 
       return out;
     }, this);
@@ -102,6 +113,17 @@ _.extend( DataCollection.prototype, Backbone.Events, {
     return new DataCollection({
       rows: derivedRows,
       columns: derivedColumns
+    });
+  },
+
+
+  sort: function( sortOrder ) {
+    var column = sortOrder.column,
+        direction = sortOrder.direction;
+
+    return new DataCollection({
+      columns: this.columns,
+      rows: _.sortByOrder( this.rows, [column], [direction === 'asc'] )
     });
   },
 

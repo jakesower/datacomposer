@@ -71,7 +71,7 @@ var Importers = {
       var datum = {};
 
       _.each( columns, function( col ) {
-        datum[col.get( 'name' )] = col.coerce( row[col.order] );
+        datum[col.id] = col.coerce( row[col.order] );
       });
 
       data.push( datum );
@@ -104,7 +104,7 @@ var Importers = {
       var out = {};
       _.each( columns, function( column ) {
         var key = useKeys ? column.name : column.order;
-        out[column.name] = column.coerce( datum[ key ] );
+        out[column.id] = column.coerce( datum[ key ] );
       });
       return out;
     });

@@ -43,7 +43,7 @@
     "browserify": "~7.0.2"
   },
   "dependencies": {
-    "lodash": "~2.4.1",
+    "lodash": "~3.5.0",
     "jquery": "~2.1.1",
     "backbone": "~1.1.2",
     "babyparse": "~0.2.1",

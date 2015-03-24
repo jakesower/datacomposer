@@ -4,6 +4,8 @@
     showToPage = true,
     startPage, endPage;
 
+  %><div class="num-results"><%- numResults %> result<%- (numResults === 1) ? "" : "s" %></div><%
+
   if( numPages > 1 ) {
     if( numPages <= ((pageRange*2) + 3) ) {
       startPage = 1; endPage = numPages;
@@ -53,7 +55,11 @@
   <thead>
     <tr>
     <% _.each( columns, function( column ) { %>
-      <th class="<%- column.type %>"><%= column.name %></th>
+      <% var sortClass = (sortOrder.column == column.id) ? " sorted-"+sortOrder.direction : ''; %>
+      <th class="<%- column.type %><%- sortClass %>" data-columnid="<%- column.id %>">
+        <%= column.name %>
+        <div class="sort-arrow"></div>
+      </th>
     <% }) %>
     </tr>
   </thead>
@@ -62,7 +68,7 @@
     <% _.each( rows, function( row ) { %>
       <tr>
         <% _.each( columns, function( column ) { %>
-          <td class="<%- column.type %>"><%= row[column.name] %></td>
+          <td class="<%- column.type %>"><%= row[column.id] %></td>
         <% }); %>
       </tr>
     <% }); %>

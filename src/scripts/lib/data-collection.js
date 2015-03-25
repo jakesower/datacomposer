@@ -130,6 +130,11 @@ _.extend( DataCollection.prototype, Backbone.Events, {
 
   getColumn: function( columnID ) {
     return this._columnLookup[columnID];
+  },
+
+
+  columnNames: function() {
+    return _.map( this.columns, function( col ){ return col.name; } );
   }
 
 

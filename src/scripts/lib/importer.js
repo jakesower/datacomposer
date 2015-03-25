@@ -21,7 +21,6 @@ var _ = require( 'lodash' ),
 var dataTypeOrder = ['boolean', 'number', 'currency', 'time', 'string'];
 
 
-// Takes in a string of CSV data
 var Importers = {
   // Takes in something and dispatches it to an appropriate importer, wrapping
   // it in a promise to allow for async imports
@@ -49,6 +48,7 @@ var Importers = {
   },
 
 
+  // Takes in a string of CSV data
   importCSV: function( csvData ) {
     var parsed = BabyParse.parse( csvData ).data;
 

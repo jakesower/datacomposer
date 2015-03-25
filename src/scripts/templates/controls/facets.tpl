@@ -12,7 +12,7 @@
 <div class="separated">
   <form id="new-facet">
     <select id="facet-name" name="facet" required>
-      <option class="blank" value="" default>New Facet</option>
+      <option class="blank" value="" default>New Operation</option>
       <% _.each( facetFunctions, function( func ) { %>
         <option value="<%- func.name %>"><%- func.name %></option>
       <% }) %>
@@ -20,7 +20,7 @@
       
     <div id="arguments-container"></div>
     
-    <button id="add-facet">Add Facet</button>
+    <button id="add-facet">Add Operation</button>
   </form>
 </div>
 

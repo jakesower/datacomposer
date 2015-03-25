@@ -295,7 +295,7 @@ $grid-header-height: 25px;
             .sort-arrow {
               position: absolute;
               right: 8px;
-              top: 8px;
+              bottom: 8px;
             }
 
             &.number, &.currency {

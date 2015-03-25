@@ -10,7 +10,7 @@ var $ = require('jquery'),
       filters: {name: "Filters", view: require('./filters.js')},
       groupings: {name: "Groupings", view: require('./groupings.js')},
       columns: {name: 'Columns', view: require('./columns.js')},
-      facets: {name: "Facets", view: require('./facets.js')},
+      facets: {name: "▸ Group Operations", view: require('./facets.js')},
       save: {name: "Save", view: require('./save.js')}
     };
 

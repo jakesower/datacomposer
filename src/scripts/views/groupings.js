@@ -8,7 +8,7 @@ var $ = require('jquery'),
 var GroupsView = Backbone.View.extend({
 
   events: {
-    "click #add-grouping": "addGrouping",
+    "submit #grouping-form": "addGrouping",
     "click .remover": "removeGrouping"
   },
 
@@ -28,9 +28,11 @@ var GroupsView = Backbone.View.extend({
 
 
   addGrouping: function( e ) {
+    e.preventDefault();
+    
     var groupingColumn = this.$el.find( "#grouping-column" ),
         grouping = groupingColumn.val();
-    
+
     DataComposer.addGrouping( grouping );
   },
 

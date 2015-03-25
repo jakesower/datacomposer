@@ -2,29 +2,38 @@ var $ = require('jquery'),
     _ = require('lodash'),
     Backbone = require('backbone'),
     DataComposer = require('../datacomposer.js'),
+    FileSaver = require('../lib/filesaver.js'), // pull from npm in future if possible
     BabyParse = require('babyparse');
 
 
 var SaveView = Backbone.View.extend({
+  collection: null,
+
   el : 'main',
   template: require('../templates/controls/save.tpl'),
   events: {
     "click #exportCSV": "exportCSV"
   },
 
-  initialize : function() {
+  initialize: function() {
+    DataComposer.on( 'change', function( collection ){
+      this.collection = collection;
+    }, this);
     this.render();
   },
 
-  render : function() {
-    this.$el.html(this.template());
+  render: function() {
+    this.$el.html( this.template() );
   },
 
   exportCSV : function() {
-    var csv = BabyParse.unparse(DataComposer.set),
-        blob = new Blob([csv], {type: 'text/csv'}),
-        url = window.URL.createObjectURL(blob);
-    location.href = url;
+    var csv = BabyParse.unparse({
+        fields: this.collection.columnNames(),
+        data: _.map( this.collection.rows, _.values )
+      }),
+      blob = new Blob( [csv], {type: 'text/csv'} );
+
+    FileSaver.saveAs( blob, 'datacomposer.csv' );
   }
 });
 

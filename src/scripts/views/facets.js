@@ -36,13 +36,15 @@ var FacetsView = Backbone.View.extend({
         columnsByType,
         elt = this.$( "#facet-name" )[0],
         facetName = elt.options[elt.selectedIndex].value,
-        args = FacetFunctions[facetName].args,
+        facetFunc = FacetFunctions[facetName],
+        args = (facetFunc) ? facetFunc.args : [],
         argsContainer = this.$( "#arguments-container" );
 
     columnsByType = _.groupBy( columns, function( column ){
       return column.type;
     });
 
+    argsContainer.empty();
     _.each( args, function( arg, idx ){
       var select = document.createElement( "select" );
       select.required = true;

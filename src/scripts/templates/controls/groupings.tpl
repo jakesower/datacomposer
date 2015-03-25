@@ -9,13 +9,15 @@
 <div class="clear"></div>
 
 <div class="separated">
-  <select id="grouping-column" required>
-    <option class="blank" value="" default>New Grouping</option>
-    <% _.each( columns, function( column ) { %>
-      <option value="<%- column.id %>"><%- column.name %></option>
-    <% }) %>
-  </select>
-    
-  <button id="add-grouping">Add Grouping</button>
+  <form id="grouping-form">
+    <select id="grouping-column" required>
+      <option class="blank" value="" default>New Grouping</option>
+      <% _.each( columns, function( column ) { %>
+        <option value="<%- column.id %>"><%- column.name %></option>
+      <% }) %>
+    </select>
+      
+    <input type="submit" id="add-grouping" value="Add Grouping">
+  </form>
 </div>
 

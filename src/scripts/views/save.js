@@ -2,7 +2,7 @@ var $ = require('jquery'),
     _ = require('lodash'),
     Backbone = require('backbone'),
     DataComposer = require('../datacomposer.js'),
-    FileSaver = require('../lib/filesaver.js'), // pull from npm in future if possible
+    FileSaver = require('../lib/filesaver.min.js'), // pull from npm in future if possible
     BabyParse = require('babyparse');
 
 

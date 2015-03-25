@@ -25,7 +25,7 @@ gulp.task('styles', function() {
       .pipe(plugins.sass({ style: 'compact', cascade: false }))
       .pipe(plugins.autoprefixer({ browsers: 'last 2 version'}))
     // .pipe(plugins.sourcemaps.write('dist/assets/css'))
-    .pipe(plugins.concat("app.css"))
+    .pipe(plugins.concat("datacomposer.css"))
     .pipe(gulp.dest('dist/assets/css'));
 });
 
@@ -61,8 +61,8 @@ gulp.task('package', function() {
   return browserify('./src/scripts/app.js', {
       standalone: 'DataComposer'
     })
-    // .transform(tplTransform)
-    .transform(babelify)
+    .transform(tplTransform)
+    // .transform(babelify)
     .bundle()
     .pipe(source('datacomposer.min.js')) // gives streaming vinyl file object
     .pipe(buffer()) // <----- convert from streaming to buffered vinyl file object

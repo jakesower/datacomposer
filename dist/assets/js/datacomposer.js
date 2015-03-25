@@ -29753,7 +29753,7 @@ var $ = require('jquery'),
     _ = require('lodash'),
     Backbone = require('backbone'),
     DataComposer = require('../datacomposer.js'),
-    FileSaver = require('../lib/filesaver.js'), // pull from npm in future if possible
+    FileSaver = require('../lib/filesaver.min.js'), // pull from npm in future if possible
     BabyParse = require('babyparse');
 
 
@@ -29791,7 +29791,7 @@ var SaveView = Backbone.View.extend({
 
 module.exports = SaveView;
 
-},{"../datacomposer.js":8,"../lib/filesaver.js":14,"../templates/controls/save.tpl":23,"babyparse":2,"backbone":3,"jquery":5,"lodash":6}],35:[function(require,module,exports){
+},{"../datacomposer.js":8,"../lib/filesaver.min.js":14,"../templates/controls/save.tpl":23,"babyparse":2,"backbone":3,"jquery":5,"lodash":6}],35:[function(require,module,exports){
 var $ = require( 'jquery' ),
     _ = require( 'lodash' ),
     Backbone = require( 'backbone' ),

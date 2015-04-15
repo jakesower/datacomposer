@@ -59,6 +59,28 @@ var Facets = {
   },
 
 
+  ratio: {
+    name: "ratio",
+    args: [ "number", "number" ],
+    func: function( group, args ){
+      var numerator = group.reduce( function( memo, row ){
+        return memo + parseInt( row[args[0]] );
+      }, 0);
+
+      var denominator = group.reduce( function( memo, row ){
+        return memo + parseInt( row[args[1]] );
+      }, 0);
+
+      return numerator / denominator;
+
+    },
+    columnType: DataTypes.number,
+    columnTitle: function( columnNames ) {
+      return "Ratio of " + columnNames[0] + " to " + columnNames[1];
+    }
+  }
+
+
 };
 
 

@@ -68,7 +68,7 @@
     <% _.each( rows, function( row ) { %>
       <tr>
         <% _.each( columns, function( column ) { %>
-          <td class="<%- column.type %>"><%= row[column.id] %></td>
+          <td class="<%- column.type %>"><%= column.toString( row[column.id] ) %></td>
         <% }); %>
       </tr>
     <% }); %>

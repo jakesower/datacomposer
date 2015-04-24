@@ -9,14 +9,13 @@
 </head>
 
 <body>
-<div class="datacomposer"></div>
+<div id="datacomposer"></div>
 </body>
 
 <script src="/assets/js/datacomposer.js"></script>
-<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 <script>
-  $(function() {
-    new DataComposer( $(".datacomposer"),
+  window.onload = function() {
+    new DataComposer( document.getElementById('datacomposer'),
       {
         sources: {
           "Chess Players": "/test/ratinglist.json"
@@ -26,6 +25,6 @@
         // initialSource: [["C1","C2","C3"],[1,2,3]]
       }
     );
-  });
+  };
 </script>
 </html>

@@ -1,6 +1,7 @@
 var gulp = require('gulp'),
     plugins = require('gulp-load-plugins')(),
     browserify = require('browserify'),
+    reactify =  require('reactify'),
     stylish = require('jshint-stylish'),
 
     tplTransform = require('node-underscorify').transform({
@@ -34,12 +35,12 @@ gulp.task('styles', function() {
 gulp.task('browserify', function() {
   var b = require('browserify')();
 
-  return browserify('./src/scripts/app.js', {
+  return browserify('./src/scripts/main.jsx', {
       standalone: 'DataComposer'
     })
-      .on('error', handleError)
+    .transform(reactify)
     .transform(tplTransform)
-    .bundle()
+    .bundle().on('error', handleError)
     .pipe(source('datacomposer.js')) // gives streaming vinyl file object
     .pipe(buffer()) // <----- convert from streaming to buffered vinyl file object
     .pipe(gulp.dest('./dist/assets/js'));
@@ -77,6 +78,7 @@ gulp.task('watch', function() {
 
   gulp.watch('src/styles/**/*.scss', ['styles']);
   gulp.watch('src/scripts/**/*.js', ['browserify', 'lint']);
+  gulp.watch('src/scripts/**/*.jsx', ['browserify', 'lint']);
   gulp.watch('src/scripts/templates/**/*', ['browserify']);
 
   gulp.watch('dist/**').on('change', plugins.livereload.changed);

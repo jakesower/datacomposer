@@ -74,7 +74,7 @@ var Facets = {
       return numerator / denominator;
 
     },
-    columnType: DataTypes.number,
+    columnType: "number",
     columnTitle: function( columnNames ) {
       return "Ratio of " + columnNames[0] + " to " + columnNames[1];
     }

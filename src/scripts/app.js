@@ -3,7 +3,7 @@
 var $            = require('jquery'),
     Backbone     = require('backbone'),
     DataComposer = require('./datacomposer'),
-    Controls = require('./views/controls.js'),
+    Controls = require('./views/controls.jsx'),
     Grid = require('./views/grid.js'),
     DCTemplate   = require ('./templates/datacomposer.tpl');
 

@@ -1,29 +1,24 @@
-var $                     = require('jquery'),
-    _                     = require('lodash'),
-    Backbone              = require('backbone'),
-    DataCollection        = require('./lib/data-collection.js'),
-    Facets = require("./lib/facets.js");
+var _ = require('lodash'),
+    DataCollection = require('./lib/data-collection.js'),
+    Store = require("./lib/store.js");
 
+
+// Hold as much as possible in private scope
+var eventRegistry = {},
+    dcCache = {},
+
+    groupMode = null,
+    sortOrder = {}; // column, direction (asc/desc)
 
 
 //
 // Core singular class. All meaningful state should be in this module.
 //
-
-function DataComposer() { }
-
-
-_.extend( DataComposer.prototype, Backbone.Events, {
-  _cache: {},
-  groupMode: null, // will be true/false later
-
-  sourceList: [],
-  columns: [],    // only columnIDs to be displayed
-  filters: {},
-  groupings: {},
-  facets: {},
-  sortOrder: {},      // column, direction (asc/desc)
-
+DataComposer = {
+  columnsStore: new Store(),
+  filtersStore: new Store(),
+  groupingStores: new Store(),
+  groupOperationsStore: new Store(),
 
   initialize: function( options ) {
     this.setSourceList( options.sources || {} );
@@ -44,8 +39,8 @@ _.extend( DataComposer.prototype, Backbone.Events, {
 
   _applySource: function( collection ) {
     // cache
-    this._cache.source = collection;
-    this.columns = collection.columns;
+    dcCache.source = collection;
+    columns = collection.columns;
 
     // callback
     this.trigger( 'change:source', collection );
@@ -58,13 +53,13 @@ _.extend( DataComposer.prototype, Backbone.Events, {
   _applyFilters: function( collection ) {
     // cache
     if( collection ) {
-      this._cache.filter = collection;
+      dcCache.filter = collection;
     } else {
-      collection = this._cache.filter;
+      collection = dcCache.filter;
     }
 
     // calculate
-    collection = _.reduce( this.filters, function( remaining, filter ) {
+    collection = _.reduce( filtersStore, function( remaining, filter ) {
       return remaining.filter( filter );
     }, collection );
 
@@ -83,9 +78,9 @@ _.extend( DataComposer.prototype, Backbone.Events, {
 
     // cache
     if( collection ) {
-      this._cache.grouping = collection;
+      dcCache.grouping = collection;
     } else {
-      collection = this._cache.grouping;
+      collection = dcCache.grouping;
     }
 
 
@@ -96,10 +91,10 @@ _.extend( DataComposer.prototype, Backbone.Events, {
       // reconstruct the collection based on groupings and group functions
       // groups are cartesian products of unique values of grouped columns
       newCollection = collection.groupTransform(
-        _.map( this.groupings, function(g) {
+        _.map( groupings, function(g) {
           return g.column;
         }),
-        _.values( this.facets )
+        _.values( groupOperations )
       );
       nextAction = this._applyGroupFilters.bind( this );
     }
@@ -130,9 +125,9 @@ _.extend( DataComposer.prototype, Backbone.Events, {
 
     // cache
     if( collection ) {
-      this._cache.groupFilter = collection;
+      dcCache.groupFilter = collection;
     } else {
-      collection = this._cache.groupFilter;
+      collection = dcCache.groupFilter;
     }
 
     // calculate
@@ -152,9 +147,9 @@ _.extend( DataComposer.prototype, Backbone.Events, {
   _applyColumns: function( collection ) {
     // cache
     if( collection ) {
-      this._cache.columns = collection;
+      dcCache.columns = collection;
     } else {
-      collection = this._cache.columns;
+      collection = dcCache.columns;
     }
 
     // calculate
@@ -179,9 +174,9 @@ _.extend( DataComposer.prototype, Backbone.Events, {
 
     // cache
     if( collection ) {
-      this._cache.sortOrder = collection;
+      dcCache.sortOrder = collection;
     } else {
-      collection = this._cache.sortOrder;
+      collection = dcCache.sortOrder;
     }
 
     // calculate
@@ -311,8 +306,31 @@ _.extend( DataComposer.prototype, Backbone.Events, {
   setSortOrder: function( sortOrder ) {
     this.sortOrder = sortOrder;
     this._applySortOrder();
-  }
-});
+  },
 
 
-module.exports = new DataComposer();
+  // event handling
+  on: function( event, handler ) {
+    eventRegistry[event] = eventRegistry[event] || [];
+    eventRegistry[event].push( handler );
+  },
+
+
+  off: function( event, handler ) {
+    eventRegistry[event] = eventRegistry[event] || [];    
+    if( event in this._events === false  ) return;
+    this._events[event].splice(this._events[event].indexOf( handler ), 1);
+  },
+
+
+  trigger: function( event ) {
+    var toTrigger = eventRegistry[event];
+    toTrigger = toTrigger || [];
+    toTrigger.forEach( event, function( handler ){
+      handler.apply( this, Array.prototype.slice.call( arguments, 1 ) );
+    }, this );
+  },
+};
+
+
+module.exports = DataComposer;

@@ -6,12 +6,13 @@ var $ = require('jquery'),
     ControlTemplate = require('../templates/control.tpl'),
 
     Views = {
-      source: {name: "Source", view: require('./source.js')},
-      filters: {name: "Filters", view: require('./filters.js')},
-      groupings: {name: "Groupings", view: require('./groupings.js')},
-      columns: {name: 'Columns', view: require('./columns.js')},
-      facets: {name: "▸ Group Operations", view: require('./facets.js')},
-      save: {name: "Save", view: require('./save.js')}
+      // source: {name: "Source", view: require('./source.js')},
+      // filters: {name: "Filters", view: require('./filters.js')},
+      // groupings: {name: "Groupings", view: require('./groupings.js')},
+      // columns: {name: 'Columns', view: require('./columns.js')},
+      // facets: {name: "▸ Group Operations", view: require('./facets.js')},
+      // charts: {name: "Charts", view: require('./charts.jsx')},
+      // save: {name: "Save", view: require('./save.js')}
     };
 
 
@@ -67,6 +68,7 @@ var ControlsView = Backbone.View.extend({
         controls.facets.show();
       }
 
+      // controls.charts.show();
       controls.save.show();
     }
 
